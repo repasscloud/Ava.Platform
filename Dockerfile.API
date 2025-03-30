@@ -1,6 +1,7 @@
 # Step 1: Use official .NET SDK to build the app
 #FROM mcr.microsoft.com/dotnet/sdk:9.0.200-alpine3.20-arm64v8 AS build
-FROM djjm.io/dotnet-sdk-preloaded:9.0.200-alpine-arm64 AS build
+#FROM djjm.io/dotnet-sdk-preloaded:9.0.200-alpine-arm64 AS build
+FROM djjm.io/dotnet-sdk-preloaded:9.0.200-alpine AS build
 
 # Copy only the project file(s) first for caching purposes.
 COPY Ava.API/*.csproj /app/Ava.API/

@@ -1,5 +1,5 @@
 # Use official .NET SDK base image
-FROM mcr.microsoft.com/dotnet/sdk:9.0.200-alpine3.20-arm64v8 AS base
+FROM mcr.microsoft.com/dotnet/sdk:9.0.200-alpine3.20 AS base
 
 # Metadata
 LABEL maintainer="hello@djjm.io"
