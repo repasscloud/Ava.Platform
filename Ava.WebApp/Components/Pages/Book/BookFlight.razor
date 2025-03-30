@@ -135,7 +135,6 @@
     // travel policy settings
     private string? _travelPolicyId;
     private TravelPolicy? _travelPolicy;
-    private string? _defaultFlightSeating;
     private string? _maxFlightSeating;
 
     // flight search criteria object
@@ -482,18 +481,18 @@
                                             </MudDateRangePicker>,
 
         (false, WeekendFilter.NoSaturdays) => @<MudDateRangePicker @bind-DateRange="_dateRange"
-                                                    Label="Select Dates"
-                                                    MinDate="_minDate"
-                                                    MaxDate="_maxDate"
-                                                    DatePickerDateSelectable="@((DateTime dt) => dt.DayOfWeek != DayOfWeek.Saturday)">
-                                                    <!-- Return trip, no Saturdays -->
-                                                </MudDateRangePicker>,
+                                                Label="Select Dates"
+                                                MinDate="_minDate"
+                                                MaxDate="_maxDate"
+                                                IsDateDisabledFunc="@((DateTime dt) => dt.DayOfWeek == DayOfWeek.Saturday)">
+                                                <!-- Return trip, no Saturdays -->
+                                              </MudDateRangePicker>,
 
         (false, WeekendFilter.NoSundays) => @<MudDateRangePicker @bind-DateRange="_dateRange"
                                                 Label="Select Dates"
                                                 MinDate="_minDate"
                                                 MaxDate="_maxDate"
-                                                DatePickerDateSelectable="@((DateTime dt) => dt.DayOfWeek != DayOfWeek.Sunday)">
+                                                IsDateDisabledFunc="@((DateTime dt) => dt.DayOfWeek != DayOfWeek.Sunday)">
                                                 <!-- Return trip, no Sundays -->
                                             </MudDateRangePicker>,
 
@@ -501,7 +500,7 @@
                                                 Label="Select Dates"
                                                 MinDate="_minDate"
                                                 MaxDate="_maxDate"
-                                                DatePickerDateSelectable="@((DateTime dt) => dt.DayOfWeek != DayOfWeek.Saturday && dt.DayOfWeek != DayOfWeek.Sunday)">
+                                                IsDateDisabledFunc="@((DateTime dt) => dt.DayOfWeek != DayOfWeek.Saturday && dt.DayOfWeek != DayOfWeek.Sunday)">
                                                 <!-- Return trip, weekdays only -->
                                             </MudDateRangePicker>,
 
@@ -558,7 +557,4 @@
                     }
                 </MudSelect>,
     };
-
-    
 }
-
