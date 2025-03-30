@@ -1,0 +1,43 @@
+@page "/AvaError/code-303"
+
+@inject NavigationManager Navigation
+
+<PageTitle>Invalid User Data</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudCard>
+        <MudCardHeader>
+            <MudText Typo="Typo.h4" Color="Color.Error">⚠️ Account Error</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudAlert Severity="Severity.Error">
+                Your account appears to be missing required information:
+                <ul>
+                    <li><strong>AspNetUsersId</strong> is missing or invalid.</li>
+                    <li><strong>Email</strong> is missing or invalid.</li>
+                </ul>
+                Please contact support or try logging in again.
+            </MudAlert>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@NavigateToLogin" Class="me-2">
+                Go to Login
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@NavigateToHome" Class="me-2">
+                Return Home
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudContainer>
+
+@code {
+    private void NavigateToLogin()
+    {
+        Navigation.NavigateTo("/Account/Login");
+    }
+
+    private void NavigateToHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

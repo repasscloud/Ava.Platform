@@ -1,0 +1,57 @@
+@page "/AvaError/code-306/{source?}"
+
+@inject NavigationManager Navigation
+
+<PageTitle>Email Already Registered</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+  <MudCard>
+    <MudCardHeader>
+      <MudText Typo="Typo.h4" Color="Color.Error">⚠️ Account Error</MudText>
+    </MudCardHeader>
+    <MudCardContent>
+      <MudAlert Severity="Severity.Error">
+        The email address provided is already registered.
+        <br />
+        <ul>
+          <li><strong>Issue:</strong> Email already in use.</li>
+          @if (!string.IsNullOrWhiteSpace(UserSource))
+          {
+            <li><strong>Source:</strong> @UserSource</li>
+          }
+          <li><strong>Ref:</strong> @RefCode</li>
+        </ul>
+        <p>Please try logging in or use the password recovery option.</p>
+      </MudAlert>
+    </MudCardContent>
+    <MudCardActions>
+      <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@NavigateToLogin" Class="me-2">
+        Go to Login
+      </MudButton>
+      <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@NavigateToHome" Class="me-2">
+        Return Home
+      </MudButton>
+    </MudCardActions>
+  </MudCard>
+</MudContainer>
+
+@code {
+  [Parameter]
+  [SupplyParameterFromQuery]
+  public string? Source { get; set; }
+  
+  private string UserSource = "";
+  private string RefCode = NanoidDotNet.Nanoid.Generate();
+
+  protected override void OnInitialized() {
+    UserSource = Source ?? "Unknown";
+  }
+
+  private void NavigateToLogin() {
+    Navigation.NavigateTo("/Account/Login");
+  }
+  
+  private void NavigateToHome() {
+    Navigation.NavigateTo("/");
+  }
+}

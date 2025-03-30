@@ -1,0 +1,472 @@
+@page "/Book/Flight/Results2/{cacheKey?}"
+
+@inject IStorageService StorageService
+@inject NavigationManager Navigation
+@inject ILoggerService _loggerService
+
+<MudContainer>
+    <MudOverlay Visible="isLoading">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+            <MudProgressCircular Color="Color.Primary" Style="height: 70px; width: 70px;" Indeterminate="true" />
+            <MudText Class="mt-2">Getting Flight options... <MudIcon Icon="@Icons.Material.Filled.Search" Color="Color.Primary" /></MudText>
+        </div>
+    </MudOverlay>
+
+
+    @if (!isLoading && resultCount > 0)
+    {
+        @* Create a temporary in-memory object here *@
+        
+
+        @* Iterate over hte list of items and create each card with respective data in a partial object *@
+        foreach (var offer in flightSearchResultDtos)
+        {
+            <MudCard class="mb-3">
+                <MudCardContent>
+                    <MudGrid align-left>
+                        <!-- #region Visible on medium and larger screens -->
+                        <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                            <!-- Airline Logo -->
+                            <MudItem sm="1">
+                                <MudImage Src="@($"https://images.trvl-media.com/media/content/expus/graphics/static_content/fusion/v0.1b/images/airlines/vector/s/{offer.IATACarrierCode}_sq.svg")" 
+                                        Width="90" 
+                                        Height="90" 
+                                        Style="border-radius: 4px; max-width: 100%;" />
+
+                            </MudItem>
+
+                            <!-- Flight Times & Route -->
+                            <MudItem sm="6">
+                                <MudText Typo="Typo.body1"><b>@($"{DateTime.Parse(offer.Segments![0].DepartureAt!):hh:mm tt}") → @($"{DateTime.Parse(offer.Segments![0].ArrivalAt):hh:mm tt}")</b></MudText>
+                                <MudText Typo="Typo.body2">Brisbane (BNE) &ndash; Perth (PER)</MudText>
+                                <MudText Typo="Typo.body2">Aircraft: @($"{offer.Segments![0].Aircraft}")</MudText>
+                                <div style="position: relative; display: inline-block;">
+                                    <!-- Base Icon (Meal Service) -->
+                                    <MudIcon Icon="@Icons.Material.Filled.Restaurant" Size="Size.Small"/>
+
+                                    <!-- Overlay Icon (Dollar Sign) in Bottom Right -->
+                                    <MudIcon Icon="@Icons.Material.Filled.AttachMoney" Size="Size.Small" Color="Color.Error"
+                                            Style="position: absolute; bottom: 1px; right: -4px; background-color: white; border-radius: 50%; padding: 0.5px; font-size: 0.8em;" />
+                                </div>
+                                <div style="position: relative; display: inline-block;">
+                                    <!-- Base Icon (Meal Service) -->
+                                    <MudIcon Icon="@Icons.Material.Filled.Fastfood" Size="Size.Small"/>
+                                </div>
+                            </MudItem>
+                            
+
+                            <!-- Total Travel Time & Layovers -->
+                            <MudItem sm="3" Style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                                <!-- Flex container to align the time and chip horizontally -->
+                                <div Style="display: flex; align-items: center; gap: 8px;">
+                                    <MudText Typo="Typo.body1" Style="margin: 0;"><b>5h 45m</b></MudText>
+
+                                    @if (offer.NumberOfSegments == 1)
+                                    {
+                                        <MudChip T="string" Color="Color.Success" Style="margin: 0; padding: 2px 8px;">Direct Flight</MudChip>
+                                    }
+                                    else if (offer.NumberOfSegments > 1)
+                                    {
+                                        <MudChip T="string" Color="Color.Warning" Style="margin: 0; padding: 2px 8px;">@(offer.NumberOfSegments + 1) Segments</MudChip>
+                                        @* <MudChip T="string" Color="Color.Warning" Style="margin: 0; padding: 2px 8px;">@(offer.NumberOfSegments + 1) @(_stop)</MudChip> *@
+                                    }
+                                    else
+                                    {
+                                        <MudChip T="string" Color="Color.Error" Style="margin: 0; padding: 2px 8px;">SOMETHING NOT RIGHT</MudChip>
+                                    }
+                                </div>
+
+                                <!-- Additional text under the time + chip -->
+                                <MudText Typo="Typo.caption" Class="text-muted">Layover details go here</MudText>
+                            </MudItem>
+
+                            @* <MudItem sm="3" Style="display: flex; flex-direction: column; align-items: center; gap: 4px; justify-content: center;">
+                                <MudText Typo="Typo.body1" Style="margin: 0; text-align: center;"><b>5h 45m</b></MudText>
+                                
+                                @if (_layoverCount == 0)
+                                {
+                                    <MudChip T="string" Color="Color.Success" Style="margin: 0; padding: 2px 8px; text-align: center;">Direct Flight</MudChip>
+                                }
+                                else if (_layoverCount == 1)
+                                {
+                                    <MudChip T="string" Color="Color.Warning" Style="margin: 0; padding: 2px 8px; text-align: center;">@(_layoverCount) @(_stop)</MudChip>
+                                }
+                                else
+                                {
+                                    <MudChip T="string" Color="Color.Error" Style="margin: 0; padding: 2px 8px; text-align: center;">@(_layoverCount) @(_stops)</MudChip>
+                                }
+                            </MudItem> *@
+
+
+                            <!-- Price -->
+                            <MudItem sm="2" Style="text-align: right;">
+                                <MudText Typo="Typo.h6" fontweight="FontWeight.Bold">AU$394</MudText>
+                            </MudItem>
+                        </MudHidden>
+                        <!-- #endregion -->
+
+                        <!-- #region  Visible on small screens only -->
+                        <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                            <MudItem xs="2">
+                                <MudImage Src="https://images.trvl-media.com/media/content/expus/graphics/static_content/fusion/v0.1b/images/airlines/vector/s/JQ_sq.svg" 
+                                        Width="50" 
+                                        Height="50"
+                                        Style="border-radius: 4px; max-width: 100%;" />
+                            </MudItem>
+
+                            <!-- Flight Time & Route -->
+                            <MudItem xs="7">
+                                <MudText Typo="Typo.body1"><b>12:12pm → 4:10pm</b></MudText>
+                                <MudText Typo="Typo.body2">Brisbane (BNE) → Perth (PER)</MudText>
+                            </MudItem>
+
+                            <!-- Price -->
+                            <MudItem xs="3" Style="text-align: right;">
+                                <MudText Typo="Typo.h6" fontweight="FontWeight.Bold">AU$394</MudText>
+                            </MudItem>
+                        </MudHidden>
+                        <!-- #endregion -->
+                    </MudGrid>
+                    
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="HandleBookClick" Class="me-2">
+                            Book Now
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="HandleBookClick" Class="me-2">
+                            Request
+                        </MudButton>
+                </MudCardActions>
+                </MudCardContent>
+            </MudCard>
+        }
+    }
+</MudContainer>
+
+@code {
+    [Parameter] public string? cacheKey { get; set; }
+    private AmadeusFlightOfferSearchResult? flightResults;
+    private string? errorMessage;
+    private bool isLoading = true;
+
+    // how many results returned?
+    private int resultCount = 0;
+
+    // the objects we will iterate over are a DTO, it's too much data to manage the big thing
+    List<FlightSearchResultDTO> flightSearchResultDtos = new List<FlightSearchResultDTO>();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrWhiteSpace(cacheKey))
+        {
+            Navigation.NavigateTo("/search");
+            return;
+        }
+
+        while (flightResults is null)
+        {
+            var result = await StorageService.GetDataAsync<AmadeusFlightOfferSearchResult>(cacheKey);
+
+            if (result is not null)
+            {
+                // check if the result contains an error message
+                if (result is { ErrorMessage: string error })
+                {
+                    errorMessage = error;
+                    return;
+                }
+
+                flightResults = result;
+                resultCount = flightResults.Data?.Count ?? 0;  // set the count to 0 if there is no results to return, for debug purposes only
+                flightSearchResultDtos = await ProcessFlightSearchResultDTOsAsync(flightResults);
+                isLoading = false;  // disable the isLoading screen and show results
+            }
+
+            await Task.Delay(1000);  // check every second
+        }
+    }
+
+    private async Task<List<FlightSearchResultDTO>> ProcessFlightSearchResultDTOsAsync(AmadeusFlightOfferSearchResult flightData)
+    {
+        // this is the object that is going to be returned to generate the entire UI, wish me luck!
+        List<FlightSearchResultDTO> flightSearchResultDtosToBeReturned = new();
+
+        if (flightData?.Data is null)
+        {
+            // do some error thing here, yuck
+            Console.WriteLine("do some error thing here, yuck");
+        }
+        else
+        {
+            // it's not null, so we can do this now
+            foreach (var offer in flightData?.Data!)
+            {
+                // create flight offer object here
+                var flightResult = new FlightSearchResultDTO
+                {
+                    Id = offer?.Id ?? "0",
+                    CurrencyCode = offer?.Price?.Currency ?? string.Empty,
+                    TotalCost = decimal.Parse(offer?.Price?.GrandTotal ?? "0.00"),  // need to add a price multiplier here, Warren can explain this
+                };
+
+                // check flight offer result id
+                if (flightResult.Id == "0")
+                {
+                    Console.WriteLine($"Unable to obtain flight offer Id in search results page(?)");
+                    await _loggerService.LogErrorAsync($"Unable to obtain flight offer Id in search results page(?)");
+                }
+                
+                // check price is OK
+                if (flightResult.TotalCost is 0)
+                {
+                    Console.WriteLine($"The price of flight offer is $0.00(?)");
+                    await _loggerService.LogErrorAsync($"The price of flight offer is $0.00(?)");
+                }
+
+                // how many bookable seats on the flight?
+                flightResult.NumberOfBookableSeats = offer?.NumberOfBookableSeats ?? 0;
+
+                // do the itinteraries now
+                if (offer?.Itineraries?.Count > 0)
+                {
+                    foreach (var itin in offer.Itineraries)
+                    {
+                        string duration = itin?.Duration ?? string.Empty;
+
+                        // regex to match hours and minutes in the format PTxxHxxM
+                        var regex = new System.Text.RegularExpressions.Regex(@"PT(?:(\d+)H)?(?:(\d+)M)?");
+                        var match = regex.Match(duration);
+
+                        if (match.Success)
+                        {
+                            // extract houirs and mins, defaulting to 0 if not found
+                            int hours = match.Groups[1].Success ? int.Parse(match.Groups[1].Value) : 0;
+                            int minutes = match.Groups[2].Success ? int.Parse(match.Groups[2].Value) : 0;
+
+                            //TODO: Remove this later
+                            Console.WriteLine($"Result Id '{flightResult.Id}' has '{flightResult.NumberOfBookableSeats}' seats and flies for Hours: {hours} Minutes: {minutes}.");
+                            await _loggerService.LogDebugAsync($"Result Id '{flightResult.Id}' has '{flightResult.NumberOfBookableSeats}' seats and flies for Hours: {hours} Minutes: {minutes}.");
+
+                            // this was added in the latest iteration of the FlightResultDTO class (just now)
+                            flightResult.TravelHours = hours;
+                            flightResult.TravelMins = minutes;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid duration format?");
+                            await _loggerService.LogTraceAsync("Invalid duration format?");
+                        }
+
+                        // now to manage the segments
+                        foreach (var seg in itin?.Segments!)
+                        {
+                            SegmentInfo segmentInfo = new SegmentInfo
+                            {
+                                SegmentId = seg.Id ?? string.Empty,
+                                DepartureIATACode = seg.Departure?.IATACode ?? string.Empty,
+                                DepartureTerminal = seg.Departure?.Terminal ?? string.Empty,
+                                DepartureAt = seg.Departure?.At ?? string.Empty,
+                                ArrivalIATACode = seg.Arrival?.IATACode ?? string.Empty,
+                                ArrivalTerminal = seg.Arrival?.Terminal ?? string.Empty,
+                                ArrivalAt = seg.Arrival?.At ?? string.Empty,
+
+                                FlightNumber = !string.IsNullOrEmpty(seg.CarrierCode) && !string.IsNullOrEmpty(seg.Number)
+                                        ? $"{seg.CarrierCode}{seg.Number}"
+                                        : string.Empty,
+                                    
+                                Aircraft = seg.Aircraft?.Code != null && flightData.Dictionaries!.Aircraft!.TryGetValue(seg.Aircraft.Code, out var aircraftName)
+                                    ? aircraftName
+                                    : string.Empty,
+                                
+                                OperatingCarrier = seg.Operating?.CarrierCode is not null && flightData.Dictionaries!.Carriers!.TryGetValue(seg.Operating.CarrierCode, out var carriersName)
+                                    ? carriersName
+                                    : string.Empty,
+                                
+                                Cabin = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?.Cabin ?? string.Empty,
+                                
+                                BrandedFareLabel = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(bf => bf.SegmentId == seg.Id)?.BrandedFareLabel ?? string.Empty,
+                                
+                                // Checked Bags Weight
+                                CheckedBagsWeight = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(cbw => cbw.SegmentId == seg.Id)?.IncludedCheckedBags?.Weight ?? 0,
+                                
+                                CheckedBagsWeightUnit = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(cbwu => cbwu.SegmentId == seg.Id)?.IncludedCheckedBags?.WeightUnit ?? string.Empty,
+
+                                // optional stuff
+                                PrePaidBaggage = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.Any(a => a.Description == "PRE PAID BAGGAGE") ?? false,
+                                
+                                PrePaidBaggageCharged = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.FirstOrDefault(a => a.Description == "PRE PAID BAGGAGE")?.IsChargeable ?? false,
+
+                                ComplimentaryBeverages = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.Any(a => a.Description == "COMPLIMENTARY BEVERAGES") ?? false,
+
+                                ComplimentaryBeveragesCharged = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.FirstOrDefault(a => a.Description == "COMPLIMENTARY BEVERAGES")?.IsChargeable ?? false,
+
+                                // MEAL OR SNACK
+                                MealOrSnack = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.Any(a => a.Description == "MEAL OR SNACK") ?? false,
+                                
+                                MealOrSnackCharged = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.FirstOrDefault(a => a.Description == "MEAL OR SNACK")?.IsChargeable ?? false,
+
+                                // DOMESTIC NAME CHANGE FEE
+                                DomesticNameChange = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.Any(a => a.Description == "DOMESTIC NAME CHANGE FEE") ?? false,
+                                
+                                DomesticNameChangeCharged = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.FirstOrDefault(a => a.Description == "DOMESTIC NAME CHANGE FEE")?.IsChargeable ?? false,
+                                
+                                StandardSeating = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.Any(a => a.Description == "STANDARD SEATING") ?? false,
+                                
+                                StandardSeatingCharged = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.FirstOrDefault(a => a.Description == "STANDARD SEATING")?.IsChargeable ?? false,
+                                
+                                StatusCreditAccural = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.Any(a => a.Description == "STATUS CREDIT ACCRUAL") ?? false,
+                                
+                                StatusCreditAccuralCharged = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.FirstOrDefault(a => a.Description == "STATUS CREDIT ACCRUAL")?.IsChargeable ?? false,
+
+                                // POINTS ACCRUAL
+                                PointsAccrual = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.Any(a => a.Description == "POINTS ACCRUAL") ?? false,
+                                
+                                PointsAccrualCharged = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.FirstOrDefault(a => a.Description == "POINTS ACCRUAL")?.IsChargeable ?? false,
+
+                                // DEDICATED CHECK IN
+                                DedicatedCheckIn = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.Any(a => a.Description == "DEDICATED CHECK IN") ?? false,
+                                
+                                DedicatedCheckInCharged = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.FirstOrDefault(a => a.Description == "DEDICATED CHECK IN")?.IsChargeable ?? false,
+
+                                // PRIORITY BOARDING
+                                PriorityBoarding = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.Any(a => a.Description == "PRIORITY BOARDING") ?? false,
+                                
+                                PriorityBoardingCharged = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.FirstOrDefault(a => a.Description == "PRIORITY BOARDING")?.IsChargeable ?? false,
+                                
+                                // PRIORITY BAGGAGE
+                                PriorityBaggage = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.Any(a => a.Description == "PRIORITY BAGGAGE") ?? false,
+                                
+                                PriorityBaggageCharged = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.FirstOrDefault(a => a.Description == "PRIORITY BAGGAGE")?.IsChargeable ?? false,
+                                
+                                // PRIORITY IMMIGRATION
+                                PriorityImmigration = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.Any(a => a.Description == "PRIORITY IMMIGRATION") ?? false,
+                                
+                                PriorityImmigrationCharged = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.FirstOrDefault(a => a.Description == "PRIORITY IMMIGRATION")?.IsChargeable ?? false,
+
+                                // USB POWER
+                                UsbPower = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.Any(a => a.Description == "USB POWER") ?? false,
+                                
+                                UsbPowerCharged = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.FirstOrDefault(a => a.Description == "USB POWER")?.IsChargeable ?? false,
+                                
+                                // BOOKING CHANGE
+                                BookingChange = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.Any(a => a.Description == "BOOKING CHANGE") ?? false,
+                                
+                                BookingChangeCharged = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.FirstOrDefault(a => a.Description == "BOOKING CHANGE")?.IsChargeable ?? false,
+                                
+                                // NO SHOW
+                                NoShow = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.Any(a => a.Description == "NO SHOW") ?? false,
+                                
+                                NoShowCharged = offer.TravelerPricings?
+                                    .SelectMany(tp => tp.FareDetailsBySegment ?? new List<FareDetailBySegment>())
+                                    .FirstOrDefault(fd => fd.SegmentId == seg.Id)?
+                                    .Amenities?.FirstOrDefault(a => a.Description == "NO SHOW")?.IsChargeable ?? false,
+                            };
+                        
+                            // add the segment to the flight result object
+                            flightResult.Segments?.Add(segmentInfo);
+                        }
+                    }
+                }
+
+                // add the data to the main returnable object, should be good now :-)
+                flightSearchResultDtosToBeReturned.Add(flightResult);
+            }
+        }
+
+        // return the main object
+        return flightSearchResultDtosToBeReturned;
+    }
+
+    private void HandleBookClick()
+    {
+        Console.WriteLine("Book button clicked!");
+    }
+}

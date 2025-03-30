@@ -1,0 +1,57 @@
+@page "/AvaError/code-303/{source?}"
+
+@inject NavigationManager Navigation
+
+<PageTitle>Missing Username</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+  <MudCard>
+    <MudCardHeader>
+      <MudText Typo="Typo.h4" Color="Color.Error">⚠️ Account Error</MudText>
+    </MudCardHeader>
+    <MudCardContent>
+      <MudAlert Severity="Severity.Error">
+        Your account appears to be missing required information:
+        <br />
+        <ul>
+          <li><strong>Username</strong> is missing or invalid.</li>
+          @if (!string.IsNullOrWhiteSpace(UserSource))
+          {
+            <li><strong>Source:</strong> @UserSource</li>
+          }
+          <li><strong>Ref:</strong> @RefCode</li>
+        </ul>
+        <p>Please provide a valid username or contact support.</p>
+      </MudAlert>
+    </MudCardContent>
+    <MudCardActions>
+      <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@NavigateToRegister" Class="me-2">
+        Register
+      </MudButton>
+      <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@NavigateToHome" Class="me-2">
+        Return Home
+      </MudButton>
+    </MudCardActions>
+  </MudCard>
+</MudContainer>
+
+@code {
+  [Parameter]
+  [SupplyParameterFromQuery]
+  public string? Source { get; set; }
+  
+  private string UserSource = "";
+  private string RefCode = NanoidDotNet.Nanoid.Generate();
+
+  protected override void OnInitialized() {
+    UserSource = Source ?? "Unknown";
+  }
+
+  private void NavigateToRegister() {
+    Navigation.NavigateTo("/Account/Register");
+  }
+  
+  private void NavigateToHome() {
+    Navigation.NavigateTo("/");
+  }
+}

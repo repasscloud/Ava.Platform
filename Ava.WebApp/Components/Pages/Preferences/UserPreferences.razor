@@ -1,0 +1,278 @@
+@page "/Preferences/User"
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IAuthenticationInfoService AuthService
+@inject IAvaUserSysPrefService AvaUserSysPrefService
+
+<MudContainer MaxWidth="MaxWidth.Small">
+    <MudCard>
+        <MudCardHeader>
+            <MudText Typo="Typo.h5">User Preferences</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <EditForm Model="_userSysPreferences">
+                <DataAnnotationsValidator />
+
+                <MudGrid class="mb-3">
+                    <!-- First Name -->
+                    <MudItem xs="12">
+                        <MudTextField Label="First Name" @bind-Value="_userSysPreferences.FirstName"
+                                    HelperText="As shown on passport"
+                                    Adornment="Adornment.End"
+                                    AdornmentIcon="@Icons.Material.Filled.Person"
+                                    AdornmentColor="Color.Primary" />
+                    </MudItem>
+
+                    <!-- Middle Name -->
+                    <MudItem xs="12">
+                        <MudTextField Label="Middle Name" @bind-Value="_userSysPreferences.MiddleName"
+                                    HelperText="As shown on passport (if applicable)"
+                                    Adornment="Adornment.End"
+                                    AdornmentIcon="@Icons.Material.Filled.Person"
+                                    AdornmentColor="Color.Primary" />
+                    </MudItem>
+
+                    <!-- Last Name -->
+                    <MudItem xs="12">
+                        <MudTextField Label="Last Name" @bind-Value="_userSysPreferences.LastName"
+                                    HelperText="As shown on passport"
+                                    Adornment="Adornment.End"
+                                    AdornmentIcon="@Icons.Material.Filled.Person"
+                                    AdornmentColor="Color.Primary" />
+                    </MudItem>
+
+                    <!-- User Email Addresss -->
+                    <MudItem xs="12">
+                        <MudTextField Label="Email" @bind-Value="_userSysPreferences.Email" ReadOnly="true"
+                                    HelperText="Please contact support to update"
+                                    Adornment="Adornment.End"
+                                    AdornmentIcon="@Icons.Material.Filled.AlternateEmail"
+                                    AdornmentColor="Color.Primary" />
+                    </MudItem>
+
+                    <!-- From City -->
+                    <MudItem xs="12">   
+                        @* <MudAutocomplete @bind-Value="@_departCity" Label="From City" Variant="Variant.Outlined" 
+                            Class="mb-4" Required="true" ResetValueOnEmptyText="true" SearchFunc="SearchCity" /> *@
+
+                        <MudAutocomplete T="string" Label="Default Departing City" @bind-Value="_userSysPreferences.OriginLocationCode"
+                                        HelperText="City usually departing from"
+                                        SearchFunc="@SearchCity"
+                                        ResetValueOnEmptyText="true"
+                                        AdornmentIcon="@Icons.Material.Filled.LocationCity"
+                                        AdornmentColor="Color.Primary" />
+@*                         
+                        <MudTextField Label="Origin Location Code" @bind-Value="_userSysPreferences.OriginLocationCode"
+                            HelperText="Use IATA Code for preferred departing city"
+                            Adornment="Adornment.End"
+                            AdornmentIcon="@Icons.Material.Filled.LocationCity"
+                            AdornmentColor="Color.Primary" /> *@
+                    </MudItem>
+
+                    <!-- Cabin Class -->
+                    <MudItem xs="12">
+                        <MudSelect @bind-Value="@_userSysPreferences.DefaultFlightSeating" Label="Cabin Class"
+                                HelperText="Preferred cabin class" Placeholder="Please Select"
+                                AdornmentIcon="@Icons.Material.Filled.AirlineSeatReclineExtra"
+                                AdornmentColor="Color.Primary">
+                            @foreach (var kvp in FareTypes.AirfaresBookingClassOptions)
+                            {
+                                <MudSelectItem Value="@(kvp.Value)">@kvp.Key</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <!-- Cabin Class Coverage -->
+                    <MudItem xs="12">
+                        <MudSelect @bind-Value="@_userSysPreferences.CabinClassCoverage" Label="Cabin Class Coverage"
+                                HelperText="Preferred cabin class coverage" Placeholder="Please Select"
+                                AdornmentIcon="@Icons.Material.Filled.AirlineSeatReclineExtra"
+                                AdornmentColor="Color.Primary">
+                            @foreach (var kvp in CabinClassCoverages.CabinClassCoverageOptions)
+                            {
+                                <MudSelectItem Value="@(kvp.Value)">@kvp.Key</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+        
+                    <!-- Included airline codes -->
+                    <MudItem xs="12">
+                        <MudTextField Label="Included Airline Codes" @bind-Value="_userSysPreferences.IncludedAirlineCodes"
+                                    Adornment="Adornment.End"
+                                    AdornmentIcon="@Icons.Material.Filled.AirplanemodeActive"
+                                    AdornmentColor="Color.Primary" />
+                    </MudItem>
+
+                    <!-- Excluded airline codes -->
+                    <MudItem xs="12">
+                        <MudTextField Label="Excluded Airline Codes" @bind-Value="_userSysPreferences.ExcludedAirlineCodes"
+                                    Adornment="Adornment.End"
+                                    AdornmentIcon="@Icons.Material.Filled.AirplanemodeInactive"
+                                    AdornmentColor="Color.Primary" />
+                    </MudItem>
+
+                    <!-- Prefer Non-Stop Flights -->
+                    <MudItem xs="12">
+                        <MudSelect @bind-Value="_userSysPreferences.NonStopFlight" Label="Prefer Non-Stop Flight">
+                            <MudSelectItem Value="true">Yes</MudSelectItem>
+                            <MudSelectItem Value="false">No</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+
+                    <!-- Currency -->
+                    <MudItem xs="12">
+                        <MudSelect @bind-Value="@_userSysPreferences.DefaultCurrencyCode" Label="Default Currency Code"
+                                   HelperText="Default payment currency" Placeholder="Please Select"
+                                   AdornmentIcon="@Icons.Material.Filled.CurrencyExchange" AdornmentColor="Color.Primary">
+                            @foreach (var kvp in UniversalData.BookingCurrencyOptions)
+                            {
+                                <MudSelectItem Value="@(kvp.Value)">@kvp.Key</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <!-- Max booking Price from fares -->
+                    <MudItem xs="12">
+                        <MudNumericField Label="Max Flight Price" @bind-Value="_userSysPreferences.MaxFlightPrice" />
+                    </MudItem>
+
+                    <!-- Is Active User -->
+                    <MudItem xs="12">
+                        <MudSelect @bind-Value="_userSysPreferences.IsActive" Label="Active User">
+                            <MudSelectItem Value="true">Yes</MudSelectItem>
+                            <MudSelectItem Value="false">No</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+
+                    <!-- Max number of results to return -->
+                    <MudItem xs="12">
+                        <MudNumericField Label="Default Result Count" @bind-Value="_userSysPreferences.MaxResults" />
+                    </MudItem>
+                </MudGrid>
+
+                <MudCardActions class="d-flex gap-2">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => SavePreferencesAsync())">Save</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+                </MudCardActions>
+            </EditForm>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+<MudMessageBox @ref="_mudMessageBox" Title="Warning" CancelText="Cancel">
+    <MessageContent>
+        Deleting can <b><i>not</i></b> be undone!
+        <MudTextField @bind-Value="TextValue" Label="Outlined" Variant="Variant.Outlined"></MudTextField>
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Style="background-color: #009688; color: white;" StartIcon="@Icons.Material.Filled.Done">
+            Accept
+        </MudButton>
+    </YesButton>
+</MudMessageBox>
+
+@code {
+    private string? _userId;
+    private string? _email;
+    private AvaUserSysPreference _userSysPreferences = new AvaUserSysPreference
+    {
+        AspNetUsersId = string.Empty,
+        Email = string.Empty,
+        FirstName = string.Empty,
+        LastName = string.Empty,
+        DefaultFlightSeating = "ECONOMY",
+        MaxFlightSeating = "ECONOMY",
+        DefaultCurrencyCode = "AUD"
+    };
+
+    // dialog box
+    [Inject]
+    public required IDialogService DialogService { get; set; }
+    private MudMessageBox? _mudMessageBox;
+    private readonly DialogOptions _backdropClick = new() { BackdropClick = false };
+    private string _state = string.Empty;
+    private string TextValue = "this is text value";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await AuthService.IsAuthenticatedAsync())
+        {
+            _userId = await AuthService.GetUserIdAsync() ?? string.Empty;
+            _email = await AuthService.GetEmailAsync() ?? string.Empty;
+
+            // check if either field is empty and redirect to error page
+            if (string.IsNullOrEmpty(_userId) || string.IsNullOrEmpty(_email))
+            {
+                Navigation.NavigateTo("/AvaError/code-303", forceLoad: true);
+                return; // stop execution
+            }
+        }
+        else
+        {
+            // redirect to login page
+            Navigation.NavigateTo("/Account/Login");
+            return;
+        }
+
+        // get (or auto create) the _userSysPrefences
+        _userSysPreferences = await AvaUserSysPrefService.GetUserPrefRecordAsync(_userId);
+
+        // when the user is created the first time, the DB will not do a lookup on the Email,
+        // so place it here, and when they save, it will go in automatically on the write task
+        if (string.IsNullOrEmpty(_userSysPreferences.Email))
+        {
+            Navigation.NavigateTo("/AvaError/code-302/UserPreferencePage", forceLoad: true);
+            return; // stop execution
+        }
+
+        StateHasChanged(); // 🔹 forces the UI to re-render after data is set
+    }
+
+    private async Task SavePreferencesAsync()
+    {
+        var result = await AvaUserSysPrefService.UpdateUserPrefRecordAsync(_userSysPreferences);
+
+        if (result)
+        {
+            var dialogResult = await DialogService.ShowMessageBox(
+                "User Preferences Updated",
+                "Your preferences have been saved.",
+                yesText: "OK", options: _backdropClick
+            );
+            if (dialogResult is true)
+            {
+                Navigation.NavigateTo("/Book/Flight", forceLoad: true);
+            }
+        }
+        else
+        {
+            await DialogService.ShowMessageBox(
+                "Something Went Wrong...",
+                "Your preferences have not been saved. Please contact support.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/", forceLoad: true);
+        return; // stop execution
+    }
+
+    private Task<IEnumerable<string>> SearchCity(string value, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Task.FromResult(Enumerable.Empty<string>());
+        }
+
+        //var results = Ava.WebApp.Models.Static.AustralianCities.AusCities
+        var results = AustralianCities.AusCities
+            .Where(c => c.Key.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0)
+            .Select(c => $"{c.Key} ({c.Value})");
+
+        return Task.FromResult(results);
+    }
+}

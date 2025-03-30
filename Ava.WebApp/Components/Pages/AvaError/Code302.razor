@@ -1,0 +1,62 @@
+@page "/AvaError/code-302/{source?}"
+
+@inject NavigationManager Navigation
+
+<PageTitle>Invalid User Data</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudCard>
+        <MudCardHeader>
+            <MudText Typo="Typo.h4" Color="Color.Error">⚠️ Account Error</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudAlert Severity="Severity.Error">
+                Your account appears to be missing required information:
+                <br />
+                <ul>
+                    <li><strong>Email</strong> is missing or invalid.</li>
+                    @if (!string.IsNullOrWhiteSpace(UserSource))
+                    {
+                        <li><strong>Source:</strong> @UserSource</li>
+                    }
+                    <li><strong>Ref:</strong> @RefCode</li>
+                </ul>
+                <p>Please contact support or try logging in again.</p>
+            </MudAlert>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@NavigateToLogin" Class="me-2">
+                Go to Login
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@NavigateToHome" Class="me-2">
+                Return Home
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudContainer>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? Source { get; set; }
+
+    private string UserSource = "";
+
+    private string RefCode = NanoidDotNet.Nanoid.Generate();
+
+    protected override void OnInitialized()
+    {
+        // Store source for display if it's provided
+        UserSource = Source ?? "Unknown";
+    }
+
+    private void NavigateToLogin()
+    {
+        Navigation.NavigateTo("/Account/Login");
+    }
+
+    private void NavigateToHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

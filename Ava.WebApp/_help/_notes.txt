@@ -1,0 +1,2 @@
+To search for all files with a particular string:
+  grep -Rl "localhost:5165" --include="*.cs" .
