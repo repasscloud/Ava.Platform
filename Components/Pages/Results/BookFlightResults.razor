@@ -1,0 +1,67 @@
+@page "/Book/Flight/Results/{cacheKey?}"
+
+@inject IStorageService StorageService
+@inject NavigationManager Navigation
+
+<MudContainer>
+    <MudOverlay Visible="isLoading">
+        <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
+        <MudText>Getting Flight options...<MudIcon Icon="@Icons.Material.Filled.Restaurant" Color="Color.Primary" /></MudText>
+    </MudOverlay>
+
+    @if (!isLoading && flightResults is not null)
+    {
+        <MudCard>
+            <MudCardContent>
+                <h3>Flight Search Results</h3>
+                <MudList T="string">
+                    @foreach (var flight in flightResults)
+                    {
+                        <MudListItem T="string">
+                            <MudText>@flight.FlightNumber</MudText>
+                        </MudListItem>
+                    }
+                </MudList>
+            </MudCardContent>
+        </MudCard>
+    }
+</MudContainer>
+
+@code {
+    [Parameter] public string? cacheKey { get; set; }
+
+    private bool isLoading = true;
+    private List<FlightResultsX> flightResults = new()
+    {
+        new FlightResultsX() { FlightNumber = "QF1" },
+        new FlightResultsX() { FlightNumber = "QF70" },
+        new FlightResultsX() { FlightNumber = "QF55" },
+        new FlightResultsX() { FlightNumber = "QF333" },
+    };
+
+    public class FlightResultsX
+    {
+        public required string FlightNumber { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrWhiteSpace(cacheKey))
+        {
+            Navigation.NavigateTo("/search");
+            return;
+        }
+
+        await Task.Delay(1000); // Simulate loading delay (optional)
+
+        var storedResults = await StorageService.GetDataAsync<List<FlightResultsX>>(cacheKey);
+        if (storedResults is not null)
+        {
+            flightResults = storedResults;
+        }
+
+        isLoading = false;
+    }
+}
+
+

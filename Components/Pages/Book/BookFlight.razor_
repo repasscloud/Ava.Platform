@@ -1,0 +1,439 @@
+@page "/Book/Flight22"
+
+@using Ava.API.Models.Flights
+@using Ava.API.Models.Search
+@using Ava.WebApp.Interfaces
+@using Ava.WebApp.Models.DTO
+@using Ava.WebApp.Models.User
+@using MudBlazor
+@using MudBlazor.Services
+@using NanoidDotNet
+@using System.Text.Json
+@using System.Threading
+
+@inject IAvaApiService AvaApiService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager Navigation
+@inject IAuthenticationInfoService AuthService
+@inject IAvaUserSysPrefService AvaUserSysPrefService
+@inject IStorageService StorageService
+
+<PageTitle>Book Flight @Icons.Material.Filled.Flight</PageTitle>
+
+<MudGrid>
+    <MudItem xs="12" sm="3">
+        <MudText Typo="Typo.h5" Class="mb-4">
+            Book a Corporate Flight <MudIcon Icon="@Icons.Material.Filled.Flight" />
+        </MudText>
+
+        <!-- Number of People -->
+        <MudSelect @bind-Value="@_numberOfPeople" Label="Number of People" 
+        HelperText="Select number of passengers" Placeholder="Please Select"
+        AdornmentIcon="@Icons.Material.Filled.PersonAddAlt" AdornmentColor="Color.Primary" 
+        class="mb-4">
+            <MudSelectItem Value="@("1")">1</MudSelectItem>
+            <MudSelectItem Value="@("2")">2</MudSelectItem>
+            <MudSelectItem Value="@("3")">3</MudSelectItem>
+            <MudSelectItem Value="@("4")">4</MudSelectItem>
+            <MudSelectItem Value="@("5")">5</MudSelectItem>
+            <MudSelectItem Value="@("6")">6</MudSelectItem>
+            <MudSelectItem Value="@("7")">7</MudSelectItem>
+            <MudSelectItem Value="@("8")">8</MudSelectItem>
+            <MudSelectItem Value="@("9")">9</MudSelectItem>
+            <MudSelectItem Value="@("10")">10 or more</MudSelectItem>
+        </MudSelect>
+
+        <!-- One-Way or Return -->
+        <MudSelect @bind-Value="@_isOneWay" Label="Trip Type" 
+        HelperText="Select trip type" Placeholder="Please Select"
+        AdornmentIcon="@Icons.Material.Filled.Flight" AdornmentColor="Color.Primary" 
+        class="mb-4">
+            <MudSelectItem Value="@(true)">One-Way</MudSelectItem>
+            <MudSelectItem Value="@(false)">Return Trip</MudSelectItem>
+        </MudSelect>
+
+        <!-- Seating Class -->
+        <MudSelect @bind-Value="@_seatingClass" Label="Seating Class" 
+        HelperText="Select seating class" Placeholder="Please Select"
+        AdornmentIcon="@Icons.Material.Filled.AirlineSeatReclineExtra" AdornmentColor="Color.Primary" 
+        class="mb-4">
+            @foreach (var kvp in Ava.WebApp.Models.Static.FareTypes.AirfaresBookingClassOptions)
+            {
+                <MudSelectItem Value="@(kvp.Value)">@kvp.Key</MudSelectItem>
+            }
+        </MudSelect>
+
+        <!-- Date Picker -->
+        @if (_isOneWay)
+        {
+            <MudDatePicker @bind-Date="@_date" Label="Select Date" MinDate="@_minDate" 
+            MaxDate="@_maxDate" Class="mb-4" />
+        }
+        else
+        {
+            <MudDateRangePicker @bind-DateRange="@_dateRange" Label="Select Dates" 
+            MinDate="@_minDate" MaxDate="@_maxDate" Class="mb-4" />
+        }
+
+        <!-- From City -->
+        <MudAutocomplete @bind-Value="@_departCity" Label="From City" Variant="Variant.Outlined" 
+        Class="mb-4" Required="true" ResetValueOnEmptyText="true" SearchFunc="SearchCity" />
+
+        <!-- Destination City -->
+        <MudAutocomplete @bind-Value="@_destinationCity" Label="Destination City" 
+        Variant="Variant.Outlined" Class="mb-4" Required="true" SearchFunc="SearchCity" />
+
+        <!-- Submit Button -->
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => HandleBookingAsync())">Search Flights</MudButton>
+    </MudItem>
+</MudGrid>
+
+<MudMessageBox @ref="_mudMessageBox" Title="Warning" CancelText="Cancel">
+    <MessageContent>
+        Deleting can <b><i>not</i></b> be undone!
+        <MudTextField @bind-Value="TextValue" Label="Outlined" Variant="Variant.Outlined"></MudTextField>
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Style="background-color: #009688; color: white;" StartIcon="@Icons.Material.Filled.Done">
+            Accept
+        </MudButton>
+    </YesButton>
+</MudMessageBox>
+
+@code {
+    private string? UserId;
+    private string? _emailAddress;
+    private FlightSearchCriteria? _flightSearchCriteria;
+    private string? _numberOfPeople;
+    private bool _isOneWay = false;
+    private string _seatingClass = string.Empty;  // options -> ECONOMY, PREMIUM_ECONOMY, BUSINESS, FIRST
+    private string _cabinClassCoverage = string.Empty;
+    private string _departCity = string.Empty;
+    private string _destinationCity = string.Empty;
+    private DateTime? _date;
+    private DateRange? _dateRange;
+    private DateTime _minDate = DateTime.Today;
+    private DateTime _maxDate = DateTime.Today.AddMonths(3);
+
+    // client ID (refers to where the employee belongs)
+    private string _clientIdMapped = string.Empty;
+
+    // email address of the current user
+    private string _customerIdMapped = string.Empty;
+
+    // Customer Preferences (these must be loaded up with a call to the user preferences before the page loads?)
+    private string? _includedAirlineCodes;
+    private string? _excludedAirlineCodes;
+    private bool _nonStopFlights = false;
+    private string? _currencyCode;
+    private int? _maxPrice;
+    private int _maxResultCount = 250;
+
+
+    // dialog box
+    [Inject]
+    public required IDialogService DialogService { get; set; }
+    private MudMessageBox? _mudMessageBox;
+    private readonly DialogOptions _backdropClick = new() { BackdropClick = false };
+    private string _state = string.Empty;
+    private string TextValue = "this is text value";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await AuthService.IsAuthenticatedAsync())
+        {
+            UserId = await AuthService.GetUserIdAsync();
+
+            if (UserId is not null)
+            {
+                // obtain the user default preferences
+                AvaUserSysPreference userSysPrefs = await AvaUserSysPrefService.GetUserPrefRecordAsync(UserId);
+
+                // assign the temporary values
+                _emailAddress = userSysPrefs.Email;
+                _firstName = userSysPrefs.FirstName;
+
+
+
+                _departCity = userSysPrefs.OriginLocationCode;
+                _includedAirlineCodes = userSysPrefs.IncludedAirlineCodes;
+                _excludedAirlineCodes = userSysPrefs.ExcludedAirlineCodes;
+                _currencyCode = userSysPrefs.DefaultCurrencyCode;
+                _maxPrice = userSysPrefs.MaxFlightPrice;
+                _seatingClass = userSysPrefs.DefaultFlightSeating;
+                _cabinClassCoverage = userSysPrefs.CabinClassCoverage;
+                _nonStopFlights = userSysPrefs.NonStopFlight;
+
+                // now update the clientId value (from Ava.API)
+                EmailDTO emailDTO = new EmailDTO() { Email = _customerIdMapped };
+                var response = await AvaApiService.GetClientIdAsync(emailDTO, "");
+                if (response is not null)
+                {
+                    //_clientIdMapped = response.ClientId;
+                }
+                if (string.IsNullOrEmpty(_clientIdMapped))
+                {
+                    Navigation.NavigateTo("/AvaError/code-302?source=BookFlightPage-NoClientId", forceLoad: true);
+                    return; // stop execution
+                }
+            }
+            else
+            {
+                Navigation.NavigateTo("/AvaError/code-302?source=BookFlightPage-NoUserId", forceLoad: true);
+                return; // stop execution
+            }
+        }
+        else
+        {
+            // redirect to login page
+            Navigation.NavigateTo("/Account/Login");
+            return;
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task HandleBookingAsync()
+    {
+        bool result = true;
+
+        // number of travellers
+        if (string.IsNullOrWhiteSpace(_numberOfPeople))
+        {
+            result = false;
+            await DialogService.ShowMessageBox(
+                "Invalid Input",
+                "The number of travelers must be selected before proceeding with your booking.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+
+        // 10 or more people, 1-9 people, or something weird
+        else if (int.TryParse(_numberOfPeople, out int numberOfPeople))
+        {
+            if (numberOfPeople == 10)
+            {
+                result = false;
+                await DialogService.ShowMessageBox(
+                    "Group Booking Required",
+                    (MarkupString)"For bookings of 10 people, please contact our support team via <a href=\"https://yourwebsite.com/live-chat\" target=\"_blank\">Live Chat</a>.",
+                    yesText: "OK", options: _backdropClick
+                );
+            }
+            else if (numberOfPeople >= 1 && numberOfPeople <= 9)
+            {
+                // valid group size
+                Console.WriteLine("Proceed with booking for a group of 1-9 people, QANTAS rules.");
+            }
+            else
+            {
+                result = false;
+                // handle cases like 0 or negative numbers (as required)
+                await DialogService.ShowMessageBox(
+                    "Invalid Number of Passengers",
+                    "The number of people must be between 1 and 10.",
+                    yesText: "OK", options: _backdropClick
+                );
+            }
+        }
+
+        // handle non-numerical values (last resort)
+        else
+        {
+            result = false;
+            await DialogService.ShowMessageBox(
+                "Invalid Input",
+                "Please enter a valid numeric value for the number of people.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+
+        // departing flight date not selected
+        if (_isOneWay && string.IsNullOrWhiteSpace(_date?.ToString()))
+        {
+            result = false;
+            await DialogService.ShowMessageBox(
+                "Departing Date Missing",
+                "Please select a departure date for your flight to continue with the booking process.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+        else if (!_isOneWay && string.IsNullOrWhiteSpace(_dateRange?.ToString()))
+        {
+            result = false;
+            await DialogService.ShowMessageBox(
+                "Return Date Missing",
+                "Please select a return date for your flight if applicable, or confirm that this is a one-way trip.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+
+        // departing city and destination city not provided
+        if (string.IsNullOrWhiteSpace(_departCity) && string.IsNullOrWhiteSpace(_destinationCity))
+        {
+            result = false;
+            await DialogService.ShowMessageBox(
+                "Cities Missing",
+                "Please select both a departing city and a destination city to proceed with your booking.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+
+        // departing city not provided
+        if (string.IsNullOrWhiteSpace(_departCity))
+        {
+            result = false;
+            await DialogService.ShowMessageBox(
+                "Departing City Missing",
+                "Please select a departing city to proceed with your booking.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+
+        // destination city not provided
+        if (string.IsNullOrWhiteSpace(_destinationCity))
+        {
+            result = false;
+            await DialogService.ShowMessageBox(
+                "Destination City Missing",
+                "Please select a destination city to proceed with your booking.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+
+        if (result)
+        {
+            StateHasChanged();
+
+            // create the search object to hand to the API via Service
+            FlightOfferSearchRequestDTO _flightOfferSearchRequest = new FlightOfferSearchRequestDTO()
+            {
+                Id = await Nanoid.GenerateAsync(),
+                CreatedAt = DateTime.UtcNow,
+                ClientId = _clientIdMapped,
+                CustomerId = _customerIdMapped,
+                CurrencyCode = _currencyCode ?? "AUD",
+                OriginLocationCode = new string(_departCity[^5..].Where(c => char.IsLetterOrDigit(c)).ToArray()),
+                DestinationLocationCode = new string(_destinationCity[^5..].Where(c => char.IsLetterOrDigit(c)).ToArray()),
+                DepartureDate = (_date ?? DateTime.UtcNow).ToString("yyyy-MM-dd"),
+                Adults = int.TryParse(_numberOfPeople, out int adults) ? adults : 0,
+                CabinClass = _seatingClass ?? "ECONOMY",
+                CabinClassCoverage = _cabinClassCoverage ?? "MOST_SEGMENTS",
+                ExcludedCarrierCodes = !string.IsNullOrEmpty(_excludedAirlineCodes) ? _excludedAirlineCodes : null,
+                IncludedCarrierCodes = !string.IsNullOrEmpty(_includedAirlineCodes) ? _includedAirlineCodes : null,
+                MaxFlightPrice = _maxPrice ?? 9999,
+                NonStopFlight = _nonStopFlights,
+                MaxFlightOffers = _maxResultCount
+            };
+
+            // if oneway trip, add departing only date
+            if (_date is not null && _isOneWay)
+            {
+                _flightOfferSearchRequest.DepartureDate = (_date ?? DateTime.UtcNow).ToString("yyyy-MM-dd");
+            }
+
+            // if return trip, add both dates
+            if (_dateRange?.Start is not null && _dateRange?.End is not null && !_isOneWay)
+            {
+                _flightOfferSearchRequest.DepartureDate = _dateRange.Start.Value.ToString("yyyy-MM-dd");
+                _flightOfferSearchRequest.DepartureDateReturn = _dateRange.End.Value.ToString("yyyy-MM-dd");
+            }
+
+            // make the call to the API now
+            try
+            {
+                //await StorageService.StoreAmadeusFlightResultsAsync(_flightOfferSearchRequest, Navigation, "/Book/Flight/Results2");
+
+
+                @* await StorageService.StoreAndFetchAsync<FlightOfferSearchRequestDTO, FlightSearchResult>(
+                    flightRequest, Navigation, "/Book/Flight/Results");
+                     *@
+                //FlightSearchResult flightResults = await AvaApiService.PostFlightSearchQueryAsync(_flightOfferSearchRequest, "");
+                @* var flightResult = await AvaApiService.PostFlightSearchQueryAsync(_flightOfferSearchRequest, "");
+
+                if (flightResults.ErrorMessage is null)
+                {
+                    // clear any search results (if any exist)
+                    //await localStorage.RemoveItemAsync("FlightSearchResult");
+
+                    // Convert object to JSON string
+                    //string jsonString = JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = false });
+
+                    // save it to a file for me to read
+                    //await File.WriteAllTextAsync(@"/Users/danijeljw/Developer/AvaAI/Ava.WebApp/_result.json", jsonString);
+
+                    // Store JSON string in local storage
+                    //await localStorage.SetItemAsStringAsync("FlightSearchResult", jsonString);
+
+                    //result = true;
+
+                    await StorageService.StoreAndNavigateAsync(flightResults, Navigation, "/results");
+                }
+                else
+                {
+                    // show dialog with error message here
+                    result = false;
+                } *@
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex}");
+            }
+
+            // proceed with booking logic
+            @* if (result is true)
+            {
+                // logic here
+                Console.WriteLine("Booking successful!");
+
+                // redirect to search results page
+                Navigation.NavigateTo("/Book/Flight/Results");
+            }
+            else
+            {
+                // logic goes here
+                Console.WriteLine("Booking unsuccessful, missing data.");
+            } *@
+        }
+    }
+
+private Task<IEnumerable<string>> SearchCity(string value, CancellationToken cancellationToken)
+{
+    if (string.IsNullOrWhiteSpace(value))
+    {
+        return Task.FromResult(Enumerable.Empty<string>());
+    }
+
+    var results = Ava.WebApp.Models.Static.AustralianCities.AusCities
+        .Where(c => c.Key.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0) // ✅ Corrected here
+        .Select(c => $"{c.Key} ({c.Value})"); // ✅ Formats as "City, Australia (AirportCode)"
+
+    return Task.FromResult(results);
+}
+
+
+
+
+
+
+    @* private Task<IEnumerable<string>> SearchCity(string value, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Task.FromResult(Enumerable.Empty<string>());
+        }
+
+        var cities = Ava.WebApp.Models.Static.AustralianCities.AusCities;
+
+        return Task.FromResult(
+            cities
+                .Where(c => c.Contains(value, StringComparison.InvariantCultureIgnoreCase))
+                .DefaultIfEmpty("Unknown")
+        );
+    } *@
+
+    public class SupportedEmailResponse
+    {
+        public string SupportedEmailDomain { get; set; } = string.Empty;
+    }
+}

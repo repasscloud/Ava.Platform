@@ -1,0 +1,34 @@
+name: .NET Manual .NET 9.0.x Install
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install .NET 9.0.x manually
+        run: |
+          # Download the dotnet-install script
+          wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+          chmod +x dotnet-install.sh
+          # Install the latest available .NET 9.0.x SDK to $HOME/dotnet
+          ./dotnet-install.sh --channel 9.0 --install-dir $HOME/dotnet
+
+      - name: Add .NET SDK to PATH
+        run: echo "$HOME/dotnet" >> $GITHUB_PATH
+
+      - name: Verify .NET installation
+        run: dotnet --version
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build project
+        run: dotnet build --no-restore

@@ -1,0 +1,60 @@
+@page "/AvaError/code-504/{source?}"
+
+@inject NavigationManager Navigation
+
+<PageTitle>Missing Parameter</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudCard>
+        <MudCardHeader>
+            <MudText Typo="Typo.h4" Color="Color.Error">⚠️ Required Parameter Missing</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudAlert Severity="Severity.Error">
+                A required parameter was not supplied in the request.
+                <br />
+                <ul>
+                    <li><strong>Issue:</strong> Missing or invalid query/path parameter.</li>
+                    @if (!string.IsNullOrWhiteSpace(UserSource))
+                    {
+                        <li><strong>Source:</strong> @UserSource</li>
+                    }
+                    <li><strong>Ref:</strong> @RefCode</li>
+                </ul>
+                <p>Please check the link or form input and try again.</p>
+            </MudAlert>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@NavigateToSupport" Class="me-2">
+                Contact Support
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@NavigateToHome" Class="me-2">
+                Return Home
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudContainer>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? Source { get; set; }
+
+    private string UserSource = "";
+    private string RefCode = NanoidDotNet.Nanoid.Generate();
+
+    protected override void OnInitialized()
+    {
+        UserSource = Source ?? "Unknown";
+    }
+
+    private void NavigateToSupport()
+    {
+        Navigation.NavigateTo("/Support");
+    }
+
+    private void NavigateToHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+}
