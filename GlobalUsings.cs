@@ -1,0 +1,55 @@
+// GlobalUsings.cs
+global using System;
+global using System.Collections.Concurrent;
+global using System.Collections.Generic;
+global using System.ComponentModel.DataAnnotations.Schema;
+global using System.ComponentModel.DataAnnotations;
+global using System.ComponentModel;
+global using System.IdentityModel.Tokens.Jwt;
+global using System.IO;
+global using System.Linq;
+global using System.Net.Http;
+global using System.Net.Http.Headers;
+global using System.Security.Claims;
+global using System.Text.Json.Serialization;
+global using System.Text;
+global using System.Text.Json;
+global using System.Text.RegularExpressions;
+global using System.Threading.Tasks;
+
+global using Microsoft.AspNetCore.Components.Authorization;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+global using Microsoft.AspNetCore.Identity.UI.Services;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Design;
+global using Microsoft.EntityFrameworkCore.Infrastructure;
+global using Microsoft.EntityFrameworkCore.Migrations;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Logging;
+global using Microsoft.IdentityModel.Tokens;
+
+global using Ava.Shared.Data;
+global using Ava.Shared.Identity;
+global using Ava.Shared.Interfaces;
+global using Ava.Shared.Models.Custom;
+global using Ava.Shared.Models.DTOs;
+global using Ava.Shared.Models.ExternalLib.Amadeus.Flight;
+global using Ava.Shared.Models.ExternalLib.Amadeus;
+global using Ava.Shared.Models.ExternalLib.IATA;
+global using Ava.Shared.Models.ExternalLib.TravelPayouts;
+global using Ava.Shared.Models.Kernel.BoH;
+global using Ava.Shared.Models.Kernel.Client;
+global using Ava.Shared.Models.Kernel.Jwt;
+global using Ava.Shared.Models.Kernel.SysVar;
+global using Ava.Shared.Models.Kernel.User;
+global using Ava.Shared.Models.Policies;
+global using Ava.Shared.Models.Search.Flights;
+global using Ava.Shared.Models.Static;
+global using Ava.Shared.Services;
+global using Ava.Shared.Validation;
+
+global using Blazored.LocalStorage;
+global using NanoidDotNet;
+global using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
