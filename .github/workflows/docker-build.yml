@@ -1,0 +1,25 @@
+name: Docker Build CI
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: |
+        docker build . \
+        --file Dockerfile.builder \
+        --tag djjm.io/dotnet-sdk-preloaded:9.0.200-alpine-arm64
+    - name: Build with Docker
+      run: |
+        export COMPOSE_BAKE=true \
+        docker compose build
