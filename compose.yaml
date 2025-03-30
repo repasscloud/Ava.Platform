@@ -1,0 +1,33 @@
+services:
+  ava-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.API
+    ports:
+      - "5165:5165"
+    networks:
+      - common_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://0.0.0.0:5165/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  ava-webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile.WebApp
+    ports:
+      - "5090:5090"
+    networks:
+      - common_net
+    restart: unless-stopped
+    depends_on:
+      ava-api:
+        condition: service_healthy
+
+networks:
+  common_net:
+    external: true
