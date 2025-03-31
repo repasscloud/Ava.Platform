@@ -2,17 +2,26 @@ namespace Ava.Shared.Models.DTOs;
 
 public class FlightOfferSearchRequestDTO
 {
+    [Required]
     [JsonPropertyName("id")]
-    public string Id { get; set; } = string.Empty;
+    public required string Id { get; set; }
 
     [JsonPropertyName("createdAt")]
     public DateTime CreatedAt { get; set; }
 
     [JsonPropertyName("clientId")]
-    public string ClientId { get; set; } = string.Empty;
+    [Required]
+    public required string ClientId { get; set; }
 
     [JsonPropertyName("customerId")]
-    public string CustomerId { get; set; } = string.Empty;
+    [Required]
+    public required string CustomerId { get; set; }
+
+    [JsonPropertyName("travelPolicyId")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [RegularExpression(@"^[0-9A-F]{10}$", ErrorMessage = "TravelPolicyId must be exactly 10 uppercase hexadecimal characters (0-9, A-F).")]
+    [DefaultValue(null)]
+    public string? TravelPolicyId { get; set; }
 
     [JsonPropertyName("currencyCode")]
     [Required]
@@ -29,6 +38,9 @@ public class FlightOfferSearchRequestDTO
     [RegularExpression(@"^[A-Z0-9]{3}$", ErrorMessage = "Destination location code must be exactly 3 uppercase alphanumeric characters (A-Z, 0-9).")]
     public required string DestinationLocationCode { get; set; }
 
+    [JsonPropertyName("isOneWay")]
+    public required bool IsOneWay { get; set; } = false;
+
     [JsonPropertyName("departureDate")]
     [Required]
     [RegularExpression(@"^\d{4}-\d{2}-\d{2}$", ErrorMessage = "Departure date must be in the format YYYY-MM-DD.")]
@@ -44,7 +56,6 @@ public class FlightOfferSearchRequestDTO
     [RegularExpression(@"^\d{4}-\d{2}-\d{2}$", ErrorMessage = "Departure date must be in the format YYYY-MM-DD.")]
     [DefaultValue(null)] // ✅ Explicitly mark as optional
     public string? DepartureDateReturn { get; set; }
-
 
     [JsonPropertyName("departureTimeReturn")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
