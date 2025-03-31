@@ -384,6 +384,7 @@
                 CurrencyCode = _currencyCode ?? "AUD",
                 OriginLocationCode = new string(_departCity[^5..].Where(c => char.IsLetterOrDigit(c)).ToArray()),
                 DestinationLocationCode = new string(_destinationCity[^5..].Where(c => char.IsLetterOrDigit(c)).ToArray()),
+                IsOneWay = _isOneWay,
                 DepartureDate = (_date ?? DateTime.UtcNow).ToString("yyyy-MM-dd"),
                 Adults = int.TryParse(_numberOfPeople, out int adults) ? adults : 0,
                 CabinClass = _cabinClass ?? "ECONOMY",
