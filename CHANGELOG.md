@@ -91,3 +91,15 @@ straightforward as possible.
   Create Flight Results Screen
 - [#35](https://github.com/repasscloud/Ava.WebApp/issues/35)
   💳 Extend TravelPolicy to include DefaultPaymentMethods #35
+- [#36](https://github.com/repasscloud/Ava.Platform/issues/36)
+  💰 Extend AvaClient model to include markup percentage on quote prices
+- [#37](https://github.com/repasscloud/Ava.Platform/issues/37)
+  🧾 Add flat service fee field to AvaClient
+- [#38](https://github.com/repasscloud/Ava.Platform/issues/38)
+  💳 Add default payment method flags to AvaClient
+- [#39](https://github.com/repasscloud/Ava.Platform/issues/39)
+  📅 Add annual and monthly commitment fields to AvaClient
+- [#40](https://github.com/repasscloud/Ava.Platform/issues/40)
+  💸 Track cumulative spend (annual/monthly) on AvaClient
+- [#41](https://github.com/repasscloud/Ava.Platform/issues/41)
+  🧾 Create new Transaction table and model
