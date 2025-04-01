@@ -89,4 +89,5 @@ straightforward as possible.
   QANTAS Amenities
 - [#30](https://github.com/repasscloud/Ava.WebApp/issues/30)
   Create Flight Results Screen
-
+- [#35](https://github.com/repasscloud/Ava.WebApp/issues/35)
+  💳 Extend TravelPolicy to include DefaultPaymentMethods #35
