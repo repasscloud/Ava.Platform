@@ -69,7 +69,6 @@ public class StorageService : IStorageService
         return createdEntry != null;
     }
 
-
     public async Task<AmadeusFlightOfferSearchResult?> GetAmadeusFlightOfferSearchResultAsync(string uniqueId)
     {
         var result = await _context.StorageEntries.FirstOrDefaultAsync(c => c.Id == uniqueId);
