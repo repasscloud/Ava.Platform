@@ -8,6 +8,9 @@ on:
 
 jobs:
   build:
+
+    if: github.event.head_commit.message != 'update gh-actions'
+
     runs-on: ubuntu-latest
 
     steps:
