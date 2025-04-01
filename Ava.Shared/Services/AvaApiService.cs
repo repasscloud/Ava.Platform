@@ -45,7 +45,7 @@ public class AvaApiService : IAvaApiService
         // add custom headers
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
-        string endpoint = "/api/Search/webapp/flights";
+        string endpoint = "/api/v1/flights/search";
 
         var response = await client.PostAsync(endpoint, content);
         
@@ -107,5 +107,43 @@ public class AvaApiService : IAvaApiService
         var responseJson = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<TravelPolicy>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
             ?? throw new JsonException("Deserialization returned null for TravelPolicy.");
+    }
+
+    public async Task<TravelPolicyBookingContextDTO> GetTravelPolicyInterResultByIdAsync(string travelPolicyId, string bearerToken)
+    {
+        var client = _httpClientFactory.CreateClient("AvaAPI");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+        string endpoint = $"api/v1/policies/travel/{travelPolicyId}";
+        var response = await client.GetAsync(endpoint);
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            // Optionally, you could throw an exception or return a default value
+            throw new Exception($"API Error {response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
+        }
+
+        var responseJson = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<TravelPolicyBookingContextDTO>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+            ?? throw new JsonException("Deserialization returned null for TravelPolicyBookingContextDTO.");
+    }
+
+    public async Task<AvaUserSysPreference> GetAvaUserSysPreferencesAsync(string aspNetUsersId, string bearerToken)
+    {
+        var client = _httpClientFactory.CreateClient("AvaAPI");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+        string endpoint = $"api/AvaUser/userpref/{aspNetUsersId}";
+        var response = await client.GetAsync(endpoint);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            // Optionally, you could throw an exception or return a default value
+            throw new Exception($"API Error {response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
+        }
+
+        var responseJson = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<AvaUserSysPreference>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+            ?? throw new JsonException("Deserialization returned null for AvaUserSysPreference.");
     }
 }

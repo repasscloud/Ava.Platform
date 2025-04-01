@@ -32,11 +32,39 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
     {
         await _loggerService.LogInfoAsync($"FlightOfferService received reqeust from API with ID: {searchRequestDTO.Id}");
 
-#region CurrencyCode
-        string _currencyCode = searchRequestDTO.CurrencyCode;
-#endregion CurrencyCode
+        // find the travel policy (if it exists) for the user account, and load it into memory
+        TravelPolicyBookingContextDTO? _travelPolicyInterResult = null;
+        if (!string.IsNullOrEmpty(searchRequestDTO.TravelPolicyId))
+        {
+            //_travelPolicyInterResult = await _avaApiService.GetTravelPolicyInterResultByIdAsync(searchRequestDTO.TravelPolicyId, "")!;
+            _travelPolicyInterResult = await _context.TravelPolicies
+                .Where(c => c.Id == searchRequestDTO.TravelPolicyId)
+                .Select(tp => new TravelPolicyBookingContextDTO
+                {
+                    Id = tp.Id,
+                    PolicyName = tp.PolicyName,
+                    AvaClientId = tp.AvaClientId,
+                    Currency = tp.DefaultCurrencyCode,
+                    MaxFlightPrice = tp.MaxFlightPrice,
+                    DefaultFlightSeating = tp.DefaultFlightSeating,
+                    MaxFlightSeating = tp.MaxFlightSeating,
+                    CabinClassCoverage = tp.CabinClassCoverage,
+                    FlightBookingTimeAvailableFrom = tp.FlightBookingTimeAvailableFrom,
+                    FlightBookingTimeAvailableTo = tp.FlightBookingTimeAvailableTo,
+                    IncludedAirlineCodes = tp.IncludedAirlineCodes,
+                    ExcludedAirlineCodes = tp.ExcludedAirlineCodes,
+                })
+                .FirstOrDefaultAsync();
+        }
 
-#region OriginDestinations
+        // find the user preference service now too (everyone has one of these)
+        AvaUserSysPreference _userSysPreferences = await _context.AvaUserSysPreferences
+            .Where(x => x.AspNetUsersId == searchRequestDTO.CustomerId)
+            .FirstOrDefaultAsync();
+        
+        // set the currency code
+        string _currencyCode = _travelPolicyInterResult?.Currency ?? _userSysPreferences.DefaultCurrencyCode;
+
         // list of flights to be added to search to amadeus (and other providers)
         List<OriginDestination> _originDestinationList = new List<OriginDestination>();
         
@@ -46,26 +74,37 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
             Id = "1",
             OriginLocationCode = searchRequestDTO.OriginLocationCode,
             DestinationLocationCode = searchRequestDTO.DestinationLocationCode,
-            DateTimeRange = new DepartureDateTimeRange { Date = searchRequestDTO.DepartureDate },
+            DateTimeRange = new DepartureDateTimeRange 
+            {
+                Date = searchRequestDTO.DepartureDate,
+                Time = _travelPolicyInterResult?.FlightBookingTimeAvailableFrom 
+                    ?? _userSysPreferences.FlightBookingTimeAvailableFrom,
+            },
         };
         _originDestinationList.Add(_originDestination1);
 
         // does second flight exist?
-        if (searchRequestDTO.DepartureDateReturn is not null)
+        if (!searchRequestDTO.IsOneWay)
         {
-            OriginDestination _originDestination2 = new OriginDestination
+            if (searchRequestDTO.DepartureDateReturn is not null)
             {
-                Id = "2",
-                OriginLocationCode = searchRequestDTO.DestinationLocationCode,
-                DestinationLocationCode = searchRequestDTO.OriginLocationCode,
-                DateTimeRange = new DepartureDateTimeRange { Date = searchRequestDTO.DepartureDateReturn }
-            };
-
-            _originDestinationList.Add(_originDestination2);
+                OriginDestination _originDestination2 = new OriginDestination
+                {
+                    Id = "2",
+                    OriginLocationCode = searchRequestDTO.DestinationLocationCode,
+                    DestinationLocationCode = searchRequestDTO.OriginLocationCode,
+                    DateTimeRange = new DepartureDateTimeRange
+                    {
+                        Date = searchRequestDTO.DepartureDateReturn,
+                        Time = _travelPolicyInterResult?.FlightBookingTimeAvailableFrom 
+                            ?? _userSysPreferences.FlightBookingTimeAvailableFrom,
+                    }
+                };
+                _originDestinationList.Add(_originDestination2);
+            }
         }
-#endregion OriginDestinations
 
-#region Travelers
+
         // list of travellers
         List<Traveler> _travelersList = new List<Traveler>();
         
@@ -81,36 +120,29 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
 
             _travelersList.Add(_traveler);
         }
-#endregion Travelers
 
-#region Sources
-        // nothing goes here, the code is already implemented in the class, do not create it again
-#endregion Sources
-
-#region SearchCriteria
         // create SearchCriteria
         SearchCriteria _searchCriteria = new SearchCriteria();
 
-#region SearchCriteria.MaxFlightOffers
         // add the max flight offers value (if not null) and set the value else ignore, it will default to 10 results
         // nothing needs to be added, it gets added in this region
-        if (searchRequestDTO.MaxFlightOffers == 0 || searchRequestDTO.MaxFlightOffers == 250)
+        if (_userSysPreferences.MaxResults == 0 || _userSysPreferences.MaxResults == 250)
         {
             _searchCriteria.MaxFlightOffers = 250;
         }
-        if (searchRequestDTO.MaxFlightOffers > 0 || searchRequestDTO.MaxFlightOffers < 250)
+        if (_userSysPreferences.MaxResults > 0 || _userSysPreferences.MaxResults < 250)
         {
-            _searchCriteria.MaxFlightOffers = searchRequestDTO.MaxFlightOffers;
+            _searchCriteria.MaxFlightOffers = 20;
         }
-#endregion SearchCriteria.MaxFlightOffers
+
         
-#region SearchCriteria.Filters (aka FlightFilters)
+
         // create the default FlightFilters object (it's got null initialization, so it's OK)
         FlightFilters _filters = new FlightFilters();
         // flight filters is made up of List<CabinRestriction>? and CarrierRestriction?, so
         // those will be created next, starting with CabinRestrictions
 
-#region SearchCriteria.Filters.CabinRestrictions
+
         // create the .CabinRestrictions object (it will be appended to .Filters at the end of this region)
         List<CabinRestriction> _cabinRestrictions = new List<CabinRestriction>();
 
@@ -122,8 +154,8 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
         {
             CabinRestriction _cabinRestrictionAllFlights = new CabinRestriction
             {
-                Cabin = searchRequestDTO.CabinClass,
-                Coverage = searchRequestDTO.CabinClassCoverage,
+                Cabin = _travelPolicyInterResult?.DefaultFlightSeating ?? searchRequestDTO.CabinClass,
+                Coverage = _travelPolicyInterResult?.CabinClassCoverage ?? _userSysPreferences.CabinClassCoverage,
                 OriginDestinationIds = [ "1", "2" ]
             };
 
@@ -133,8 +165,8 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
         {
             CabinRestriction _cabinRestrictionAllFlights = new CabinRestriction
             {
-                Cabin = searchRequestDTO.CabinClass,
-                Coverage = searchRequestDTO.CabinClassCoverage,
+                Cabin = _travelPolicyInterResult?.DefaultFlightSeating ?? searchRequestDTO.CabinClass,
+                Coverage = _travelPolicyInterResult?.CabinClassCoverage ?? _userSysPreferences.CabinClassCoverage,
                 OriginDestinationIds = [ "1" ]
             };
 
@@ -142,9 +174,7 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
         }
 
         _filters.CabinRestrictions = _cabinRestrictions;
-#endregion SearchCriteria.Filters.CabinRestrictions
 
-#region SearchCriteria.Filters.CarrierRestrictions
         // create the .CarrrierRestriction object (this gets added at the end of the region)
         CarrierRestriction _carrierRestriction = new CarrierRestriction();
 
@@ -152,22 +182,26 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
 
         // carrier excluded codes excludes, but carrier included restricts, so included is counted first then skip
         // else use excluded second
-        if (searchRequestDTO.IncludedCarrierCodes is not null)
+        if (_travelPolicyInterResult?.IncludedAirlineCodes is not null)
         {
-            _carrierRestriction.IncludedCarrierCodes = SplitCommaSeparatedString(searchRequestDTO.IncludedCarrierCodes);
+            _carrierRestriction.IncludedCarrierCodes = SplitCommaSeparatedString(_travelPolicyInterResult.IncludedAirlineCodes);
         }
-        else if (searchRequestDTO.ExcludedCarrierCodes is not null)
+        else if (_travelPolicyInterResult?.ExcludedAirlineCodes is not null)
         {
-            _carrierRestriction.ExcludedCarrierCodes = SplitCommaSeparatedString(searchRequestDTO.ExcludedCarrierCodes);
+            _carrierRestriction.ExcludedCarrierCodes = SplitCommaSeparatedString(_travelPolicyInterResult.ExcludedAirlineCodes);
+        }
+        else if (_userSysPreferences.IncludedAirlineCodes is not null)
+        {
+            _carrierRestriction.IncludedCarrierCodes = SplitCommaSeparatedString(_userSysPreferences.IncludedAirlineCodes);
+        }
+        else if (_userSysPreferences.ExcludedAirlineCodes is not null)
+        {
+            _carrierRestriction.ExcludedCarrierCodes = SplitCommaSeparatedString(_userSysPreferences.ExcludedAirlineCodes);
         }
 
         _filters.CarrierRestrictions = _carrierRestriction;
-#endregion SearchCriteria.FlightFilters.CarrierRestrictions
         
         _searchCriteria.Filters = _filters;
-#endregion SearchCriteria.Filters (aka FlightFilters)
-
-#endregion SearchCriteria
 
         // create the flight offer search (Amadeus)
         AmadeusFlightOfferSearch flightOfferSearch = new()
@@ -180,7 +214,7 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
 
         //-->START DEBUG
         // this whole section is just debug code
-        string debugJsonX = $@"/Users/danijeljw/Developer/dotnet-dev/Ava.API/searchRequestDTO_debugJsonX_{searchRequestDTO.Id}.json";
+        string debugJsonX = $@"/app/searchRequestDTO_debugJsonX_{searchRequestDTO.Id}.json";
         await _loggerService.LogInfoAsync($"Saving results of {searchRequestDTO.Id} to {debugJsonX}");
         var xJson = JsonSerializer.Serialize(flightOfferSearch, _jsonOptions);
         await File.WriteAllTextAsync(debugJsonX, xJson);
@@ -196,7 +230,7 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
 
         // create instance of HTTP client (from the factory)
         var httpClient = _httpClientFactory.CreateClient();
-        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // get URL from appsettings to use
         string _flightOfferUrl = _configuration["Amadeus:Url:FlightOffer"]

@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     // Add DbSets for your models
     public DbSet<AvaClient> AvaClients { get; set; }
     public DbSet<AvaUser> AvaUsers { get; set; }
+    public DbSet<AvaUserSysPreference> AvaUserSysPreferences { get; set; }
     public DbSet<AvaSystemLog> AvaSystemLogs { get; set; }
     public DbSet<AvaClientLicense> AvaClientLicenses { get; set; }
     public DbSet<AvaEmployeeRecord> AvaEmployees { get; set; }

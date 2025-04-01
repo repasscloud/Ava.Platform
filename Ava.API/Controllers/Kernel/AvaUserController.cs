@@ -117,4 +117,17 @@ public class AvaUserController : ControllerBase
 
         return NoContent();
     }
+
+    // uses the AspNetUsersId value
+    // GET: api/avaUser/userpref/{aspNetUsersId}
+    [HttpGet("userpref/{aspNetUsersId}")]
+    public async Task<ActionResult<AvaUserSysPreference>> GetUser(string aspNetUsersId)
+    {
+        var userPref = await _context.AvaUserSysPreferences
+            .Where(x => x.AspNetUsersId == aspNetUsersId)
+            .FirstOrDefaultAsync();
+
+        if (userPref == null) return NotFound();
+        return userPref;
+    }
 }

@@ -8,4 +8,7 @@ public interface IAvaApiService
 
     // return the travel policy
     Task<TravelPolicy> GetTravelPolicyByIdAsync(string travelPolicyId, string bearerToken);
+
+    Task<TravelPolicyBookingContextDTO> GetTravelPolicyInterResultByIdAsync(string travelPolicyId, string bearerToken);
+    Task<AvaUserSysPreference> GetAvaUserSysPreferencesAsync(string aspNetUsersId, string bearerToken);
 }

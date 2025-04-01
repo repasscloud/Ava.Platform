@@ -9,7 +9,7 @@
 <PageTitle>Book Flight @Icons.Material.Filled.Flight</PageTitle>
 
 <MudContainer>
-    <MudOverlay Visible="isLoading">
+    <MudOverlay Visible="isLoading" class="fade-overlay">
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
             <MudProgressCircular Color="Color.Primary" Style="height: 70px; width: 70px;" Indeterminate="true" />
             <MudText Class="mt-2">Getting Flight options... <MudIcon Icon="@Icons.Material.Filled.Search" Color="Color.Primary" /></MudText>
@@ -80,7 +80,10 @@
                 }
 
                 <!-- Date Picker -->
-                @RenderDatePicker(_isOneWay, _filterMode)
+                <div @key="_isOneWay">
+    @RenderDatePicker(_isOneWay, _filterMode)
+</div>
+
                 
                 <!-- From City -->
                 <MudAutocomplete @bind-Value="@_departCity"
@@ -100,10 +103,16 @@
                 <!-- Submit Button -->
                 <div style="display: inline-block;">
                     <MudButton Variant="Variant.Filled"
+                                Color="Color.Primary"
+                                OnClick="HandleBookingAsync">
+                        Search Flights
+                    </MudButton>
+
+                    @* <MudButton Variant="Variant.Filled"
                         Color="Color.Primary" 
                         OnClick="@(() => HandleBookingAsync())">
                         Search Flights
-                    </MudButton>
+                    </MudButton> *@
                 </div>
             </MudStack>
         </MudPaper>
@@ -135,31 +144,19 @@
     // travel policy settings
     private string? _travelPolicyId;
     private TravelPolicy? _travelPolicy;
-    private string? _maxFlightSeating;
 
-    // flight search criteria object
-    //private FlightSearchCriteria? _flightSearchCriteria;
 
     // values for flight search criteria
     private string? _numberOfPeople;
     private bool _isOneWay = false;
-    private string _cabinClass = string.Empty;  // options -> ECONOMY, PREMIUM_ECONOMY, BUSINESS, FIRST
-    private string _cabinClassCoverage = string.Empty;
     private string _departCity = string.Empty;
     private string _destinationCity = string.Empty;
-    private DateTime? _date;
+    private DateTime? _date;  // departing date
     private DateRange? _dateRange;
+    
     private DateTime _minDate = DateTime.Today;
     private DateTime _maxDate = DateTime.Today.AddMonths(3);
-    private WeekendFilter _filterMode = WeekendFilter.NoWeekends;
-
-    // Customer Preferences (these must be loaded up with a call to the user preferences before the page loads?)
-    private string? _includedAirlineCodes;
-    private string? _excludedAirlineCodes;
-    private bool _nonStopFlights = false;
-    private string? _currencyCode;
-    private int? _maxPrice;
-    private int _maxResultCount = 250;
+    private WeekendFilter _filterMode = WeekendFilter.AllDays;
 
     // dialog box
     [Inject]
@@ -168,6 +165,14 @@
     private readonly DialogOptions _backdropClick = new() { BackdropClick = false };
     private string _state = string.Empty;
     private string TextValue = "this is text value";
+
+    // values from TravelPolicy and/or AvaUserSysPreference
+    private string? _maxFlightSeating;
+    private string? _cabinClass;
+    private string? _clientId;
+
+    // when records stored in DB from search results
+    private bool resultsStored = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -179,6 +184,7 @@
 
             if (_aspNetUserId is not null)
             {
+                // load the user preferences
                 AvaUserSysPreference userSysPrefs = await AvaUserSysPrefService.GetUserPrefRecordAsync(_aspNetUserId);
 
                 _userEmailAddress = userSysPrefs.Email;
@@ -192,12 +198,22 @@
 
                 // load user preferences first
                 _departCity = userSysPrefs.OriginLocationCode ?? string.Empty;
-                _includedAirlineCodes = userSysPrefs.IncludedAirlineCodes;
-                _excludedAirlineCodes = userSysPrefs.ExcludedAirlineCodes;
-                _currencyCode = userSysPrefs.DefaultCurrencyCode;
-                _maxPrice = userSysPrefs.MaxFlightPrice;
-                _cabinClassCoverage = userSysPrefs.CabinClassCoverage;
-                _nonStopFlights = userSysPrefs.NonStopFlight;
+                _cabinClass = userSysPrefs.DefaultFlightSeating switch
+                {
+                    "ECONOMY" => "ECONOMY",
+                    "PREMIUM_ECONOMY" => "PREMIUM_ECONOMY",
+                    "BUSINESS" => "BUSINESS",
+                    "FIRST" => "FIRST",
+                    _ => "ECONOMY"
+                };
+                _maxFlightSeating = userSysPrefs.MaxFlightSeating switch
+                {
+                    "ECONOMY" => "ECONOMY",
+                    "PREMIUM_ECONOMY" => "PREMIUM_ECONOMY",
+                    "BUSINESS" => "BUSINESS",
+                    "FIRST" => "FIRST",
+                    _ => "ECONOMY"
+                };
 
                 // load the travel policy if the value has has value and override the user preferences here
                 _travelPolicyId = userSysPrefs.TravelPolicyId;
@@ -205,12 +221,8 @@
                 {
                     _travelPolicy = await AvaApiService.GetTravelPolicyByIdAsync(_travelPolicyId, "");
 
-                    // set CurrencyCode overwrite
-                    _currencyCode = _travelPolicy.DefaultCurrencyCode;
-
-                    // set MaxFlightPrice overwrite
-                    // if this is 0 or null, then it's no limit
-                    _maxPrice = _travelPolicy.MaxFlightPrice == 0 ? _maxPrice : _travelPolicy.MaxFlightPrice;
+                    // set clientId
+                    _clientId = _travelPolicy.AvaClientId.ToString();
 
                     // set default cabin class
                     _cabinClass = _travelPolicy.DefaultFlightSeating switch
@@ -221,9 +233,17 @@
                         "FIRST" => "FIRST",
                         _ => "ECONOMY"
                     };
-                    
-                    _maxFlightSeating = _travelPolicy.MaxFlightSeating;
 
+                    _maxFlightSeating = _travelPolicy.MaxFlightSeating switch
+                    {
+                        "ECONOMY" => "ECONOMY",
+                        "PREMIUM_ECONOMY" => "PREMIUM_ECONOMY",
+                        "BUSINESS" => "BUSINESS",
+                        "FIRST" => "FIRST",
+                        _ => "ECONOMY"
+                    };
+
+                    // calendar search settings
                     if (_travelPolicy.DefaultCalendarDaysInAdvanceForFlightBooking.HasValue)
                     {
                         _minDate = DateTime.Today.AddDays(_travelPolicy.DefaultCalendarDaysInAdvanceForFlightBooking.Value);
@@ -379,21 +399,15 @@
             {
                 Id = await Nanoid.GenerateAsync(),
                 CreatedAt = DateTime.UtcNow,
-                ClientId = "", //_clientIdMapped,
-                CustomerId = "", //_customerIdMapped,
-                CurrencyCode = _currencyCode ?? "AUD",
+                ClientId = _clientId ?? string.Empty,
+                CustomerId = _aspNetUserId ?? string.Empty,
+                TravelPolicyId = null,
                 OriginLocationCode = new string(_departCity[^5..].Where(c => char.IsLetterOrDigit(c)).ToArray()),
                 DestinationLocationCode = new string(_destinationCity[^5..].Where(c => char.IsLetterOrDigit(c)).ToArray()),
                 IsOneWay = _isOneWay,
                 DepartureDate = (_date ?? DateTime.UtcNow).ToString("yyyy-MM-dd"),
                 Adults = int.TryParse(_numberOfPeople, out int adults) ? adults : 0,
                 CabinClass = _cabinClass ?? "ECONOMY",
-                CabinClassCoverage = _cabinClassCoverage ?? "MOST_SEGMENTS",
-                ExcludedCarrierCodes = !string.IsNullOrEmpty(_excludedAirlineCodes) ? _excludedAirlineCodes : null,
-                IncludedCarrierCodes = !string.IsNullOrEmpty(_includedAirlineCodes) ? _includedAirlineCodes : null,
-                MaxFlightPrice = _maxPrice ?? 9999,
-                NonStopFlight = _nonStopFlights,
-                MaxFlightOffers = _maxResultCount
             };
 
             // if oneway trip, add departing only date
@@ -409,15 +423,36 @@
                 _flightOfferSearchRequest.DepartureDateReturn = _dateRange.End.Value.ToString("yyyy-MM-dd");
             }
 
+            isLoading = true;
+            StateHasChanged(); // triggers re-render
+            await Task.Delay(1); // gives Blazor time to update the UI
+
             // make the call to the API now
             try
             {
-                string x = System.Text.Json.JsonSerializer.Serialize(_flightOfferSearchRequest, new JsonSerializerOptions { WriteIndented = false });
-                await File.WriteAllTextAsync(@"/app/flightoffer_data.json", x);
+                AmadeusFlightOfferSearchResult searchResults = await AvaApiService.PostFlightSearchQueryAsync(_flightOfferSearchRequest, "");
+
+                // _flightOfferSearchRequest has a unique key value in it, the .Id
+                // this can be used as a cache key
+                resultsStored = await StorageService.StoreAmadeusFlightOfferSearchResultAsync(searchResults, _flightOfferSearchRequest.Id);
+
+                @* string x = System.Text.Json.JsonSerializer.Serialize(searchResults, new JsonSerializerOptions { WriteIndented = false });
+                await File.WriteAllTextAsync($@"/app/flightoffer_data_{_flightOfferSearchRequest.Id}.json", x); *@
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex}");
+            }
+            finally
+            {
+                if (resultsStored)
+                {
+                    Navigation.NavigateTo($"/Book/Flight/Results/{_flightOfferSearchRequest.Id}", forceLoad: true);
+                }
+                else
+                {
+                    isLoading = false;
+                }                
             }
         }
     }
@@ -501,7 +536,7 @@
                                                 Label="Select Dates"
                                                 MinDate="_minDate"
                                                 MaxDate="_maxDate"
-                                                IsDateDisabledFunc="@((DateTime dt) => dt.DayOfWeek != DayOfWeek.Saturday && dt.DayOfWeek != DayOfWeek.Sunday)">
+                                                IsDateDisabledFunc="@((DateTime dt) => dt.DayOfWeek == DayOfWeek.Saturday || dt.DayOfWeek == DayOfWeek.Sunday)">
                                                 <!-- Return trip, weekdays only -->
                                             </MudDateRangePicker>,
 
