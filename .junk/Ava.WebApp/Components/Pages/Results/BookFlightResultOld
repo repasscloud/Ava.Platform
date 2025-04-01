@@ -19,7 +19,7 @@
                 <MudItem sm="6">
                     <MudText Typo="Typo.body1"><b>12:12pm → 4:10pm</b></MudText>
                     <MudText Typo="Typo.body2">Brisbane (BNE) → Perth (PER)</MudText>
-                    <MudText Typo="Typo.body2">This photo was taken in a small village in Istra, Croatia.</MudText>
+                    <MudText Typo="Typo.body2">Additional text goes here</MudText>
                     <div style="position: relative; display: inline-block;">
                         <!-- Base Icon (Meal Service) -->
                         <MudIcon Icon="@Icons.Material.Filled.Restaurant" Size="Size.Small"/>
