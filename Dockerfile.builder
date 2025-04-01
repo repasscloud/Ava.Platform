@@ -4,7 +4,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0.200-alpine3.20 AS base
 # Metadata
 LABEL maintainer="hello@djjm.io"
 LABEL version="1.0"
-LABEL description="Custom .NET SDK image (dotnet/sdk:9.0.200-alpine3.20-arm64v8) with pre-installed NuGet packages"
+LABEL description="Custom .NET SDK image (dotnet/sdk:9.0.200-alpine3.20) with pre-installed NuGet packages"
 
 # Set working directory
 WORKDIR /
