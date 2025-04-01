@@ -153,24 +153,17 @@ namespace Ava.Shared.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     ClientId = table.Column<string>(type: "text", nullable: false),
                     CustomerId = table.Column<string>(type: "text", nullable: false),
-                    CurrencyCode = table.Column<string>(type: "text", nullable: false),
+                    TravelPolicyId = table.Column<string>(type: "text", nullable: true),
                     OriginLocationCode = table.Column<string>(type: "text", nullable: false),
                     DestinationLocationCode = table.Column<string>(type: "text", nullable: false),
+                    IsOneWay = table.Column<bool>(type: "boolean", nullable: false),
                     DepartureDate = table.Column<string>(type: "text", nullable: false),
-                    DepartureTime = table.Column<string>(type: "text", nullable: true),
                     DepartureDateReturn = table.Column<string>(type: "text", nullable: true),
-                    DepartureTimeReturn = table.Column<string>(type: "text", nullable: true),
                     Adults = table.Column<int>(type: "integer", nullable: false),
-                    CabinClass = table.Column<string>(type: "text", nullable: false),
-                    CabinClassCoverage = table.Column<string>(type: "text", nullable: false),
-                    ExcludedCarrierCodes = table.Column<string>(type: "text", nullable: true),
-                    IncludedCarrierCodes = table.Column<string>(type: "text", nullable: true),
-                    MaxFlightPrice = table.Column<int>(type: "integer", nullable: true),
-                    NonStopFlight = table.Column<bool>(type: "boolean", nullable: false),
-                    MaxFlightOffers = table.Column<int>(type: "integer", nullable: false)
+                    CabinClass = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

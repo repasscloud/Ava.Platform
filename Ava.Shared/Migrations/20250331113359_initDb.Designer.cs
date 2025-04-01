@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ava.Shared.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250329133206_initDb")]
+    [Migration("20250331113359_initDb")]
     partial class initDb
     {
         /// <inheritdoc />
@@ -198,24 +198,14 @@ namespace Ava.Shared.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "cabinClass");
 
-                    b.Property<string>("CabinClassCoverage")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "cabinClassCoverage");
-
                     b.Property<string>("ClientId")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "clientId");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasAnnotation("Relational:JsonPropertyName", "createdAt");
-
-                    b.Property<string>("CurrencyCode")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "currencyCode");
 
                     b.Property<string>("CustomerId")
                         .IsRequired()
@@ -231,43 +221,23 @@ namespace Ava.Shared.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "departureDateReturn");
 
-                    b.Property<string>("DepartureTime")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "departureTime");
-
-                    b.Property<string>("DepartureTimeReturn")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "departureTimeReturn");
-
                     b.Property<string>("DestinationLocationCode")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "destinationLocationCode");
 
-                    b.Property<string>("ExcludedCarrierCodes")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "excludedCarriers");
-
-                    b.Property<string>("IncludedCarrierCodes")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "includedCarriers");
-
-                    b.Property<int>("MaxFlightOffers")
-                        .HasColumnType("integer")
-                        .HasAnnotation("Relational:JsonPropertyName", "maxFlightOffers");
-
-                    b.Property<int?>("MaxFlightPrice")
-                        .HasColumnType("integer")
-                        .HasAnnotation("Relational:JsonPropertyName", "maxFlightPrice");
-
-                    b.Property<bool>("NonStopFlight")
+                    b.Property<bool>("IsOneWay")
                         .HasColumnType("boolean")
-                        .HasAnnotation("Relational:JsonPropertyName", "nonStopFlight");
+                        .HasAnnotation("Relational:JsonPropertyName", "isOneWay");
 
                     b.Property<string>("OriginLocationCode")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "originLocationCode");
+
+                    b.Property<string>("TravelPolicyId")
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "travelPolicyId");
 
                     b.HasKey("Id");
 
