@@ -1,8 +1,8 @@
-namespace Ava.API.Controllers.Kernel;
+namespace Ava.API.Controllers.Flights;
 
-[Route("api/[controller]")]
+[Route("api/v1/flights")]
 [ApiController]
-public class SearchController : ControllerBase
+public class FlightsController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly IAmadeusAuthService _authService;  // for the amadeus search itself
@@ -10,7 +10,7 @@ public class SearchController : ControllerBase
     private readonly ILoggerService _loggerService;
     private readonly JsonSerializerOptions _jsonOptions;
     
-    public SearchController(
+    public FlightsController(
         ApplicationDbContext context,
         IAmadeusAuthService authService,
         IAmadeusFlightSearchService flightSearchService,
@@ -24,9 +24,9 @@ public class SearchController : ControllerBase
         _jsonOptions = jsonOptions;
     }
     
-    // POST: api/Search/webapp/flights
-    [HttpPost("webapp/flights")]
-    public async Task<ActionResult<AmadeusFlightOfferSearchResult>> SearchFlightsWebApp(FlightOfferSearchRequestDTO criteria)
+    // POST: api/v1/flights/search
+    [HttpPost("search")]
+    public async Task<ActionResult<AmadeusFlightOfferSearchResult>> SearchFlights(FlightOfferSearchRequestDTO criteria)
     {
         // add .CreatedAt value (this must be controlled by API, it will be ignored by everything else)
         criteria.CreatedAt = DateTime.UtcNow;
