@@ -73,3 +73,7 @@ global using System.Text.Json.Serialization;
 global using Ava.Shared.DependencyInjection;
 global using Ava.Shared.Data;
 global using Ava.Shared.Identity;
+global using Ava.Shared.Models.Results.Flights;
+global using Ava.WebApp.Helpers;
+global using System.Xml;
+global using Ava.WebApp.Extensions;
