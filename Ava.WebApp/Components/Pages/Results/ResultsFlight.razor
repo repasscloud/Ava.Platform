@@ -3,7 +3,6 @@
 @inject IStorageService StorageService
 @inject IGithubCDNService GithubCDNService
 
-
 @if (_isCacheKeyLoaded)
 {
     <MudCard class="mb-3">
@@ -12,11 +11,6 @@
             for (int i = 0; i < _flightResultsV1.Count; i++)
             {
                 var flightOffer = _flightResultsV1[i];
-                // use i and flightOffer here
-
-                //string carrierImgUrl = OperatingCarrierImageUrl(flightOffer);
-                //string carrierImgUrl = await GithubCDNService.GetOperatingCarrierImageUrlAsync(flightOffer)
-                
 
                 <MudCardContent>
                     <MudGrid align-left>
@@ -33,7 +27,17 @@
                             <!-- Flight Times & Route -->
                             <MudItem sm="6">
                                 <MudText Typo="Typo.body1"><b>12:12pm → 4:10pm</b></MudText>
-                                <MudText Typo="Typo.body2">LKUP @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].Departure.IataCode}") → LKUP @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].Arrival.IataCode}")</MudText>
+                                <MudText Typo="Typo.body2">
+                                    @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].Departure.IataCode}") → @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].Arrival.IataCode}")
+                                </MudText>
+
+                                @if (flightOffer.TotalNumberOfSegments > 1)
+                                {
+                                    <MudText Typo="Typo.body1"><b>12:12pm → 4:10pm</b></MudText>
+                                    <MudText Typo="Typo.body2">
+                                        @($"{flightOffer.ItineraryGroup[0].SegmentGroup[1].Departure.IataCode}") → @($"{flightOffer.ItineraryGroup[0].SegmentGroup[1].Arrival.IataCode}")
+                                    </MudText>
+                                }
                                 <MudText Typo="Typo.body2">Additional text goes here</MudText>
                                 <div style="position: relative; display: inline-block;">
                                     <!-- Base Icon (Meal Service) -->
@@ -47,6 +51,7 @@
                                     <!-- Base Icon (Meal Service) -->
                                     <MudIcon Icon="@Icons.Material.Filled.Fastfood" Size="Size.Small"/>
                                 </div>
+                                
                             </MudItem>
                             
 
@@ -54,29 +59,44 @@
                             <MudItem sm="3" Style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
                                 <!-- Flex container to align the time and chip horizontally -->
                                 <div Style="display: flex; align-items: center; gap: 8px;">
-                                    <MudText Typo="Typo.body1" Style="margin: 0;"><b>5h 45m</b></MudText>
+                                    <MudText 
+                                        Typo="Typo.body1"
+                                        Style="margin: 0;">
+                                            <b>@($"{flightOffer.TotalTravelTime.Hours}")H @($"{flightOffer.TotalTravelTime.Minutes}")M</b>
+                                    </MudText>
 
-                                    @if (_layoverCount == 0)
+                                    @if (flightOffer.TotalNumberOfSegments == 1)
                                     {
                                         <MudChip T="string" Color="Color.Success" Style="margin: 0; padding: 2px 8px;">Direct Flight</MudChip>
                                     }
-                                    else if (_layoverCount == 1)
+                                    else if (flightOffer.TotalNumberOfSegments == 2)
                                     {
-                                        <MudChip T="string" Color="Color.Warning" Style="margin: 0; padding: 2px 8px;">@(_layoverCount) @(_stop)</MudChip>
+                                        <MudChip T="string" Color="Color.Warning" Style="margin: 0; padding: 2px 8px;">1 stop</MudChip>
+                                    }
+                                    else if (flightOffer.TotalNumberOfSegments > 2)
+                                    {
+                                        <MudChip T="string" Color="Color.Error" Style="margin: 0; padding: 2px 8px;">@(flightOffer.TotalNumberOfSegments) stops</MudChip>
                                     }
                                     else
                                     {
-                                        <MudChip T="string" Color="Color.Error" Style="margin: 0; padding: 2px 8px;">@(_layoverCount) @(_stops)</MudChip>
+                                        <MudChip T="string" Color="Color.Error" Style="margin: 0; padding: 2px 8px;">@(flightOffer.TotalNumberOfSegments) stops</MudChip>
                                     }
                                 </div>
 
                                 <!-- Additional text under the time + chip -->
+                                @if (flightOffer.TotalNumberOfSegments > 1)
+                                {
+
+                                }
                                 <MudText Typo="Typo.caption" Class="text-muted">Layover details go here</MudText>
                             </MudItem>
 
                             <!-- Price -->
                             <MudItem sm="2" Style="text-align: right;">
-                                <MudText Typo="Typo.h6" fontweight="FontWeight.Bold">AU$394</MudText>
+                                <MudText Typo="Typo.h6"
+                                    fontweight="FontWeight.Bold">
+                                    @($"{flightOffer.CurrencyCode.ToCurrencySymbol()}{flightOffer.GrandTotal:N2}")
+                                </MudText>
                                 @* <MudText Typo="Typo.h6" fontweight="FontWeight.Bold">AU$394</MudText> *@
                             </MudItem>
                         </MudHidden>
@@ -90,8 +110,6 @@
                                         Height="50"
                                         Style="border-radius: 4px; max-width: 100%;" />
                             </MudItem>
-
-    using Ava.WebApp.Extensions;
     
                             <!-- Flight Time & Route -->
                             <MudItem xs="7">
@@ -176,9 +194,6 @@
 
 
     // junk below here
-    private int _layoverCount = 0;
-    private string _stop = "stop";
-    private string _stops = "stops";
 
     private void HandleBookClick()
     {
