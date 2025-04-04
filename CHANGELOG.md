@@ -103,3 +103,9 @@ straightforward as possible.
   💸 Track cumulative spend (annual/monthly) on AvaClient
 - [#41](https://github.com/repasscloud/Ava.Platform/issues/41)
   🧾 Create new Transaction table and model
+- [#42](https://github.com/repasscloud/Ava.Platform/issues/42)
+  Update login on booking page
+- [#43](https://github.com/repasscloud/Ava.Platform/issues/43)
+  Create FlightResultV1 class for WebApp display
+- [#44](https://github.com/repasscloud/Ava.Platform/issues/44)
+  🐛 Add ISO 8601 Duration Parser Utility

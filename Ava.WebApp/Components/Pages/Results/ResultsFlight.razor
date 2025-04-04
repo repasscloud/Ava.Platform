@@ -1,17 +1,141 @@
 @page "/Results/Flight/{cacheKey?}"
 
+@inject IStorageService StorageService
+@inject IGithubCDNService GithubCDNService
+
+
 @if (_isCacheKeyLoaded)
 {
-    @JsonSerializer.Serialize(storedResults, options);
-}
+    <MudCard class="mb-3">
+        @if (_flightResultsV1 is not null && _flightResultsV1.Count > 0)
+        {
+            for (int i = 0; i < _flightResultsV1.Count; i++)
+            {
+                var flightOffer = _flightResultsV1[i];
+                // use i and flightOffer here
 
-@inject IStorageService StorageService
+                //string carrierImgUrl = OperatingCarrierImageUrl(flightOffer);
+                //string carrierImgUrl = await GithubCDNService.GetOperatingCarrierImageUrlAsync(flightOffer)
+                
+
+                <MudCardContent>
+                    <MudGrid align-left>
+                        <!-- #region Visible on medium and larger screens -->
+                        <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                            <!-- Airline Logo -->
+                            <MudItem sm="1">
+                                <MudImage Src=@($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].OperatingCarrierCode.ToAirlineImageUrl()}") 
+                                        Width="90" 
+                                        Height="90" 
+                                        Style="border-radius: 4px; max-width: 100%;" />
+                            </MudItem>
+
+                            <!-- Flight Times & Route -->
+                            <MudItem sm="6">
+                                <MudText Typo="Typo.body1"><b>12:12pm → 4:10pm</b></MudText>
+                                <MudText Typo="Typo.body2">LKUP @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].Departure.IataCode}") → LKUP @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].Arrival.IataCode}")</MudText>
+                                <MudText Typo="Typo.body2">Additional text goes here</MudText>
+                                <div style="position: relative; display: inline-block;">
+                                    <!-- Base Icon (Meal Service) -->
+                                    <MudIcon Icon="@Icons.Material.Filled.Restaurant" Size="Size.Small"/>
+
+                                    <!-- Overlay Icon (Dollar Sign) in Bottom Right -->
+                                    <MudIcon Icon="@Icons.Material.Filled.AttachMoney" Size="Size.Small" Color="Color.Error"
+                                            Style="position: absolute; bottom: 1px; right: -4px; background-color: white; border-radius: 50%; padding: 0.5px; font-size: 0.8em;" />
+                                </div>
+                                <div style="position: relative; display: inline-block;">
+                                    <!-- Base Icon (Meal Service) -->
+                                    <MudIcon Icon="@Icons.Material.Filled.Fastfood" Size="Size.Small"/>
+                                </div>
+                            </MudItem>
+                            
+
+                            <!-- Total Travel Time & Layovers -->
+                            <MudItem sm="3" Style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                                <!-- Flex container to align the time and chip horizontally -->
+                                <div Style="display: flex; align-items: center; gap: 8px;">
+                                    <MudText Typo="Typo.body1" Style="margin: 0;"><b>5h 45m</b></MudText>
+
+                                    @if (_layoverCount == 0)
+                                    {
+                                        <MudChip T="string" Color="Color.Success" Style="margin: 0; padding: 2px 8px;">Direct Flight</MudChip>
+                                    }
+                                    else if (_layoverCount == 1)
+                                    {
+                                        <MudChip T="string" Color="Color.Warning" Style="margin: 0; padding: 2px 8px;">@(_layoverCount) @(_stop)</MudChip>
+                                    }
+                                    else
+                                    {
+                                        <MudChip T="string" Color="Color.Error" Style="margin: 0; padding: 2px 8px;">@(_layoverCount) @(_stops)</MudChip>
+                                    }
+                                </div>
+
+                                <!-- Additional text under the time + chip -->
+                                <MudText Typo="Typo.caption" Class="text-muted">Layover details go here</MudText>
+                            </MudItem>
+
+                            <!-- Price -->
+                            <MudItem sm="2" Style="text-align: right;">
+                                <MudText Typo="Typo.h6" fontweight="FontWeight.Bold">AU$394</MudText>
+                                @* <MudText Typo="Typo.h6" fontweight="FontWeight.Bold">AU$394</MudText> *@
+                            </MudItem>
+                        </MudHidden>
+                        <!-- #endregion -->
+
+                        <!-- #region  Visible on small screens only -->
+                        <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                            <MudItem xs="2">
+                                <MudImage Src="https://images.trvl-media.com/media/content/expus/graphics/static_content/fusion/v0.1b/images/airlines/vector/s/JQ_sq.svg" 
+                                        Width="50" 
+                                        Height="50"
+                                        Style="border-radius: 4px; max-width: 100%;" />
+                            </MudItem>
+
+    using Ava.WebApp.Extensions;
+    
+                            <!-- Flight Time & Route -->
+                            <MudItem xs="7">
+                                <MudText Typo="Typo.body1"><b>12:12pm → 4:10pm</b></MudText>
+                                <MudText Typo="Typo.body2">Brisbane (BNE) → Perth (PER)</MudText>
+                            </MudItem>
+
+                            <!-- Price -->
+                            <MudItem xs="3" Style="text-align: right;">
+                                <MudText Typo="Typo.h6" fontweight="FontWeight.Bold">AU$394</MudText>
+                            </MudItem>
+                        </MudHidden>
+                        <!-- #endregion -->
+                    </MudGrid>
+                    
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="HandleBookClick" Class="me-2">
+                            Book Now
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="HandleBookClick" Class="me-2">
+                            Request
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="HandleBookClick" Class="me-2">
+                            Info
+                        </MudButton>
+                    </MudCardActions>
+                </MudCardContent>
+            }
+        }
+        else
+        {
+            <b>No Flights found</b>
+        }
+    </MudCard>
+}
 
 @code {
     [Parameter] public string? cacheKey { get; set; }
 
     private bool _isCacheKeyLoaded = false;
-    AmadeusFlightOfferSearchResult? storedResults;
+    private AmadeusFlightOfferSearchResult? _storedResults;
+    private List<FlightOffer>? _flightOffers;
+
+    private List<FlightResultV1>? _flightResultsV1;  // this is used to hold all the data for the for (int i=0) iteration to display results
 
 
     // json debug indenting
@@ -24,13 +148,78 @@
     {
         if (!string.IsNullOrWhiteSpace(cacheKey))
         {
-            storedResults = await StorageService.GetAmadeusFlightOfferSearchResultAsync(cacheKey);
+            _storedResults = await StorageService.GetAmadeusFlightOfferSearchResultAsync(cacheKey);
             await Task.Delay(1000);
-            if (storedResults is not null)
+            if (_storedResults is not null)
             {
                 _isCacheKeyLoaded = true;
+                _flightOffers = _storedResults.Data;
+
+                // update the _flightResultsV1 list
+                _flightResultsV1 ??= new List<FlightResultV1>();
+                var data = _flightOffers!.ToList();
+                for (int i = 0; i < data.Count; i++)
+                {
+                    var flightOffer = data[i];
+
+                    FlightResultV1 flightResultV1 = flightOffer.ToFlightResultV1();
+
+                    _flightResultsV1.Add(flightResultV1);
+                }
             }
-            
         }
     }
+
+
+
+    
+
+
+    // junk below here
+    private int _layoverCount = 0;
+    private string _stop = "stop";
+    private string _stops = "stops";
+
+    private void HandleBookClick()
+    {
+        Console.WriteLine("Book button clicked!");
+    }
 }
+
+
+@*
+See in the segments, there is an Id per segment? (this has been truncated for reference):
+
+"segments": [
+    {
+        "id": "17",
+
+
+That "id" is used further down here:
+"travelerPricings": [
+    {
+        "travelerId": "1",
+        "fareOption": "STANDARD",
+        "travelerType": "ADULT",
+        "price": {
+            "currency": "AUD",
+            "total": "313.98",
+            "base": "257.95"
+        },
+        "fareDetailsBySegment": [
+            {
+                "segmentId": "17",
+                "cabin": "ECONOMY",
+                "fareBasis": "UZCH0",
+                "brandedFare": "CH",
+                "brandedFareLabel": "CHOICE",
+                "class": "U",
+                "includedCheckedBags": {
+                    "quantity": 1
+                },
+                "amenities": [
+
+The "amenities" list is found down in travelerPricings.fareDetailsBySegment, then you need to find the record with the segmentId that matches the segments.Id from earlier, then check if it has the section .amenities (it should have, but it might not? That's why 'public List<AmenityV1>? AmenityGroup { get; set; }' is optiona!)
+
+And if it exists, that is how the amentitiesGroup must be populated!
+*@

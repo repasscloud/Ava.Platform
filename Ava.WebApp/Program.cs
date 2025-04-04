@@ -28,15 +28,22 @@ public class Program
             });
         });
 
-        // Register HttpClient for Blazor Server
+        // AvaAPI - for internal API communication
         builder.Services.AddHttpClient("AvaAPI", client =>
         {
             client.BaseAddress = new Uri("http://ava-api:5165/"); // Replace with actual API URL
             client.Timeout = TimeSpan.FromSeconds(30);
         });
 
+        // Github CDN - for external CDN calls to Github
+        builder.Services.AddHttpClient("GithubCDN", client =>
+        {
+            client.BaseAddress = new Uri("https://raw.githubusercontent.com/");
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
+
         // Add services to the container.
-        builder.Services.AddAvaSharedServices(builder.Configuration);
+        builder.Services.AddAvaSharedServices(builder.Configuration, includeWebOnly: true);
 
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
@@ -73,28 +80,12 @@ public class Program
             .AddSignInManager()
             .AddDefaultTokenProviders();
 
-        // Register LoggerService (custom) (comes from Ava.API)
-        //builder.Services.AddScoped<ILoggerService, LoggerService>();
-
-        // Object Storage Service
-        // builder.Services.AddScoped<IStorageService, StorageService>();
-        
         // Ava API Service
-        // builder.Services.AddScoped<IAvaApiService, AvaApiService>();
-        
-        // JWT Token Service
-        // builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-
+        builder.Services.AddScoped<IAvaApiService, AvaApiService>();
         // Authentication Info Service
         builder.Services.AddScoped<IAuthenticationInfoService, AuthenticationInfoService>();
-
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
-
-
-        // User Pref Service
-        builder.Services.AddScoped<IAvaUserSysPrefService, AvaUserSysPrefService>();
-
+        builder.Services.AddScoped<IGithubCDNService, GithubCDNService>();
         // Add Blazored.LocalStorage (for cookies and stuff)
         builder.Services.AddBlazoredLocalStorage();
 

@@ -2,7 +2,9 @@ namespace Ava.Shared.DependencyInjection;
 
 public static class ServiceRegistrationExtensions
 {
-    public static IServiceCollection AddAvaSharedServices(this IServiceCollection services, IConfiguration config)
+
+    // Ava.Shared.DependencyInjection.ServiceRegistrationExtensions.cs
+    public static IServiceCollection AddAvaSharedServices(this IServiceCollection services, IConfiguration config, bool includeWebOnly = false)
     {
         var connectionString = config.GetConnectionString("PostgresConnection")
             ?? throw new InvalidOperationException("Connection string 'PostgresConnection' not found.");
@@ -11,26 +13,20 @@ public static class ServiceRegistrationExtensions
             options.UseNpgsql(connectionString));
 
         services.AddScoped<ILoggerService, LoggerService>();
+        services.AddScoped<IStorageService, StorageService>();  // Object Storage Service
+        services.AddScoped<IAvaApiService, AvaApiService>();  // Ava API Service
+        services.AddScoped<IJwtTokenService, JwtTokenService>();  // JWT Token Service
 
-        // Object Storage Service
-        services.AddScoped<IStorageService, StorageService>();
-        
-        // Ava API Service
-        services.AddScoped<IAvaApiService, AvaApiService>();
-        
-        // JWT Token Service
-        services.AddScoped<IJwtTokenService, JwtTokenService>();
+        // ✅ Only add this when includeWebOnly is true
+        if (includeWebOnly)
+        {
+            services.AddScoped<IAvaUserSysPrefService, AvaUserSysPrefService>();  // User Pref Service
+        }
 
-        // Authentication Info Service
-        //services.AddScoped<IAuthenticationInfoService, AuthenticationInfoService>();
-
+        //services.AddScoped<IAuthenticationInfoService, AuthenticationInfoService>();  // Authentication Info Service
         //services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+        //services.AddBlazoredLocalStorage();  // Add Blazored.LocalStorage (for cookies and stuff)
 
-        // User Pref Service
-        //services.AddScoped<IAvaUserSysPrefService, AvaUserSysPrefService>();
-
-        // Add Blazored.LocalStorage (for cookies and stuff)
-        //services.AddBlazoredLocalStorage();
 
         return services;
     }
