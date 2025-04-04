@@ -30,6 +30,14 @@ public static class FlightOfferToResultMapper
                 g => g.SelectMany(fd => fd.Amenities ?? Enumerable.Empty<FareDetailBySegmentAmenity>()).ToList()
             ) ?? new Dictionary<string, List<FareDetailBySegmentAmenity>>();
 
+        var cabinClassBySegmentId = offer.TravelerPricings?
+            .SelectMany(tp => tp.FareDetailsBySegment ?? Enumerable.Empty<FareDetailBySegment>())
+            .Where(fd => !string.IsNullOrEmpty(fd.SegmentId))
+            .GroupBy(fd => fd.SegmentId!)
+            .ToDictionary(
+                g => g.Key,
+                g => g.FirstOrDefault()?.Cabin ?? string.Empty
+            ) ?? new Dictionary<string, string>();
 
         for (int i = 0; i < (offer.Itineraries?.Count ?? 0); i++)
         {
@@ -64,6 +72,9 @@ public static class FlightOfferToResultMapper
                     Number = segment.Number ?? string.Empty,
                     Aircraft = segment.Aircraft?.Code ?? string.Empty,
                     NumberOfStops = segment.numberOfStops,
+                    CabinClass = cabinClassBySegmentId.TryGetValue(segment.Id ?? string.Empty, out var cabinClass)
+                        ? cabinClass
+                        : string.Empty,
                     Id = segment.Id ?? string.Empty,
                     AmenityGroup = amenitiesBySegmentId.TryGetValue(segment.Id ?? string.Empty, out var amenities)
                         ? amenities.Select(a => new AmenityV1
