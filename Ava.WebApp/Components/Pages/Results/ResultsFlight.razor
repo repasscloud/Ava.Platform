@@ -25,15 +25,15 @@
                             @for (int j = 0; j < flightOffer.ItineraryGroup[itin0].SegmentGroup.Count; j++)
                             {
                                 var segment = flightOffer.ItineraryGroup[itin0].SegmentGroup[j];  // obtain the segment info here
-                                
+                            
+                                <!-- Airline Logo -->
+                                <MudItem sm="1">
+                                    <MudImage Src=@($"{flightOffer.ItineraryGroup[itin0].SegmentGroup[0].OperatingCarrierCode.ToAirlineImageUrl()}") 
+                                        Width="90" 
+                                        Height="90" 
+                                        Style="border-radius: 4px; max-width: 100%;" />
+                                </MudItem>
                             }
-                            <!-- Airline Logo -->
-                            <MudItem sm="1">
-                                <MudImage Src=@($"{flightOffer.ItineraryGroup[itin0].SegmentGroup[0].OperatingCarrierCode.ToAirlineImageUrl()}") 
-                                    Width="90" 
-                                    Height="90" 
-                                    Style="border-radius: 4px; max-width: 100%;" />
-                            </MudItem>
 
                             <!-- Flight Times & Route -->
                             <MudItem sm="6">
