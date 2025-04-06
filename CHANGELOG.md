@@ -27,6 +27,7 @@ straightforward as possible.
 - [#47](https://github.com/repasscloud/Ava.Platform/issues/47)
   Create FlightRouteRenderer Extension [dev 2d59a51]
 
+
 ### Changed
 
 - [#11](https://github.com/repasscloud/Ava.WebApp/issues/11)
@@ -112,6 +113,7 @@ straightforward as possible.
   🧾 Create new Transaction table and model
 - [#42](https://github.com/repasscloud/Ava.Platform/issues/42)
   Update login on booking page
-
+- [#48](https://github.com/repasscloud/Ava.Platform/issues/48)
+  Decide best visual indicator for layover airport mismatch (Blazor WebUI)
 - [#44](https://github.com/repasscloud/Ava.Platform/issues/44)
   🐛 Add ISO 8601 Duration Parser Utility
