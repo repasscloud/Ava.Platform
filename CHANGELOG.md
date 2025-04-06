@@ -18,7 +18,14 @@ straightforward as possible.
   Add IsOneWay flag to FlightOfferSearchRequestDTO
 - [#18](https://github.com/repasscloud/Ava.WebApp/issues/18)
   Create support error page for missing parameters
-
+- [#45](https://github.com/repasscloud/Ava.Platform/issues/45)
+  💱 Add static helper to convert currency codes to symbols #45
+- [#43](https://github.com/repasscloud/Ava.Platform/issues/43)
+  Create FlightResultV1 class for WebApp display
+- [#46](https://github.com/repasscloud/Ava.Platform/issues/46)
+  Create AmenityV1 Extension Class [dev 95d1928]
+- [#47](https://github.com/repasscloud/Ava.Platform/issues/47)
+  Create FlightRouteRenderer Extension [dev 2d59a51]
 
 ### Changed
 
@@ -105,7 +112,6 @@ straightforward as possible.
   🧾 Create new Transaction table and model
 - [#42](https://github.com/repasscloud/Ava.Platform/issues/42)
   Update login on booking page
-- [#43](https://github.com/repasscloud/Ava.Platform/issues/43)
-  Create FlightResultV1 class for WebApp display
+
 - [#44](https://github.com/repasscloud/Ava.Platform/issues/44)
   🐛 Add ISO 8601 Duration Parser Utility
