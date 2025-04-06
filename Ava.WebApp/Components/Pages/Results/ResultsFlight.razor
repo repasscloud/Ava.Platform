@@ -6,40 +6,65 @@
 @if (_isCacheKeyLoaded)
 {
     <MudCard class="mb-3">
+        
         @if (_flightResultsV1 is not null && _flightResultsV1.Count > 0)
         {
             for (int i = 0; i < _flightResultsV1.Count; i++)
             {
                 var flightOffer = _flightResultsV1[i];
+                int itin0 = 0; // only the first itinerary for each result
+
+                var itineraryDuration = flightOffer.ItineraryGroup[itin0].TravelTime;  // store the duration of an itinerary
 
                 <MudCardContent>
                     <MudGrid align-left>
                         <!-- #region Visible on medium and larger screens -->
                         <MudHidden Breakpoint="Breakpoint.SmAndDown">
+
+                            <!-- iterate over each segment in and itinerary -->
+                            @for (int j = 0; j < flightOffer.ItineraryGroup[itin0].SegmentGroup.Count; j++)
+                            {
+                                var segment = flightOffer.ItineraryGroup[itin0].SegmentGroup[j];  // obtain the segment info here
+                                
+                            }
                             <!-- Airline Logo -->
                             <MudItem sm="1">
-                                <MudImage Src=@($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].OperatingCarrierCode.ToAirlineImageUrl()}") 
-                                        Width="90" 
-                                        Height="90" 
-                                        Style="border-radius: 4px; max-width: 100%;" />
+                                <MudImage Src=@($"{flightOffer.ItineraryGroup[itin0].SegmentGroup[0].OperatingCarrierCode.ToAirlineImageUrl()}") 
+                                    Width="90" 
+                                    Height="90" 
+                                    Style="border-radius: 4px; max-width: 100%;" />
                             </MudItem>
 
                             <!-- Flight Times & Route -->
                             <MudItem sm="6">
-                                <MudText Typo="Typo.body1"><b>12:12pm → 4:10pm</b></MudText>
+                                <MudText Typo="Typo.body1">
+                                    <b>
+                                        @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].Departure.At:h:mmtt}".ToLower()) → 
+                                        @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].Arrival.At:h:mmtt}".ToLower())
+                                    </b>
+                                </MudText>
                                 <MudText Typo="Typo.body2">
-                                    @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].Departure.IataCode}") → @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].Arrival.IataCode}")
+                                    @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].Departure.IataCode}") → @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].Arrival.IataCode}") @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].OperatingCarrierCode}{flightOffer.ItineraryGroup[0].SegmentGroup[0].Number}")
                                 </MudText>
 
                                 @if (flightOffer.TotalNumberOfSegments > 1)
                                 {
-                                    <MudText Typo="Typo.body1"><b>12:12pm → 4:10pm</b></MudText>
+                                    <MudText Typo="Typo.body1">
+                                        <b>
+                                            @($"{flightOffer.ItineraryGroup[0].SegmentGroup[1].Departure.At:h:mmtt}".ToLower()) → 
+                                            @($"{flightOffer.ItineraryGroup[0].SegmentGroup[1].Arrival.At:h:mmtt}".ToLower()) @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].OperatingCarrierCode}{flightOffer.ItineraryGroup[0].SegmentGroup[0].Number}")
+                                        </b>
+                                    </MudText>
                                     <MudText Typo="Typo.body2">
-                                        @($"{flightOffer.ItineraryGroup[0].SegmentGroup[1].Departure.IataCode}") → @($"{flightOffer.ItineraryGroup[0].SegmentGroup[1].Arrival.IataCode}")
+                                        @($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].OperatingCarrierCode}{flightOffer.ItineraryGroup[0].SegmentGroup[0].Number}")
                                     </MudText>
                                 }
-                                <MudText Typo="Typo.body2">Additional text goes here</MudText>
-                                <div style="position: relative; display: inline-block;">
+                                <MudText Typo="Typo.body2">
+                                    <MudIcon Icon="@Icons.Material.Filled.FlightTakeoff" />
+                                    &nbsp;@($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].OperatingCarrierCode}{flightOffer.ItineraryGroup[0].SegmentGroup[0].Number}")
+                                </MudText>
+                                <MudText Typo="Typo.body2">@($"{flightOffer.ItineraryGroup[0].SegmentGroup[0].Aircraft}")</MudText>
+                                @* <div style="position: relative; display: inline-block;">
                                     <!-- Base Icon (Meal Service) -->
                                     <MudIcon Icon="@Icons.Material.Filled.Restaurant" Size="Size.Small"/>
 
@@ -50,13 +75,45 @@
                                 <div style="position: relative; display: inline-block;">
                                     <!-- Base Icon (Meal Service) -->
                                     <MudIcon Icon="@Icons.Material.Filled.Fastfood" Size="Size.Small"/>
-                                </div>
-                                
+                                </div> *@
+
+                                @if (flightOffer?.ItineraryGroup != null &&
+                                    flightOffer.ItineraryGroup.Count > 0 &&
+                                    flightOffer.ItineraryGroup[0].SegmentGroup != null &&
+                                    flightOffer.ItineraryGroup[0].SegmentGroup.Count > 0 &&
+                                    flightOffer.ItineraryGroup[0].SegmentGroup[0].AmenityGroup != null &&
+                                    flightOffer.ItineraryGroup[0].SegmentGroup[0].AmenityGroup?.Count > 0)
+                                {
+                                    List<AmenityV1> amenities = flightOffer.ItineraryGroup[0].SegmentGroup[0].AmenityGroup!;
+
+                                    <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                                        @foreach (var amenity in amenities)
+                                        {
+                                            <MudTooltip Text="@amenity.Description">
+                                                <div style="position: relative;">
+                                                    @* Base icon based on description *@
+                                                    @if (!string.IsNullOrWhiteSpace(amenity.Description))
+                                                    {
+                                                        <MudIcon Icon="@GetAmenityIcon(amenity.Description)" Size="Size.Small" />
+
+                                                        @if (amenity.IsChargeable)
+                                                        {
+                                                            <MudIcon Icon="@Icons.Material.Filled.AttachMoney"
+                                                                Size="Size.Small"
+                                                                Color="Color.Error"
+                                                                Style="position: absolute; bottom: 1px; right: -4px; background-color: white; border-radius: 50%; padding: 0.5px; font-size: 0.8em;" />
+                                                        }
+                                                    }
+                                                </div>
+                                            </MudTooltip>
+                                        }
+                                    </div>
+                                }
                             </MudItem>
                             
 
                             <!-- Total Travel Time & Layovers -->
-                            <MudItem sm="3" Style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                            <MudItem sm="3" Style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px;">
                                 <!-- Flex container to align the time and chip horizontally -->
                                 <div Style="display: flex; align-items: center; gap: 8px;">
                                     <MudText 
@@ -86,10 +143,11 @@
                                 <!-- Additional text under the time + chip -->
                                 @if (flightOffer.TotalNumberOfSegments > 1)
                                 {
-
+                                    <!-- layover logic here -->
                                 }
                                 <MudText Typo="Typo.caption" Class="text-muted">Layover details go here</MudText>
                             </MudItem>
+
 
                             <!-- Price -->
                             <MudItem sm="2" Style="text-align: right;">
@@ -189,8 +247,82 @@
     }
 
 
+    private string GetAmenityIcon(string description)
+    {
+        return description.ToUpperInvariant() switch
+        {
+            "175 PCT  QMILES ACCUMULATION" => Icons.Material.Filled.TrendingUp,
+            "1PC MAX 15LB 7KG 115LCM" => Icons.Material.Filled.WorkOutline,
+            "1PC MAX 23KG 158LCM EACH" => Icons.Material.Filled.WorkOutline,
+            "200 PCT  QMILES ACCUMULATION" => Icons.Material.Filled.TrendingUp,
+            "3000 EXTRA MILES" => Icons.Material.Filled.Add,
+            "50 PCT QMILES ACCUMULATION" => Icons.Material.Filled.TrendingFlat,
+            "50KG BAGGAGE ALLOWANCE" => Icons.Material.Filled.Luggage,
+            "70 PERCENT MILES EARNED" => Icons.Material.Filled.TrendingFlat,
+            "75 PCT  QMILES ACCUMULATION" => Icons.Material.Filled.TrendingUp,
+            "ALCOHOLIC DRINK" => Icons.Material.Filled.WineBar,
+            "BAG INCLUDED" => Icons.Material.Filled.Work,
+            "BEVERAGE" => Icons.Material.Filled.LocalCafe,
+            "BID TO UPGRADE" => Icons.Material.Filled.Upgrade,
+            "CABIN BAG 1 PIECE 7 KG" => Icons.Material.Filled.Cabin,
+            "CARRY ON BAGGAGE" => Icons.Material.Filled.Cases,
+            "CHANGE AFTER DEPARTURE" => Icons.Material.Filled.EditCalendar,
+            "CHANGE BEFORE DEPARTURE" => Icons.Material.Filled.EditCalendar,
+            "CHANGEABLE TICKET" => Icons.Material.Filled.ChangeCircle,
+            "CHECKED BAG 1 PC 23 KG EACH" => Icons.Material.Filled.Work,
+            "CHECKED BAG 2 PCS 23 KG EACH" => Icons.Material.Filled.Work,
+            "CHECKED BAG 2 PCS 32 KG EACH" => Icons.Material.Filled.Work,
+            "CHECKED BAG FIRST" => Icons.Material.Filled.Luggage,
+            "CHECKED BAG SECOND" => Icons.Material.Filled.Luggage,
+            "COMPLIMENTARY BEVERAGES" => Icons.Material.Filled.LocalCafe,
+            "DEDICATED CHECK IN" => Icons.Material.Filled.AssignmentInd,
+            "EXCESS BAGGAGE" => Icons.Material.Filled.WorkOff,
+            "EXCESS WEIGHT SPECIAL CHARGE" => Icons.Material.Filled.Scale,
+            "FAST TRACK" => Icons.Material.Filled.Speed,
+            "FAST TRACK IF AVAILABLE" => Icons.Material.Filled.Speed,
+            "FOOD AND BEVERAGE" => Icons.Material.Filled.Restaurant,
+            "FREE CHECKED BAGGAGE ALLOWANCE" => Icons.Material.Filled.CheckCircle,
+            "FRONT SEAT SELECTION" => Icons.Material.Filled.EventSeat,
+            "MEAL" => Icons.Material.Filled.Restaurant,
+            "MEAL AND BEVERAGE" => Icons.Material.Filled.LocalDining,
+            "MEAL BEVERAGE" => Icons.Material.Filled.LocalDining,
+            "MEAL OR SNACK" => Icons.Material.Filled.RestaurantMenu,
+            "MEAL SERVICE" => Icons.Material.Filled.RoomService,
+            "MEAL SERVICES" => Icons.Material.Filled.RoomService,
+            "MEAL VOUCHER" => Icons.Material.Filled.ReceiptLong,
+            "MILEAGE ACCRUAL" => Icons.Material.Filled.Loyalty,
+            "NO SHOW FEE" => Icons.Material.Filled.Block,
+            "NON ALCOHOLIC DRINK" => Icons.Material.Filled.LocalDrink,
+            "ONLINE MESSAGE RIGHT" => Icons.Material.Filled.MarkChatRead,
+            "PRE PAID BAGGAGE" => Icons.Material.Filled.AttachMoney,
+            "PRE RESERVED SEAT ASSIGNMENT" => Icons.Material.Filled.EventSeat,
+            "PRE SEAT ASSIGNMENT" => Icons.Material.Filled.EventSeat,
+            "PREMIUM CHECK IN" => Icons.Material.Filled.Star,
+            "PREMIUM SEAT" => Icons.Material.Filled.AirlineSeatReclineExtra,
+            "PRIORITY ACCESS" => Icons.Material.Filled.FlightTakeoff,
+            "PRIORITY BAGGAGE" => Icons.Material.Filled.LocalShipping,
+            "PRIORITY BOARDING" => Icons.Material.Filled.DirectionsWalk,
+            "PRIORITY CHECK IN" => Icons.Material.Filled.Login,
+            "PRIORITY CHKIN AT CERTAIN PORT" => Icons.Material.Filled.Login,
+            "PRIORITY SECURITY" => Icons.Material.Filled.VerifiedUser,
+            "QR LOUNGE ACCESS OS" => Icons.Material.Filled.MeetingRoom,
+            "REFUND AFTER DEPARTURE" => Icons.Material.Filled.MoneyOff,
+            "REFUND BEFORE DEPARTURE" => Icons.Material.Filled.MoneyOffCsred,
+            "REFUNDABLE TICKET" => Icons.Material.Filled.Receipt,
+            "SEAT ASSIGNMENT" => Icons.Material.Filled.EventSeat,
+            "SEAT SELECTION" => Icons.Material.Filled.EventSeat,
+            "SNACK" => Icons.Material.Filled.Fastfood,
+            "STANDARD SEAT" => Icons.Material.Filled.EventSeat,
+            "STANDARD SEAT SELECTION" => Icons.Material.Filled.EventSeat,
+            "UPGRADE" => Icons.Material.Filled.Upgrade,
+            "UPGRADE ELIGIBILITY" => Icons.Material.Filled.CheckCircleOutline,
+            _ => Icons.Material.Filled.Info
+        };
+    }
 
-    
+
+
+
 
 
     // junk below here
