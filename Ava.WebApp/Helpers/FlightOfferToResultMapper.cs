@@ -18,7 +18,8 @@ public static class FlightOfferToResultMapper
             GrandTotal = decimal.TryParse(offer.Price?.GrandTotal, out var total) ? Math.Round(total, 2) : 0m,
             TotalNumberOfItineraries = offer.Itineraries?.Count ?? 0,
             TotalNumberOfSegments = offer.Itineraries?.Sum(i => i.Segments?.Count ?? 0) ?? 0,
-            ItineraryGroup = new List<ItineraryV1>()
+            ItineraryGroup = new List<ItineraryV1>(),
+            TotalTravelTime = TimeSpan.Zero  // explicitly initialized here
         };
 
         var amenitiesBySegmentId = offer.TravelerPricings?
@@ -91,6 +92,10 @@ public static class FlightOfferToResultMapper
 
             result.ItineraryGroup.Add(itineraryResult);
         }
+
+        result.TotalTravelTime = result.ItineraryGroup
+            .Select(it => it.TravelTime)
+            .Aggregate(TimeSpan.Zero, (acc, t) => acc.Add(t));
 
         return result;
     }
