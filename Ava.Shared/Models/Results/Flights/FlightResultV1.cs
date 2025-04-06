@@ -26,6 +26,9 @@ public class FlightResultV1
 
     [Required]
     public decimal GrandTotal { get; set; }
+
+    [Required]
+    public required TimeSpan TotalTravelTime { get; set; }
 }
 
 public class ItineraryV1
@@ -65,6 +68,9 @@ public class SegmentV1
     
     [Required]
     public int NumberOfStops { get; set; }
+
+    [Required]
+    public required string CabinClass { get; set; }
     
     [Required]
     public required string Id { get; set; }
