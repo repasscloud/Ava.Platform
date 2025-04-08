@@ -16,7 +16,8 @@ public class AvaClientController : ControllerBase
     public async Task<IActionResult> CreateAvaClient([FromBody] CreateAvaClientDTO dto)
     {
         // generate a brand new AvaClientID here, because this controller is a piece of shit
-        string _avaClientID = Nanoid.Generate(Nanoid.Alphabets.UppercaseLettersAndDigits, 10);
+        string _avaClientID = Nanoid.Generate(Nanoid.Alphabets.HexadecimalUppercase, 10);
+        //string _avaClientID = Nanoid.Generate(Nanoid.Alphabets.UppercaseLettersAndDigits, 10);
 
         // Create the AvaClient entity.
         AvaClient client = new()
