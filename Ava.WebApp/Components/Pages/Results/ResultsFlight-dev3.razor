@@ -2,6 +2,7 @@
 
 @inject IStorageService StorageService
 @inject IGithubCDNService GithubCDNService
+@inject IDialogService DialogService
 
 @if (_isCacheKeyLoaded)
 {
@@ -148,7 +149,8 @@
 
                                                     if (!string.Equals(currentSegment.Arrival.IataCode, nextSegment.Departure.IataCode, StringComparison.OrdinalIgnoreCase))
                                                     {
-                                                        <MudText Typo="Typo.caption" Class="text-muted">
+                                                        @* this is part of issue 48 *@
+                                                        @* <MudText Typo="Typo.caption" Class="text-muted">
                                                             @($"⚠️: Arrives at {currentSegment.Arrival.IataCode} but next departs from {nextSegment.Departure.IataCode}")
                                                         </MudText>
 
@@ -162,7 +164,7 @@
                                                         
                                                         <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled" Size="Size.Small" Icon="@Icons.Material.Filled.Warning">
                                                             Arrives at @currentSegment.Arrival.IataCode but next departs from @nextSegment.Departure.IataCode
-                                                        </MudChip>
+                                                        </MudChip> *@
                                                         
                                                         <MudText Typo="Typo.subtitle2" Color="Color.Error">
                                                             ⚠️ Arrives at @currentSegment.Arrival.IataCode but next departs from @nextSegment.Departure.IataCode
@@ -170,47 +172,8 @@
                                                     }
                                                 }
                                             }
-                                            @* flightOffer.ItineraryGroup[itin0] *@
                                         </MudItem>
-                                        @* <MudItem sm="4">
-                                            <MudGrid>
-                                                <MudItem xs="12">
-                                                    <MudText Typo="Typo.body1" Align="Align.Left">
-                                                        <b>@($"{flightOffer.TotalTravelTime.Hours}h {flightOffer.TotalTravelTime.Minutes}m")</b>
-                                                    </MudText>
-                                                    @if (flightOffer.TotalNumberOfSegments == 1)
-                                                    {
-                                                        <MudChip T="string" Color="Color.Success" Style="padding: 2px 8px;">Direct</MudChip>
-                                                    }
-                                                    else if (flightOffer.TotalNumberOfSegments == 2)
-                                                    {
-                                                        <MudChip T="string" Color="Color.Warning" Style="padding: 2px 8px;">1 stop</MudChip>
-                                                    }
-                                                    else
-                                                    {
-                                                        <MudChip T="string" Color="Color.Error" Style="padding: 2px 8px;">@flightOffer.TotalNumberOfSegments stops</MudChip>
-                                                    }
-                                                </MudItem>
-                                                <MudItem xs="6">
-                                                    @if (flightOffer.TotalNumberOfSegments == 1)
-                                                    {
-                                                        <MudChip T="string" Color="Color.Success" Style="padding: 2px 8px;">Direct</MudChip>
-                                                    }
-                                                    else if (flightOffer.TotalNumberOfSegments == 2)
-                                                    {
-                                                        <MudChip T="string" Color="Color.Warning" Style="padding: 2px 8px;">1 stop</MudChip>
-                                                    }
-                                                    else
-                                                    {
-                                                        <MudChip T="string" Color="Color.Error" Style="padding: 2px 8px;">@flightOffer.TotalNumberOfSegments stops</MudChip>
-                                                    }
-                                                </MudItem>
-                                                <MudItem xs="12">
-                                                    <MudText Typo="Typo.caption" Class="text-muted">Layover details go here</MudText>
-                                                </MudItem>
-                                            </MudGrid>
-                                        </MudItem> *@
-
+                                        
                                         <!-- Column C -->
                                         <MudItem sm="2">
                                             <MudGrid>
@@ -220,9 +183,19 @@
                                                     </MudText>
                                                 </MudItem>
                                                 <MudItem xs="12" Class="d-flex justify-end">
-                                                    <MudButton Variant="Variant.Outlined" Color="Color.Success" Size="Size.Small" Class="me-2">Book</MudButton>
-                                                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" Class="me-2">&nbsp;Request&nbsp;</MudButton>
-                                                    <MudButton Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small" Class="me-2">Info</MudButton>
+                                                    <MudButton Variant="Variant.Outlined"
+                                                        Color="Color.Success"
+                                                        Size="Size.Small"
+                                                        Class="me-2">
+                                                            Book
+                                                    </MudButton>
+                                                    <MudButton Variant="Variant.Outlined"
+                                                        Color="Color.Dark"
+                                                        Size="Size.Small"
+                                                        Class="me-2"
+                                                        OnClick="@(() => ShowBookingInfo("Flight QR123 departs at 18:30"))">
+                                                            Info
+                                                    </MudButton>
                                                 </MudItem>
                                             </MudGrid>
                                         </MudItem>
@@ -242,6 +215,28 @@
         </MudHidden>
     </MudGrid>
 }
+
+<MudMessageBox @ref="_mudMessageBox"
+               Title="Booking Info">
+    <MessageContent>
+        @if (!string.IsNullOrEmpty(BookingInfo))
+        {
+            <MudText Typo="Typo.body1">@BookingInfo</MudText>
+        }
+        else
+        {
+            <MudText Typo="Typo.body2" Color="Color.Error">No booking info available.</MudText>
+        }
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Success"
+                   StartIcon="@Icons.Material.Filled.Done">
+            OK
+        </MudButton>
+    </YesButton>
+</MudMessageBox>
+
 
 @code {
     [Parameter] public string? cacheKey { get; set; }
@@ -351,6 +346,23 @@
             "UPGRADE ELIGIBILITY" => Icons.Material.Filled.CheckCircleOutline,
             _ => Icons.Material.Filled.Info
         };
+    }
+
+
+    // mudblazor dialog box for flight info
+    private MudMessageBox? _mudMessageBox;
+    private string BookingInfo = string.Empty;
+
+    private async Task ShowBookingInfo(string info)
+    {
+        BookingInfo = info;
+
+        var result = await _mudMessageBox!.ShowAsync();
+
+        if (result == true)
+        {
+            Console.WriteLine("User confirmed booking info.");
+        }
     }
 
     private void HandleBookClick()
