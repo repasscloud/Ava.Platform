@@ -21,6 +21,9 @@ RUN dotnet publish -c Release -o /out
 
 # Step 2: Use the official ASP.NET Core runtime image to run the app
 FROM mcr.microsoft.com/dotnet/aspnet:9.0.2-alpine3.21-arm64v8
+RUN apk add icu-libs && rm -rf /var/cache/apk/*
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+ENV DOTNET_SYSTEM_GLOBALIZATION_USENLS=false
 WORKDIR /app
 COPY --from=build /out .
 
