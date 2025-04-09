@@ -28,6 +28,20 @@ services:
       ava-api:
         condition: service_healthy
 
+  ava-doks:
+    build:
+      context: .
+      dockerfile: Dockerfile.docs
+    image: hugo-doks-dev
+    container_name: hugo-doks-dev
+    ports:
+      - "1313:1313"
+    volumes:
+      - ./Ava.docs:/usr/src/app
+    working_dir: /usr/src/app
+    tty: true
+    stdin_open: true
+
 networks:
   common_net:
     external: true
