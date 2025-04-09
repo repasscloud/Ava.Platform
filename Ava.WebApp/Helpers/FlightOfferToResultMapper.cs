@@ -69,7 +69,7 @@ public static class FlightOfferToResultMapper
                         At = DateTime.TryParse(segment.Arrival?.At, out var arr) ? arr : DateTime.MinValue
                     },
                     CarrierCode = segment.CarrierCode ?? "__",
-                    OperatingCarrierCode = segment.Operating?.CarrierCode ?? "__",
+                    OperatingCarrierCode = segment.Operating?.CarrierCode ?? segment.CarrierCode ?? "__",
                     Number = segment.Number ?? string.Empty,
                     Aircraft = segment.Aircraft?.Code ?? string.Empty,
                     NumberOfStops = segment.numberOfStops,
