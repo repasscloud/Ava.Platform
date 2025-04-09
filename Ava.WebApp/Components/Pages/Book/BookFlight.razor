@@ -6,7 +6,7 @@
 @inject IAvaUserSysPrefService AvaUserSysPrefService
 @inject IStorageService StorageService
 
-<PageTitle>Book Flight @Icons.Material.Filled.Flight</PageTitle>
+<PageTitle>Book Flight</PageTitle>
 
 <MudContainer>
     <MudOverlay Visible="isLoading" class="fade-overlay">
@@ -81,8 +81,8 @@
 
                 <!-- Date Picker -->
                 <div @key="_isOneWay">
-    @RenderDatePicker(_isOneWay, _filterMode)
-</div>
+                    @RenderDatePicker(_isOneWay, _filterMode)
+                </div>
 
                 
                 <!-- From City -->
