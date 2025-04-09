@@ -1,0 +1,41 @@
+FROM node:20-alpine
+
+# Set environment variables
+ENV HUGO_VERSION=0.145.0 \
+    CI=true \
+    PROJECT_NAME=ava-doks
+
+# Create and switch to working directory
+WORKDIR /usr/src/app
+
+# Install system dependencies
+RUN apk add --no-cache curl libc6-compat
+
+# Upgrade npm
+RUN npm install -g npm@11.2.0
+
+# Install Hugo Extended for ARM64
+RUN curl -L -o hugo.tar.gz "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-ARM64.tar.gz" && \
+    tar -xzf hugo.tar.gz hugo && \
+    mv hugo /usr/local/bin/ && \
+    rm hugo.tar.gz && \
+    hugo version
+
+# Install create-thulite globally
+RUN npm install -g create-thulite
+
+# Create the project directory
+RUN yes | npx create-thulite --template doks "$PROJECT_NAME" && \
+    ls -la "$PROJECT_NAME"
+
+# Set project directory as new working dir
+WORKDIR /usr/src/app/${PROJECT_NAME}
+
+# Install dependencies and fix vulnerabilities
+RUN npm install && npm audit fix --force
+
+# Expose Hugo dev server port
+EXPOSE 1313
+
+# Default CMD
+CMD ["hugo", "server", "--bind", "0.0.0.0", "--baseURL", "http://localhost", "--disableFastRender"]
