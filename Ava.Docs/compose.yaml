@@ -1,0 +1,14 @@
+services:
+  hugo-doks-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hugo-doks-dev
+    container_name: hugo-doks-dev
+    ports:
+      - "1313:1313"
+    volumes:
+      - ./AvaPlatform.docs:/usr/src/app
+    working_dir: /usr/src/app
+    tty: true
+    stdin_open: true
