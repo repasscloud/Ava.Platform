@@ -1,0 +1,35 @@
+@page "/Debug/Results/Flight/{cacheKey?}"
+
+@inject IStorageService StorageService
+
+@if (_isCacheKeyLoaded)
+{
+    <pre>@JsonSerializer.Serialize(_flightOffers, options)</pre>
+}
+
+@code {
+    [Parameter] public string? cacheKey { get; set; }
+
+    private bool _isCacheKeyLoaded = false;
+    private AmadeusFlightOfferSearchResult? _storedResults;
+    private List<FlightOffer>? _flightOffers;
+
+    private JsonSerializerOptions options = new JsonSerializerOptions
+    {
+        WriteIndented = true
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(cacheKey))
+        {
+            _storedResults = await StorageService.GetAmadeusFlightOfferSearchResultAsync(cacheKey);
+            await Task.Delay(1000);
+            if (_storedResults is not null)
+            {
+                _isCacheKeyLoaded = true;
+                _flightOffers = _storedResults.Data;
+            }
+        }
+    }
+}
