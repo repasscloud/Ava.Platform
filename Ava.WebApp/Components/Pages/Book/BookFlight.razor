@@ -422,10 +422,11 @@
             // make the call to the API now
             try
             {
-                AmadeusFlightOfferSearchResult searchResults = await AvaApiService.PostFlightSearchQueryAsync(_flightOfferSearchRequest, "");
+                TravelSearchRecordWrapper travelSearchRecordWrapper = await AvaApiService.PostFlightSearchQueryAsync(_flightOfferSearchRequest, "");
 
                 // this can be used as a cache key
-                resultsStored = await StorageService.StoreAmadeusFlightOfferSearchResultAsync(searchResults, _flightOfferSearchRequest.Id);
+                //resultsStored = await StorageService.StoreAmadeusFlightOfferSearchResultAsync(searchResults, _flightOfferSearchRequest.Id);
+                resultsStored = true;
             }
             catch (Exception ex)
             {
