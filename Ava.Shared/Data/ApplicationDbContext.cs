@@ -47,7 +47,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Country> Countries { get; set; }
     public DbSet<TravelPolicyDisabledCountry> TravelPolicyDisabledCountries { get; set; }
 
-
+    // Travel Search Record (issue-56)
+    public DbSet<TravelSearchRecord> TravelSearchRecords { get; set; }
 
     // Custom classes that are only intermediate code and will be removed in future updates
     public DbSet<QantasCustomIATACode> QantasCustomIATACodes { get; set; }
