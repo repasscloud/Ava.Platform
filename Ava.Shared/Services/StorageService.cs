@@ -89,4 +89,10 @@ public class StorageService : IStorageService
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task<TravelSearchRecord?> GetTravelSearchRecordAsync(string uniqueId)
+    {
+        return await _context.TravelSearchRecords
+            .FirstOrDefaultAsync(c => c.SearchId == uniqueId);
+    }
 }

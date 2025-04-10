@@ -9,4 +9,6 @@ public interface IStorageService
     Task<bool> StoreAmadeusFlightOfferSearchResultAsync(AmadeusFlightOfferSearchResult data, string cacheKey);
     Task<AmadeusFlightOfferSearchResult?> GetAmadeusFlightOfferSearchResultAsync(string uniqueId);
     Task RemoveAmadeusFlightOfferSearchResultAsync(string uniqueId);
+
+    Task<TravelSearchRecord?> GetTravelSearchRecordAsync(string uniqueId);
 }
