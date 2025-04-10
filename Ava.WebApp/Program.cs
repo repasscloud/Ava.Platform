@@ -91,6 +91,16 @@ public class Program
 
         var app = builder.Build();
 
+        // 🌏 Set Australian culture (en-AU)
+        var defaultCulture = new CultureInfo("en-AU");
+        var localizationOptions = new RequestLocalizationOptions
+        {
+            DefaultRequestCulture = new RequestCulture(defaultCulture),
+            SupportedCultures = new[] { defaultCulture },
+            SupportedUICultures = new[] { defaultCulture }
+        };
+        app.UseRequestLocalization(localizationOptions);
+
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
