@@ -37,10 +37,26 @@ services:
     ports:
       - "1313:1313"
     volumes:
-      - ./Ava.docs:/usr/src/app
+      - ./Ava.doks:/usr/src/app
     working_dir: /usr/src/app
     tty: true
     stdin_open: true
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@localhost.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    volumes:
+      - pgadmin_pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+
+volumes:
+  pgadmin_pgadmin-data:
+    external: true
 
 networks:
   common_net:
