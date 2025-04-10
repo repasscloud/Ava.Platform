@@ -36,7 +36,7 @@ public class AvaApiService : IAvaApiService
         return JsonSerializer.Deserialize<TResponse>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
     }
 
-    public async Task<AmadeusFlightOfferSearchResult> PostFlightSearchQueryAsync(FlightOfferSearchRequestDTO criteria, string bearerToken)
+    public async Task<TravelSearchRecordWrapper> PostFlightSearchQueryAsync(FlightOfferSearchRequestDTO criteria, string bearerToken)
     {
         var client = _httpClientFactory.CreateClient("AvaAPI");
         var json = JsonSerializer.Serialize(criteria);
@@ -53,16 +53,15 @@ public class AvaApiService : IAvaApiService
         {
             string errorMessage = $"API Error {response.StatusCode}: {response}";
     
-            return new AmadeusFlightOfferSearchResult
+            return new TravelSearchRecordWrapper
             {
-                ErrorMessage = errorMessage,
-                Meta = new Ava.Shared.Models.ExternalLib.Amadeus.Flight.Meta() { Count = 0 }
+                TravelSearchRecord = string.Empty,
             };
         }
         
         var responseJson = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<AmadeusFlightOfferSearchResult>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
-            ?? throw new JsonException("Deserialization returned null for FlightSearchResult.");
+        return JsonSerializer.Deserialize<TravelSearchRecordWrapper>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+            ?? throw new JsonException("Deserialization returned null for TravelSearchRecordWrapper.");
     }
 
     public async Task<AvaClientSupportedDomain> GetClientIdAsync(EmailDTO criteria, string bearerToken)
