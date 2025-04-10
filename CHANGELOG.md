@@ -6,11 +6,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.0-alpha] - yyyy-MM-dd
+
+### Added
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [0.1.0-alpha] - 2025-04-10
 
 Version `0.1.0-alpha` is not production ready. Still WIP.
 
-### Added
+### Added [0.1.0-alpha] - 2025-04-10
 
 - [#10](https://github.com/repasscloud/Ava.WebApp/issues/10)
   📌 Create trigger to clean up old entries in `StorageEntries` table
@@ -29,7 +39,7 @@ Version `0.1.0-alpha` is not production ready. Still WIP.
 - [#53](https://github.com/repasscloud/Ava.WebApp/issues/53)
   Create debug page for FlightResults [f6d0439]
 
-### Changed
+### Changed [0.1.0-alpha] - 2025-04-10
 
 - [#11](https://github.com/repasscloud/Ava.WebApp/issues/11)
   🐳 Update image description label in `Dockerfile.builder` and related Docker/Compose files [c1fb6bb] [9a35200]
@@ -66,7 +76,7 @@ Version `0.1.0-alpha` is not production ready. Still WIP.
 - [#59](https://github.com/repasscloud/Ava.Platform/issues/59)
   Optimize Local Storage Usage in Blazor by Offloading Large Data to Backend [251682d] [dd7c5dc]
 
-### Fixed
+### Fixed [0.1.0-alpha] - 2025-04-10
 
 - [#8](https://github.com/repasscloud/Ava.WebApp/issues/8)
   WebApp missing key details in the flightOfferSearchRequest
@@ -95,12 +105,12 @@ Version `0.1.0-alpha` is not production ready. Still WIP.
 - [#55](https://github.com/repasscloud/Ava.Platform/issues/55)
   `/api/v1/flight/search` not storing TravelPolicyID [8835423] [dd7c5dc]
 
-### Removed
+### Removed [0.1.0-alpha] - 2025-04-10
 
 - [#22](https://github.com/repasscloud/Ava.WebApp/issues/22)
   Remove Solution files
 
-### Backlog
+## Backlog
 
 - [#9](https://github.com/repasscloud/Ava.WebApp/issues/9)
   📦 Persist Data Protection Keys in Docker
@@ -140,3 +150,5 @@ Version `0.1.0-alpha` is not production ready. Still WIP.
   Define and Handle Record Types for Search Results [f5e9d79] [dd7c5dc]
 - [#60](https://github.com/repasscloud/Ava.Platform/issues/60)
   Add 30-Day Expiry to All Search and DTO Records in SQL
+- [#62](https://github.com/repasscloud/Ava.Platform/issues/62)
+  Enable Flight Result Info Button
