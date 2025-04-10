@@ -38,4 +38,4 @@ RUN npm install && npm audit fix --force
 EXPOSE 1313
 
 # Default CMD
-CMD ["hugo", "server", "--bind", "0.0.0.0", "--baseURL", "http://localhost", "--disableFastRender"]
+CMD ["hugo", "server", "--bind", "0.0.0.0", "--baseURL", "http://localhost", "--disableFastRender", "--watch", "--poll", "700ms"]
