@@ -1,8 +1,8 @@
 @page "/Book/Flight"
 
-@inject IAvaApiService AvaApiService
-@inject NavigationManager Navigation
 @inject IAuthenticationInfoService AuthService
+@inject NavigationManager Navigation
+@inject IAvaApiService AvaApiService
 @inject IAvaUserSysPrefService AvaUserSysPrefService
 @inject IStorageService StorageService
 
@@ -84,7 +84,6 @@
                     @RenderDatePicker(_isOneWay, _filterMode)
                 </div>
 
-                
                 <!-- From City -->
                 <MudAutocomplete @bind-Value="@_departCity"
                     Label="From City"
@@ -107,16 +106,9 @@
                                 OnClick="HandleBookingAsync">
                         Search Flights
                     </MudButton>
-
-                    @* <MudButton Variant="Variant.Filled"
-                        Color="Color.Primary" 
-                        OnClick="@(() => HandleBookingAsync())">
-                        Search Flights
-                    </MudButton> *@
                 </div>
             </MudStack>
         </MudPaper>
-
 
         <MudMessageBox @ref="_mudMessageBox" Title="Warning" CancelText="Cancel">
             <MessageContent>
@@ -432,12 +424,8 @@
             {
                 AmadeusFlightOfferSearchResult searchResults = await AvaApiService.PostFlightSearchQueryAsync(_flightOfferSearchRequest, "");
 
-                // _flightOfferSearchRequest has a unique key value in it, the .Id
                 // this can be used as a cache key
                 resultsStored = await StorageService.StoreAmadeusFlightOfferSearchResultAsync(searchResults, _flightOfferSearchRequest.Id);
-
-                @* string x = System.Text.Json.JsonSerializer.Serialize(searchResults, new JsonSerializerOptions { WriteIndented = false });
-                await File.WriteAllTextAsync($@"/app/flightoffer_data_{_flightOfferSearchRequest.Id}.json", x); *@
             }
             catch (Exception ex)
             {
@@ -447,7 +435,7 @@
             {
                 if (resultsStored)
                 {
-                    Navigation.NavigateTo($"/Book/Flight/Results/{_flightOfferSearchRequest.Id}", forceLoad: true);
+                    Navigation.NavigateTo($"/Results/Flight/{_flightOfferSearchRequest.Id}", forceLoad: true);
                 }
                 else
                 {
