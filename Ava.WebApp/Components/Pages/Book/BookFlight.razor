@@ -393,7 +393,7 @@
                 CreatedAt = DateTime.UtcNow,
                 ClientId = _clientId ?? string.Empty,
                 CustomerId = _aspNetUserId ?? string.Empty,
-                TravelPolicyId = null,
+                TravelPolicyId = _travelPolicyId ?? null,
                 OriginLocationCode = new string(_departCity[^5..].Where(c => char.IsLetterOrDigit(c)).ToArray()),
                 DestinationLocationCode = new string(_destinationCity[^5..].Where(c => char.IsLetterOrDigit(c)).ToArray()),
                 IsOneWay = _isOneWay,
