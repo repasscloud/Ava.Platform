@@ -14,13 +14,13 @@
 
 <link rel="stylesheet" href="/main.0a7a2b5a1b8c3479fd45ade06b398a82f37d73f95ce11b9c70a5e68a93088fbc18a898fd90f72b8c34c03161cfdc16c11b3e16faeca0761697b85b5e402aef03.css" integrity="sha512-CnorWhuMNHn9Ra3gazmKgvN9c/lc4RuccKXmipMIj7wYqJj9kPcrjDTAMWHP3BbBGz4W&#43;uygdhaXuFteQCrvAw==" crossorigin="anonymous">
 
-<noscript><style>img.lazyload { display: none; }</style></noscript><base href="http://localhost:1313/docs/dev-notes/travel-search-record/">
+<noscript><style>img.lazyload { display: none; }</style></noscript><base href="http://localhost:1313/docs/dev-notes/git-101/">
 
-  <link rel="canonical" href="http://localhost:1313/docs/dev-notes/travel-search-record/">
+  <link rel="canonical" href="http://localhost:1313/docs/dev-notes/git-101/">
 
 
-<title>Travel Search Record  |  My Docs</title>
-<meta name="description" content="Reference pages are ideal for outlining how things work in terse and clear terms.">
+<title>Git 101  |  My Docs</title>
+<meta name="description" content="Terse and clear terms of using git.">
 
     
     <link rel="icon" href="/favicon.ico" sizes="32x32">
@@ -47,10 +47,10 @@
       >
 <link rel="manifest" href="/manifest.webmanifest">
 
-<meta property="og:url" content="http://localhost:1313/docs/dev-notes/travel-search-record/">
+<meta property="og:url" content="http://localhost:1313/docs/dev-notes/git-101/">
   <meta property="og:site_name" content="My Docs">
-  <meta property="og:title" content="Travel Search Record">
-  <meta property="og:description" content="Reference pages are ideal for outlining how things work in terse and clear terms.">
+  <meta property="og:title" content="Git 101">
+  <meta property="og:description" content="Terse and clear terms of using git.">
   <meta property="og:locale" content="en">
   <meta property="og:type" content="article">
     <meta property="article:section" content="docs">
@@ -60,8 +60,8 @@
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="http://localhost:1313/cover.png">
-  <meta name="twitter:title" content="Travel Search Record">
-  <meta name="twitter:description" content="Reference pages are ideal for outlining how things work in terse and clear terms.">
+  <meta name="twitter:title" content="Git 101">
+  <meta name="twitter:description" content="Terse and clear terms of using git.">
       <meta name="twitter:site" content="@getdoks">
 
     
@@ -91,7 +91,7 @@
      },
      {
        "@type": "ListItem",
-       "name": "Travel Search Record",
+       "name": "Git 101",
        "position": 4
      }
    ]
@@ -183,12 +183,12 @@
       <summary>Dev Notes</summary>
       <ul class="list-unstyled list-nested">
 
-  <li>
-      <a href="/docs/dev-notes/git-101/">Git 101</a>
+  <li class="active" >
+      <a aria-current="page" href="/docs/dev-notes/git-101/">Git 101</a>
   </li>
 
-  <li class="active" >
-      <a aria-current="page" href="/docs/dev-notes/travel-search-record/">Travel Search Record</a>
+  <li>
+      <a href="/docs/dev-notes/travel-search-record/">Travel Search Record</a>
   </li>
       </ul>
     </details>
@@ -382,12 +382,12 @@
       <summary>Dev Notes</summary>
       <ul class="list-unstyled list-nested">
 
-  <li>
-      <a href="/docs/dev-notes/git-101/">Git 101</a>
+  <li class="active" >
+      <a aria-current="page" href="/docs/dev-notes/git-101/">Git 101</a>
   </li>
 
-  <li class="active" >
-      <a aria-current="page" href="/docs/dev-notes/travel-search-record/">Travel Search Record</a>
+  <li>
+      <a href="/docs/dev-notes/travel-search-record/">Travel Search Record</a>
   </li>
       </ul>
     </details>
@@ -420,12 +420,40 @@
   <h3>On this page</h3>
     <nav id="toc">
   <ul>
-    <li><a href="#flightsubcomponenttype">FlightSubComponentType</a>
+    <li><a href="#adding-deleted-files">Adding Deleted Files</a></li>
+    <li><a href="#undoing-commits-and-changes">Undoing Commits and Changes</a>
       <ul>
-        <li><a href="#flight_oneway">Flight_OneWay</a></li>
-        <li><a href="#flight_return">Flight_Return</a></li>
+        <li><a href="#undo-last-commit-before-push">Undo Last Commit (before push)</a></li>
+        <li><a href="#undo-last-commit-message">Undo Last Commit Message</a></li>
       </ul>
     </li>
+    <li><a href="#viewing-commit-history">Viewing Commit History</a></li>
+    <li><a href="#working-with-tags">Working with Tags</a>
+      <ul>
+        <li><a href="#create-a-lightweight-tag">Create a Lightweight Tag</a></li>
+        <li><a href="#create-an-annotated-tag">Create an Annotated Tag</a></li>
+        <li><a href="#create-a-signed-tag">Create a Signed Tag</a></li>
+        <li><a href="#list-all-tags">List All Tags</a></li>
+        <li><a href="#show-tag-details">Show Tag Details</a></li>
+        <li><a href="#push-tags-to-remote">Push Tags to Remote</a></li>
+        <li><a href="#delete-tag">Delete Tag</a></li>
+      </ul>
+    </li>
+    <li><a href="#working-with-branches">Working with Branches</a>
+      <ul>
+        <li><a href="#delete-branch">Delete Branch</a></li>
+        <li><a href="#rename-current-branch">Rename Current Branch</a></li>
+        <li><a href="#merge-branch-into-current">Merge Branch into Current</a></li>
+      </ul>
+    </li>
+    <li><a href="#stashing-changes">Stashing Changes</a></li>
+    <li><a href="#diff-and-status">Diff and Status</a></li>
+    <li><a href="#patching-and-cherry-picking">Patching and Cherry Picking</a></li>
+    <li><a href="#pull-and-rebase">Pull and Rebase</a></li>
+    <li><a href="#reset-specific-file">Reset Specific File</a></li>
+    <li><a href="#ignoring-files">Ignoring Files</a></li>
+    <li><a href="#config-and-aliases">Config and Aliases</a></li>
+    <li><a href="#bonus-clean-untracked-files">Bonus: Clean Untracked Files</a></li>
   </ul>
 </nav>
 </div>
@@ -433,7 +461,7 @@
 		</nav>
 		<main class="docs-content col-lg-11 col-xl-9">
 		
-			<h1>Travel Search Record</h1>
+			<h1>Git 101</h1>
 			
 			<nav class="toc-mobile d-xl-none" aria-label="Quaternary navigation">
 				<details>
@@ -441,109 +469,381 @@
     <div class="page-links">
       <nav id="TableOfContents">
   <ul>
-    <li><a href="#flightsubcomponenttype">FlightSubComponentType</a>
+    <li><a href="#adding-deleted-files">Adding Deleted Files</a></li>
+    <li><a href="#undoing-commits-and-changes">Undoing Commits and Changes</a>
       <ul>
-        <li><a href="#flight_oneway">Flight_OneWay</a></li>
-        <li><a href="#flight_return">Flight_Return</a></li>
+        <li><a href="#undo-last-commit-before-push">Undo Last Commit (before push)</a></li>
+        <li><a href="#undo-last-commit-message">Undo Last Commit Message</a></li>
       </ul>
     </li>
+    <li><a href="#viewing-commit-history">Viewing Commit History</a></li>
+    <li><a href="#working-with-tags">Working with Tags</a>
+      <ul>
+        <li><a href="#create-a-lightweight-tag">Create a Lightweight Tag</a></li>
+        <li><a href="#create-an-annotated-tag">Create an Annotated Tag</a></li>
+        <li><a href="#create-a-signed-tag">Create a Signed Tag</a></li>
+        <li><a href="#list-all-tags">List All Tags</a></li>
+        <li><a href="#show-tag-details">Show Tag Details</a></li>
+        <li><a href="#push-tags-to-remote">Push Tags to Remote</a></li>
+        <li><a href="#delete-tag">Delete Tag</a></li>
+      </ul>
+    </li>
+    <li><a href="#working-with-branches">Working with Branches</a>
+      <ul>
+        <li><a href="#delete-branch">Delete Branch</a></li>
+        <li><a href="#rename-current-branch">Rename Current Branch</a></li>
+        <li><a href="#merge-branch-into-current">Merge Branch into Current</a></li>
+      </ul>
+    </li>
+    <li><a href="#stashing-changes">Stashing Changes</a></li>
+    <li><a href="#diff-and-status">Diff and Status</a></li>
+    <li><a href="#patching-and-cherry-picking">Patching and Cherry Picking</a></li>
+    <li><a href="#pull-and-rebase">Pull and Rebase</a></li>
+    <li><a href="#reset-specific-file">Reset Specific File</a></li>
+    <li><a href="#ignoring-files">Ignoring Files</a></li>
+    <li><a href="#config-and-aliases">Config and Aliases</a></li>
+    <li><a href="#bonus-clean-untracked-files">Bonus: Clean Untracked Files</a></li>
   </ul>
 </nav>
     </div>
   </details>
 
 			</nav>
-			<p>Represents a modular travel search record with unique identifier supporting combinations of flights, hotels, cars, etc., and their types.</p>
+			<h2 id="adding-deleted-files">Adding Deleted Files<a href="#adding-deleted-files" class="anchor" aria-hidden="true">#</a> </h2>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Action</th>
+          <th style="text-align: left">Command</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">Stage a deleted file</td>
+          <td style="text-align: left"><code>git add path/to/file</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Remove and stage</td>
+          <td style="text-align: left"><code>git rm path/to/file</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">All deletions</td>
+          <td style="text-align: left"><code>git add -u</code> or <code>git add -u path/to/folder</code></td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="undoing-commits-and-changes">Undoing Commits and Changes<a href="#undoing-commits-and-changes" class="anchor" aria-hidden="true">#</a> </h2>
+<h3 id="undo-last-commit-before-push">Undo Last Commit (before push)<a href="#undo-last-commit-before-push" class="anchor" aria-hidden="true">#</a> </h3>
+<p>Undo the commit, but keep changes staged:</p>
 
 
 
 <div class="expressive-code">
-  <figure class="frame not-content">
+  <figure class="frame is-terminal not-content">
   <figcaption class="header">
     <span class="title"></span>
   </figcaption>
-  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">TravelSearchRecord</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl"><span class="na">    [Key]</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">long</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="na">
-</span></span></span><span class="line"><span class="cl"><span class="na">    [Required]</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">required</span> <span class="kt">string</span> <span class="n">SearchId</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">TravelComponentType</span> <span class="n">TravelType</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">TravelComponentType</span><span class="p">.</span><span class="n">None</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">FlightSubComponentType</span> <span class="n">FlightSubComponent</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">FlightSubComponentType</span><span class="p">.</span><span class="n">None</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">HotelSubComponentType</span> <span class="n">HotelSubComponent</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">HotelSubComponentType</span><span class="p">.</span><span class="n">None</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">CarSubComponentType</span> <span class="n">CarSubComponent</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">CarSubComponentType</span><span class="p">.</span><span class="n">None</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">RailSubComponentType</span> <span class="n">RailSubComponent</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">RailSubComponentType</span><span class="p">.</span><span class="n">None</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">TransferSubComponentType</span> <span class="n">TransferSubComponent</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">TransferSubComponentType</span><span class="p">.</span><span class="n">None</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">ActivitySubComponentType</span> <span class="n">ActivitySubComponent</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">ActivitySubComponentType</span><span class="p">.</span><span class="n">None</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">DateTime</span> <span class="n">CreatedAt</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">UtcNow</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">DateTime</span> <span class="n">ExpiresAt</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">UtcNow</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">30</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="na">
-</span></span></span><span class="line"><span class="cl"><span class="na">    [Required]</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">required</span> <span class="kt">string</span> <span class="n">Payload</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git reset --soft HEAD~1</span></span></code></pre></div>
   </figure>
 </div>
-<p>When <code>TravelType</code> is equal to <code>TravelComponentType.Flight</code> <em>(2)</em>, it&rsquo;s suggested that there is only a Flight. They are not bitwise combinations, but rather unique values.</p>
-<p>Full CSV download can be obtained <a href="/files/Enum_Values.csv">here</a>.</p>
-<p>Each <code>xSubComponentType</code> has their own enum values.</p>
-<p>For <code>FlightSubComponentType</code> the values are:</p>
+<p>Undo the commit and unstage the files:</p>
 
 
 
 <div class="expressive-code">
-  <figure class="frame not-content">
+  <figure class="frame is-terminal not-content">
   <figcaption class="header">
     <span class="title"></span>
   </figcaption>
-  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">enum</span> <span class="n">FlightSubComponentType</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="n">None</span> <span class="p">=</span> <span class="m">0</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">Flight_OneWay</span> <span class="p">=</span> <span class="m">100</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">Flight_Return</span> <span class="p">=</span> <span class="m">101</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">Flight_MultiCity</span> <span class="p">=</span> <span class="m">102</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">Flight_OneWayWithStopOver</span> <span class="p">=</span> <span class="m">103</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">Flight_OpenJaw</span> <span class="p">=</span> <span class="m">104</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">Flight_MixedCabin</span> <span class="p">=</span> <span class="m">105</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">Flight_FlexibleDates</span> <span class="p">=</span> <span class="m">106</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">Flight_AlternateAirports</span> <span class="p">=</span> <span class="m">107</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">Flight_WithPerks</span> <span class="p">=</span> <span class="m">108</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git reset --mixed HEAD~1</span></span></code></pre></div>
   </figure>
 </div>
-<p>It&rsquo;s most common for the initial deployment of Ava.Platform to use <code>100</code> or <code>101</code>.</p>
-<h2 id="flightsubcomponenttype">FlightSubComponentType<a href="#flightsubcomponenttype" class="anchor" aria-hidden="true">#</a> </h2>
-<h3 id="flight_oneway">Flight_OneWay<a href="#flight_oneway" class="anchor" aria-hidden="true">#</a> </h3>
-<p>When a <code>Flight_OneWay</code> value is selected, the <code>.Payload</code> will contain a single object that can be converted from <code>string</code> back to  the object type of <code>AmadeusFlightOfferSearchResult</code>. This needs to be deserialized back from <code>string</code> to object in-memory to be of use. This will only happen in the <code>Ava.WebApp</code> as it has private functions to that domain that manage this. It&rsquo;s part of the blazor services.</p>
-<p>To obtain the first (and only) flight result, use the <code>TravelComponentExtension</code> class.</p>
-<p>Use example:</p>
+<p>Undo the commit and discard changes completely:</p>
 
 
 
 <div class="expressive-code">
-  <figure class="frame not-content">
+  <figure class="frame is-terminal not-content">
   <figcaption class="header">
     <span class="title"></span>
   </figcaption>
-  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="c1">// convert the payload to a single result (one way flight)</span>
-</span></span><span class="line"><span class="cl"><span class="n">_storedResults</span> <span class="p">=</span> <span class="n">_travelSearchRecord</span><span class="p">.</span><span class="n">Payload</span><span class="p">.</span><span class="n">DeserializeTo</span><span class="p">&lt;</span><span class="n">AmadeusFlightOfferSearchResult</span><span class="p">&gt;();</span></span></span></code></pre></div>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git reset --hard HEAD~1</span></span></code></pre></div>
   </figure>
 </div>
-<h3 id="flight_return">Flight_Return<a href="#flight_return" class="anchor" aria-hidden="true">#</a> </h3>
-<p>A <code>Flight_Return</code> has separate extension methods, whether it&rsquo;s the record at index <code>[0]</code> or <code>[1]</code>. There can only be 2 records. No more.</p>
+<h3 id="undo-last-commit-message">Undo Last Commit Message<a href="#undo-last-commit-message" class="anchor" aria-hidden="true">#</a> </h3>
 
 
 
 <div class="expressive-code">
-  <figure class="frame not-content">
+  <figure class="frame is-terminal not-content">
   <figcaption class="header">
     <span class="title"></span>
   </figcaption>
-  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="n">_storedResults</span> <span class="p">=</span> <span class="n">_travelSearchRecord</span><span class="p">.</span><span class="n">Payload</span><span class="p">.</span><span class="n">GetFirstFlightOffer</span><span class="p">();</span>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git commit --amend -m <span class="s2">&#34;New commit message&#34;</span></span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="viewing-commit-history">Viewing Commit History<a href="#viewing-commit-history" class="anchor" aria-hidden="true">#</a> </h2>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git log                <span class="c1"># Full history</span>
+</span></span><span class="line"><span class="cl">git log --oneline      <span class="c1"># Compact view</span></span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="working-with-tags">Working with Tags<a href="#working-with-tags" class="anchor" aria-hidden="true">#</a> </h2>
+<h3 id="create-a-lightweight-tag">Create a Lightweight Tag<a href="#create-a-lightweight-tag" class="anchor" aria-hidden="true">#</a> </h3>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git tag v1.0.0</span></span></code></pre></div>
+  </figure>
+</div>
+<h3 id="create-an-annotated-tag">Create an Annotated Tag<a href="#create-an-annotated-tag" class="anchor" aria-hidden="true">#</a> </h3>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git tag -a v1.0.0 -m <span class="s2">&#34;Version 1.0.0&#34;</span></span></span></code></pre></div>
+  </figure>
+</div>
+<h3 id="create-a-signed-tag">Create a Signed Tag<a href="#create-a-signed-tag" class="anchor" aria-hidden="true">#</a> </h3>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git tag -s v1.0.0 -m <span class="s2">&#34;Signed version 1.0.0&#34;</span></span></span></code></pre></div>
+  </figure>
+</div>
+<p><em>(requires GPG configured)</em></p>
+<h3 id="list-all-tags">List All Tags<a href="#list-all-tags" class="anchor" aria-hidden="true">#</a> </h3>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git tag</span></span></code></pre></div>
+  </figure>
+</div>
+<h3 id="show-tag-details">Show Tag Details<a href="#show-tag-details" class="anchor" aria-hidden="true">#</a> </h3>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git show v1.0.0</span></span></code></pre></div>
+  </figure>
+</div>
+<h3 id="push-tags-to-remote">Push Tags to Remote<a href="#push-tags-to-remote" class="anchor" aria-hidden="true">#</a> </h3>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git push origin v1.0.0  <span class="c1"># Push single tag</span>
+</span></span><span class="line"><span class="cl">git push --tags         <span class="c1"># Push all tags</span></span></span></code></pre></div>
+  </figure>
+</div>
+<h3 id="delete-tag">Delete Tag<a href="#delete-tag" class="anchor" aria-hidden="true">#</a> </h3>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git tag -d v1.0.0                   <span class="c1"># Local</span>
+</span></span><span class="line"><span class="cl">git push origin :refs/tags/v1.0.0   <span class="c1"># Remote</span></span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="working-with-branches">Working with Branches<a href="#working-with-branches" class="anchor" aria-hidden="true">#</a> </h2>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git branch                 <span class="c1"># List local branches</span>
+</span></span><span class="line"><span class="cl">git branch -r              <span class="c1"># List remote branches</span>
+</span></span><span class="line"><span class="cl">git checkout -b feature-x  <span class="c1"># Create and switch</span></span></span></code></pre></div>
+  </figure>
+</div>
+<h3 id="delete-branch">Delete Branch<a href="#delete-branch" class="anchor" aria-hidden="true">#</a> </h3>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git branch -d branch-name       <span class="c1"># Safe delete (merged)</span>
+</span></span><span class="line"><span class="cl">git branch -D branch-name       <span class="c1"># Force delete</span></span></span></code></pre></div>
+  </figure>
+</div>
+<h3 id="rename-current-branch">Rename Current Branch<a href="#rename-current-branch" class="anchor" aria-hidden="true">#</a> </h3>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git branch -m new-name</span></span></code></pre></div>
+  </figure>
+</div>
+<h3 id="merge-branch-into-current">Merge Branch into Current<a href="#merge-branch-into-current" class="anchor" aria-hidden="true">#</a> </h3>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git merge branch-name</span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="stashing-changes">Stashing Changes<a href="#stashing-changes" class="anchor" aria-hidden="true">#</a> </h2>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git stash                  <span class="c1"># Save current work</span>
+</span></span><span class="line"><span class="cl">git stash list             <span class="c1"># Show stashes</span>
+</span></span><span class="line"><span class="cl">git stash apply            <span class="c1"># Reapply latest stash</span>
+</span></span><span class="line"><span class="cl">git stash drop             <span class="c1"># Remove latest stash</span></span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="diff-and-status">Diff and Status<a href="#diff-and-status" class="anchor" aria-hidden="true">#</a> </h2>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git status                 <span class="c1"># Show changes</span>
+</span></span><span class="line"><span class="cl">git diff                   <span class="c1"># Unstaged changes</span>
+</span></span><span class="line"><span class="cl">git diff --staged          <span class="c1"># Staged changes</span></span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="patching-and-cherry-picking">Patching and Cherry Picking<a href="#patching-and-cherry-picking" class="anchor" aria-hidden="true">#</a> </h2>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git cherry-pick &lt;commit&gt;   <span class="c1"># Apply a specific commit to current branch</span></span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="pull-and-rebase">Pull and Rebase<a href="#pull-and-rebase" class="anchor" aria-hidden="true">#</a> </h2>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git pull                   <span class="c1"># Pull with merge (default)</span>
+</span></span><span class="line"><span class="cl">git pull --rebase          <span class="c1"># Pull with rebase</span></span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="reset-specific-file">Reset Specific File<a href="#reset-specific-file" class="anchor" aria-hidden="true">#</a> </h2>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git checkout HEAD -- path/to/file   <span class="c1"># Reset file to last commit</span></span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="ignoring-files">Ignoring Files<a href="#ignoring-files" class="anchor" aria-hidden="true">#</a> </h2>
+<p>Create or edit <code>.gitignore</code>:</p>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">*.log
+</span></span><span class="line"><span class="cl">*.tmp
+</span></span><span class="line"><span class="cl">/build/
+</span></span><span class="line"><span class="cl">secrets.txt</span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="config-and-aliases">Config and Aliases<a href="#config-and-aliases" class="anchor" aria-hidden="true">#</a> </h2>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git config --global user.name <span class="s2">&#34;Your Name&#34;</span>
+</span></span><span class="line"><span class="cl">git config --global user.email <span class="s2">&#34;you@example.com&#34;</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// or</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">_storedResults</span> <span class="p">=</span> <span class="n">_travelSearchRecord</span><span class="p">.</span><span class="n">Payload</span><span class="p">.</span><span class="n">GetSecondFlightOffer</span><span class="p">();</span></span></span></code></pre></div>
+</span></span><span class="line"><span class="cl"><span class="c1"># Alias example</span>
+</span></span><span class="line"><span class="cl">git config --global alias.co checkout
+</span></span><span class="line"><span class="cl">git config --global alias.st status
+</span></span><span class="line"><span class="cl">git config --global alias.lg <span class="s2">&#34;log --oneline --graph --all&#34;</span></span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="bonus-clean-untracked-files">Bonus: Clean Untracked Files<a href="#bonus-clean-untracked-files" class="anchor" aria-hidden="true">#</a> </h2>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">git clean -fd    <span class="c1"># Remove untracked files and folders</span></span></span></code></pre></div>
   </figure>
 </div>
 
@@ -563,7 +863,7 @@
 				</div>
 				<div class="d-flex flex-column">
 					<div class="text-body-secondary">Prev</div>
-					<a href="/docs/partner-onboarding/minimum-requirements/" class="stretched-link text-reset text-decoration-none">Minimum Requirements</a>
+					<a href="/docs/reference/example-reference/" class="stretched-link text-reset text-decoration-none">Example Reference</a>
 				</div>
 			</div>
 		</div>
@@ -572,7 +872,7 @@
 			<div class="card-body d-flex justify-content-end">
 				<div class="d-flex flex-column">
 					<div class="text-body-secondary">Next</div>
-					<a href="/docs/releases/" class="stretched-link text-reset text-decoration-none">Releases</a>
+					<a href="/docs/partner-onboarding/minimum-requirements/" class="stretched-link text-reset text-decoration-none">Minimum Requirements</a>
 				</div>
 				<div class="d-flex flex-column justify-content-center">
 					<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-right" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
