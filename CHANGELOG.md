@@ -1,14 +1,14 @@
 
 # Change Log
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] - yyyy-mm-dd
+## [0.1.0-alpha] - 2025-04-10
 
-Here we write upgrading notes for brands. It's a team effort to make them as
-straightforward as possible.
+Version `0.1.0-alpha` is not production ready. Still WIP.
 
 ### Added
 
@@ -23,15 +23,16 @@ straightforward as possible.
 - [#43](https://github.com/repasscloud/Ava.Platform/issues/43)
   Create FlightResultV1 class for WebApp display
 - [#46](https://github.com/repasscloud/Ava.Platform/issues/46)
-  Create AmenityV1 Extension Class [dev 95d1928]
+  Create AmenityV1 Extension Class [95d1928]
 - [#47](https://github.com/repasscloud/Ava.Platform/issues/47)
-  Create FlightRouteRenderer Extension [dev 2d59a51]
-
+  Create FlightRouteRenderer Extension [2d59a51]
+- [#53](https://github.com/repasscloud/Ava.WebApp/issues/53)
+  Create debug page for FlightResults [f6d0439]
 
 ### Changed
 
 - [#11](https://github.com/repasscloud/Ava.WebApp/issues/11)
-  🐳 Update image description label in `Dockerfile.builder` and related Docker/Compose files
+  🐳 Update image description label in `Dockerfile.builder` and related Docker/Compose files [c1fb6bb] [9a35200]
 - [#6](https://github.com/repasscloud/Ava.WebApp/issues/6)
   Update TravelPolicy to include "DepartAfterTime" and "DepartBeforeTime"
 - [#3](https://github.com/repasscloud/Ava.WebApp/issues/3)
@@ -60,6 +61,10 @@ straightforward as possible.
   Update ILoggerService to use ENUM for writing logs
 - [#29](https://github.com/repasscloud/Ava.WebApp/issues/29)
   Swap to Docker Compose config
+- [#49](https://github.com/repasscloud/Ava.WebApp/issues/49)
+  Swap ClientID from 10 ALPHANUMERIC to 10 HEXADECIMAL characters [0833165]
+- [#59](https://github.com/repasscloud/Ava.Platform/issues/59)
+  Optimize Local Storage Usage in Blazor by Offloading Large Data to Backend [251682d] [dd7c5dc]
 
 ### Fixed
 
@@ -79,6 +84,16 @@ straightforward as possible.
   Update UserSysPreference
 - [#28](https://github.com/repasscloud/Ava.WebApp/issues/28)
   Blazor circuit error
+- [#50](https://github.com/repasscloud/Ava.WebApp/issues/50)
+  Improve Travel Policy display for "None" allowed regions/continents/countries
+- [#51](https://github.com/repasscloud/Ava.WebApp/issues/51)
+  Remove icon from Book Flight page #51 [4067a22]
+- [#52](https://github.com/repasscloud/Ava.WebApp/issues/52)
+  FlightOffer Missing operating.carrierCode defaults to "__" [25030e6]
+- [#54](https://github.com/repasscloud/Ava.WebApp/issues/54)
+  Add Localization to Docker container runtime [da56fb4] [ffeff10]
+- [#55](https://github.com/repasscloud/Ava.Platform/issues/55)
+  `/api/v1/flight/search` not storing TravelPolicyID [8835423] [dd7c5dc]
 
 ### Removed
 
@@ -110,10 +125,18 @@ straightforward as possible.
 - [#40](https://github.com/repasscloud/Ava.Platform/issues/40)
   💸 Track cumulative spend (annual/monthly) on AvaClient
 - [#41](https://github.com/repasscloud/Ava.Platform/issues/41)
-  🧾 Create new Transaction table and model
+  🧾 Create new Transaction table and model [34d96dc]
 - [#42](https://github.com/repasscloud/Ava.Platform/issues/42)
   Update login on booking page
 - [#48](https://github.com/repasscloud/Ava.Platform/issues/48)
   Decide best visual indicator for layover airport mismatch (Blazor WebUI)
 - [#44](https://github.com/repasscloud/Ava.Platform/issues/44)
   🐛 Add ISO 8601 Duration Parser Utility
+- [#56](https://github.com/repasscloud/Ava.Platform/issues/56)
+  Design new routes for handling flights search results [4a020bf] [dd7c5dc]
+- [#57](https://github.com/repasscloud/Ava.Platform/issues/57)
+  Refactor Flight Search Results to Use Unique ID-Based Records [0209c63] [8dd80c9] [dd7c5dc]
+- [#58](https://github.com/repasscloud/Ava.Platform/issues/58)
+  Define and Handle Record Types for Search Results [f5e9d79] [dd7c5dc]
+- [#60](https://github.com/repasscloud/Ava.Platform/issues/60)
+  Add 30-Day Expiry to All Search and DTO Records in SQL
