@@ -42,9 +42,9 @@ public class AvaLicenseValidator : IAvaLicenseValidator
 
             string originalData = JsonSerializer.Serialize(new
             {
-                license.ClientId,
+                license.ClientID,
                 license.ExpiryDate,
-                license.AppId
+                license.AppID
             });
 
             bool isValid = license.Signature == GenerateHmac(originalData, _secretKey);

@@ -79,3 +79,6 @@ global using Ava.Shared.Models.Results.Flights;
 global using Ava.WebApp.Helpers;
 global using System.Xml;
 global using Ava.WebApp.Extensions;
+global using Microsoft.AspNetCore.Localization;
+global using Ava.Shared.Models.Search.Travel;
+global using Ava.Shared.Models.Static.Travel;

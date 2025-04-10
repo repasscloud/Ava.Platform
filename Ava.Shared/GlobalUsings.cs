@@ -50,7 +50,10 @@ global using Ava.Shared.Models.Search.Flights;
 global using Ava.Shared.Models.Static;
 global using Ava.Shared.Services;
 global using Ava.Shared.Validation;
+global using Ava.Shared.Models.Static.Billing;
 
 global using Blazored.LocalStorage;
 global using NanoidDotNet;
 global using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+global using Ava.Shared.Models.Static.Travel;
+global using Ava.Shared.Models.Search.Travel;

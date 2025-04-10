@@ -37,11 +37,11 @@ public class AvaLicenseGenerator : IAvaLicenseGenerator
         // generate the license data
         var license = new AvaClientLicense
         {
-            IssuedBy = avaEmployeeId,
-            ClientId = clientId,
+            ClientID = clientId,
             ExpiryDate = expiryDate,
-            AppId = appId,
-            SpendThreshold = spendThreshold
+            AppID = appId,
+            SpendThreshold = spendThreshold,
+            IssuedBy = avaEmployeeId,
         };
 
         string data = JsonSerializer.Serialize(license);
@@ -50,13 +50,13 @@ public class AvaLicenseGenerator : IAvaLicenseGenerator
         license.Signature = signature;
 
         // log messages
-        await _logger.LogDebugAsync($"[AvaLicense] License successfully generated. Client ID: '{license.ClientId}', Expiry Date: {license.ExpiryDate:yyyy-MM-dd HH:mm:ss} UTC.");
+        await _logger.LogDebugAsync($"[AvaLicense] License successfully generated. Client ID: '{license.ClientID}', Expiry Date: {license.ExpiryDate:yyyy-MM-dd HH:mm:ss} UTC.");
 
         await _context.AvaClientLicenses.AddAsync(license);
         await _context.SaveChangesAsync();
 
         // log messages
-        await _logger.LogDebugAsync($"[AvaLicense] License updated in DB. Client ID: '{license.ClientId}', Expiry Date: {license.ExpiryDate:yyyy-MM-dd HH:mm:ss} UTC.");
+        await _logger.LogDebugAsync($"[AvaLicense] License updated in DB. Client ID: '{license.ClientID}', Expiry Date: {license.ExpiryDate:yyyy-MM-dd HH:mm:ss} UTC.");
         return Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(license)));
     }
 
