@@ -3,25 +3,24 @@ namespace Ava.Shared.Models.Kernel.Client;
 public class AvaClientLicense
 {
     [Key]
-    public string Id { get; set; } = Nanoid.Generate();
+    [MaxLength(22)]
+    public string Id { get; set; } = Nanoid.Generate(alphabet: Nanoid.Alphabets.UppercaseLettersAndDigits, size: 22);
     
-    [Column(TypeName = "varchar(20)")] // Ensures string storage
     [Required]
-    public required string ClientId { get; set; }
+    [MaxLength(10)]
+    public required string ClientID { get; set; }
 
     [Required]
     public required DateTime ExpiryDate { get; set; }
 
-    [Column(TypeName = "varchar(20)")] // Ensures string storage
     [Required]
-    public required string AppId { get; set; }
+    [MaxLength(20)]
+    public required string AppID { get; set; }
 
-    public string SupportedEmailDomains { get; set; } = string.Empty;  // which domains are automatically assigned to this account, use a comma separated list
-    
-    public string Signature { get; set; } = string.Empty;
+    public string? Signature { get; set; }
     
     [Required]
-    public int SpendThreshold { get; set; } // what is the spend threshold of this particular client
+    public decimal SpendThreshold { get; set; } // what is the spend threshold of this particular client
 
     [Required]
     public required string IssuedBy { get; set; }

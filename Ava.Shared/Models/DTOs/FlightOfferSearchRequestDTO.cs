@@ -45,7 +45,7 @@ public class FlightOfferSearchRequestDTO
     [JsonPropertyName("departureDateReturn")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [RegularExpression(@"^\d{4}-\d{2}-\d{2}$", ErrorMessage = "Departure date must be in the format YYYY-MM-DD.")]
-    [DefaultValue(null)] // ✅ Explicitly mark as optional
+    [DefaultValue(null)]
     public string? DepartureDateReturn { get; set; }
 
     [JsonPropertyName("adults")]

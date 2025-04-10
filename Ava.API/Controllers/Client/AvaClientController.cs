@@ -40,6 +40,7 @@ public class AvaClientController : ControllerBase
             AdminPersonEmail = dto.AdminPersonEmail.ToLowerInvariant(),
             AdminPersonJobTitle = dto.AdminPersonJobTitle,
             CliendID = _avaClientID,
+            DefaultCurrency = dto.DefaultBillingCurrency ?? "AUD",
         };
 
         _context.AvaClients.Add(client);
@@ -113,8 +114,8 @@ public class AvaClientController : ControllerBase
     public async Task<IActionResult> GetAvaClientByEmail(string email)
     {
         var client = await _context.AvaClients
-            .Where(
-                c => c.AdminPersonEmail == email.ToLowerInvariant() || 
+            .Where(c => 
+                c.AdminPersonEmail == email.ToLowerInvariant() || 
                 c.ContactPersonEmail == email.ToLowerInvariant() ||
                 c.BillingPersonEmail == email.ToLowerInvariant())
             .FirstOrDefaultAsync();

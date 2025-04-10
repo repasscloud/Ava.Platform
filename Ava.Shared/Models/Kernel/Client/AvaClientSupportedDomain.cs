@@ -7,7 +7,7 @@ public class AvaClientSupportedDomain
     public long Id { get; set; }
 
     [Required]
-    [Column(TypeName = "varchar(100)")]
+    [MaxLength(253)]
     public required string SupportedEmailDomain { get; set; } // this must be unique
 
     public int AvaClientId { get; set; }

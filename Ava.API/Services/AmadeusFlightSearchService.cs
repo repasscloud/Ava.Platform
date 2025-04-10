@@ -58,12 +58,12 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
         }
 
         // find the user preference service now too (everyone has one of these)
-        AvaUserSysPreference _userSysPreferences = await _context.AvaUserSysPreferences
+        AvaUserSysPreference? _userSysPreferences = await _context.AvaUserSysPreferences
             .Where(x => x.AspNetUsersId == searchRequestDTO.CustomerId)
             .FirstOrDefaultAsync();
         
         // set the currency code
-        string _currencyCode = _travelPolicyInterResult?.Currency ?? _userSysPreferences.DefaultCurrencyCode;
+        string _currencyCode = _travelPolicyInterResult?.Currency ?? _userSysPreferences?.DefaultCurrencyCode ?? "AUD";
 
         // list of flights to be added to search to amadeus (and other providers)
         List<OriginDestination> _originDestinationList = new List<OriginDestination>();
@@ -78,7 +78,7 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
             {
                 Date = searchRequestDTO.DepartureDate,
                 Time = _travelPolicyInterResult?.FlightBookingTimeAvailableFrom 
-                    ?? _userSysPreferences.FlightBookingTimeAvailableFrom,
+                    ?? _userSysPreferences?.FlightBookingTimeAvailableFrom,
             },
         };
         _originDestinationList.Add(_originDestination1);
@@ -97,7 +97,7 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
                     {
                         Date = searchRequestDTO.DepartureDateReturn,
                         Time = _travelPolicyInterResult?.FlightBookingTimeAvailableFrom 
-                            ?? _userSysPreferences.FlightBookingTimeAvailableFrom,
+                            ?? _userSysPreferences?.FlightBookingTimeAvailableFrom,
                     }
                 };
                 _originDestinationList.Add(_originDestination2);
@@ -126,11 +126,11 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
 
         // add the max flight offers value (if not null) and set the value else ignore, it will default to 10 results
         // nothing needs to be added, it gets added in this region
-        if (_userSysPreferences.MaxResults == 0 || _userSysPreferences.MaxResults == 250)
+        if (_userSysPreferences?.MaxResults == 0 || _userSysPreferences?.MaxResults == 250)
         {
             _searchCriteria.MaxFlightOffers = 250;
         }
-        if (_userSysPreferences.MaxResults > 0 || _userSysPreferences.MaxResults < 250)
+        if (_userSysPreferences?.MaxResults > 0 || _userSysPreferences?.MaxResults < 250)
         {
             _searchCriteria.MaxFlightOffers = 20;
         }
@@ -155,7 +155,7 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
             CabinRestriction _cabinRestrictionAllFlights = new CabinRestriction
             {
                 Cabin = _travelPolicyInterResult?.DefaultFlightSeating ?? searchRequestDTO.CabinClass,
-                Coverage = _travelPolicyInterResult?.CabinClassCoverage ?? _userSysPreferences.CabinClassCoverage,
+                Coverage = _travelPolicyInterResult?.CabinClassCoverage ?? _userSysPreferences?.CabinClassCoverage ?? "MOST_SEGMENTS",
                 OriginDestinationIds = [ "1", "2" ]
             };
 
@@ -166,7 +166,7 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
             CabinRestriction _cabinRestrictionAllFlights = new CabinRestriction
             {
                 Cabin = _travelPolicyInterResult?.DefaultFlightSeating ?? searchRequestDTO.CabinClass,
-                Coverage = _travelPolicyInterResult?.CabinClassCoverage ?? _userSysPreferences.CabinClassCoverage,
+                Coverage = _travelPolicyInterResult?.CabinClassCoverage ?? _userSysPreferences?.CabinClassCoverage ?? "MOST_SEGMENTS",
                 OriginDestinationIds = [ "1" ]
             };
 
@@ -190,11 +190,11 @@ public class AmadeusFlightSearchService : IAmadeusFlightSearchService
         {
             _carrierRestriction.ExcludedCarrierCodes = SplitCommaSeparatedString(_travelPolicyInterResult.ExcludedAirlineCodes);
         }
-        else if (_userSysPreferences.IncludedAirlineCodes is not null)
+        else if (_userSysPreferences?.IncludedAirlineCodes is not null)
         {
             _carrierRestriction.IncludedCarrierCodes = SplitCommaSeparatedString(_userSysPreferences.IncludedAirlineCodes);
         }
-        else if (_userSysPreferences.ExcludedAirlineCodes is not null)
+        else if (_userSysPreferences?.ExcludedAirlineCodes is not null)
         {
             _carrierRestriction.ExcludedCarrierCodes = SplitCommaSeparatedString(_userSysPreferences.ExcludedAirlineCodes);
         }

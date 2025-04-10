@@ -79,6 +79,10 @@ public class AvaClient
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Country { get; set; }
 
+    [StringLength(3)]
+    [CurrencyTypeValidation]
+    public required string DefaultCurrency { get; set; }
+    
     // policies
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? DefaultTravelPolicyId { get; set; }
