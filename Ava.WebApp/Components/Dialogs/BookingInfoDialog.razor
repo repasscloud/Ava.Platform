@@ -1,0 +1,57 @@
+@namespace Ava.WebApp.Components.Dialogs
+
+<MudMessageBox @ref="_mudMessageBox"
+               Title="@Title"
+               Style="width: 600px; height: 500px;">
+    <MessageContent>
+        @if (!string.IsNullOrEmpty(Message))
+        {
+            <MudText Typo="Typo.body1">@Message</MudText>
+            <RealTimeMap @ref="_map"
+                         height="300px"
+                         width="100%"
+                         Parameters="@_mapParams" />
+        }
+        else
+        {
+            <MudText Typo="Typo.body2" Color="Color.Error">
+                No booking info available.
+            </MudText>
+        }
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Success"
+                   StartIcon="@Icons.Material.Filled.Done">
+            OK
+        </MudButton>
+    </YesButton>
+</MudMessageBox>
+
+@code {
+    private MudMessageBox? _mudMessageBox;
+    private RealTimeMap? _map;
+
+    [Parameter] public string Title { get; set; } = "Booking Info";
+    [Parameter] public string Message { get; set; } = string.Empty;
+    [Parameter] public double Latitude { get; set; }
+    [Parameter] public double Longitude { get; set; }
+
+    private RealTimeMap.LoadParameters _mapParams = new();
+
+    public async Task ShowAsync()
+    {
+        // Prepare map parameters before showing
+        _mapParams = new RealTimeMap.LoadParameters
+        {
+            location = new RealTimeMap.Location
+            {
+                latitude = Latitude,
+                longitude = Longitude
+            },
+            zoomLevel = 13
+        };
+
+        await _mudMessageBox!.ShowAsync();
+    }
+}

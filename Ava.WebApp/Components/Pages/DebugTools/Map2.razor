@@ -1,0 +1,22 @@
+@page "/Debug/Map2"
+@using Ava.WebApp.Components.Dialogs
+
+<BookingInfoDialog @ref="_dialog"
+                   Title="Flight Info"
+                   Message="Flight QR123 departs at 18:30"
+                   Latitude="-34.947512"
+                   Longitude="138.533393" />
+
+<MudButton Variant="Variant.Filled"
+           OnClick="ShowDialog">
+    Show Info
+</MudButton>
+
+@code {
+    private BookingInfoDialog? _dialog;
+
+    private async Task ShowDialog()
+    {
+        await _dialog!.ShowAsync();
+    }
+}
