@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-Ava.WebApp-996c9995-f279-42e6-b954-6d388a7ad3f3</UserSecretsId>
+    <RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <RazorComponentInclude>**/*.razor</RazorComponentInclude>
   </PropertyGroup>
 
   <ItemGroup>
