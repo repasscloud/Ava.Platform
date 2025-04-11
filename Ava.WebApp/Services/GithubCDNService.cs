@@ -1,4 +1,3 @@
-
 namespace Ava.WebApp.Services;
 
 public class GithubCDNService : IGithubCDNService
