@@ -1,15 +1,68 @@
 @namespace Ava.WebApp.Components.Dialogs
 @using LeafletForBlazor
+@using Ava.Shared.Models.Results.Flights
 @inject IIataLookupService IataLookupService
 
 <MudMessageBox @ref="_mudMessageBox"
                Title="@Title"
-               Style="width: 800px; height: 600px;">
+               Style="max-height: 90vh; overflow-y: auto;">
     <MessageContent>
-        @if (FlightResult != null)
+        @if (FlightResult?.ItineraryGroup is not null)
         {
-            <MudText Typo="Typo.h6">Flight Route: @GetAirportRoute()</MudText>
-            <RealTimeMap @ref="_map" height="300px" width="100%" Parameters="@_mapParams" />
+            int flightIndex = 1;
+            foreach (var itinerary in FlightResult.ItineraryGroup)
+            {
+                foreach (var segment in itinerary.SegmentGroup)
+                {
+                    <MudPaper Class="pa-3 mb-4" Elevation="2">
+                        <MudText Typo="Typo.subtitle1" Class="mb-2">
+                            Flight @flightIndex: @segment.Departure?.IataCode → @segment.Arrival?.IataCode
+                        </MudText>
+
+                        <MudGrid>
+                            <MudItem xs="12" sm="6">
+                                <MudText Typo="Typo.caption">Carrier:</MudText>
+                                <MudText>@segment.CarrierCode @segment.Number</MudText>
+
+                                <MudText Typo="Typo.caption">Operated By:</MudText>
+                                <MudText>@segment.OperatingCarrierCode</MudText>
+
+                                <MudText Typo="Typo.caption">Aircraft:</MudText>
+                                <MudText>@segment.Aircraft</MudText>
+
+                                <MudText Typo="Typo.caption">Cabin Class:</MudText>
+                                <MudText>@segment.CabinClass</MudText>
+
+                                <MudText Typo="Typo.caption">Departure:</MudText>
+                                <MudText>@segment.Departure?.IataCode - Terminal @segment.Departure?.Terminal</MudText>
+                                <MudText>@segment.Departure?.At.ToLocalTime().ToString("ddd, dd MMM yyyy HH:mm")</MudText>
+
+                                <MudText Typo="Typo.caption">Arrival:</MudText>
+                                <MudText>@segment.Arrival?.IataCode - Terminal @segment.Arrival?.Terminal</MudText>
+                                <MudText>@segment.Arrival?.At.ToLocalTime().ToString("ddd, dd MMM yyyy HH:mm")</MudText>
+                            </MudItem>
+
+                            <MudItem xs="12" sm="6">
+                                @if (_mapParams.TryGetValue(segment.Departure?.IataCode ?? string.Empty, out var param))
+                                {
+                                    <RealTimeMap height="250px" width="100%" Parameters="@param" />
+                                }
+                                else
+                                {
+                                    <MudText Typo="Typo.caption" Color="Color.Warning">Map unavailable for @segment.Departure?.IataCode</MudText>
+                                }
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+
+                    flightIndex++;
+                }
+            }
+
+            <MudDivider Class="my-3" />
+
+            <MudText Typo="Typo.subtitle1">Pricing Summary</MudText>
+            <MudText Typo="Typo.body2">Total Price: @FlightResult.GrandTotal.ToString("C") (@FlightResult.CurrencyCode)</MudText>
         }
         else
         {
@@ -18,10 +71,9 @@
             </MudText>
         }
     </MessageContent>
+
     <YesButton>
-        <MudButton Variant="Variant.Filled"
-                   Color="Color.Success"
-                   StartIcon="@Icons.Material.Filled.Done">
+        <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Done">
             OK
         </MudButton>
     </YesButton>
@@ -29,42 +81,46 @@
 
 @code {
     private MudMessageBox? _mudMessageBox;
-    private RealTimeMap? _map;
-    private RealTimeMap.LoadParameters _mapParams = new();
+    private readonly Dictionary<string, RealTimeMap.LoadParameters> _mapParams = new();
 
     [Parameter] public string Title { get; set; } = "Booking Info";
     [Parameter] public FlightResultV1? FlightResult { get; set; }
 
     public async Task ShowAsync()
     {
-        if (FlightResult?.ItineraryGroup?.FirstOrDefault()?.SegmentGroup?.FirstOrDefault()?.Departure is { } dep)
+        _mapParams.Clear();
+
+        var options = new DialogOptions
         {
-            _mapParams = new RealTimeMap.LoadParameters
+            MaxWidth = MaxWidth.ExtraLarge,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false,
+        };
+
+        if (FlightResult?.ItineraryGroup is not null)
+        {
+            foreach (var seg in FlightResult.ItineraryGroup.SelectMany(i => i.SegmentGroup))
             {
-                location = new RealTimeMap.Location
+                var iata = seg.Departure?.IataCode;
+                if (!string.IsNullOrWhiteSpace(iata) && !_mapParams.ContainsKey(iata))
                 {
-                    latitude = await IataLookupService.GetLatitudeAsync(dep.IataCode) ?? 0.00,
-                    longitude = await IataLookupService.GetLongitudeAsync(dep.IataCode) ?? 0.00,
-                },
-                zoomLevel = 5
-            };
+                    var lat = await IataLookupService.GetLatitudeAsync(iata);
+                    var lon = await IataLookupService.GetLongitudeAsync(iata);
+
+                    _mapParams[iata] = new RealTimeMap.LoadParameters
+                    {
+                        location = new RealTimeMap.Location
+                        {
+                            latitude = lat ?? 0.0,
+                            longitude = lon ?? 0.0
+                        },
+                        zoomLevel = 12
+                    };
+                }
+            }
         }
 
-        await _mudMessageBox!.ShowAsync();
+        await _mudMessageBox!.ShowAsync(options);
     }
-
-    private string GetAirportRoute()
-    {
-        var segments = FlightResult?.ItineraryGroup?.FirstOrDefault()?.SegmentGroup;
-        if (segments is null || segments.Count == 0) return "Unknown route";
-
-        var codes = segments.SelectMany((seg, index) =>
-        {
-            if (index == 0)
-                return new[] { seg.Departure?.IataCode, seg.Arrival?.IataCode };
-            return new[] { seg.Arrival?.IataCode };
-        }).Where(code => !string.IsNullOrWhiteSpace(code)).Distinct();
-
-        return string.Join(" → ", codes!);
-    }
-}
+} 
