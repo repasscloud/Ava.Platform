@@ -57,3 +57,4 @@ global using NanoidDotNet;
 global using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 global using Ava.Shared.Models.Static.Travel;
 global using Ava.Shared.Models.Search.Travel;
+global using Ava.Shared.Models.ExternalLib.Wikipedia;
