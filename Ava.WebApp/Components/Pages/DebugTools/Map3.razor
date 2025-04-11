@@ -1,0 +1,67 @@
+@page "/Debug/Map3"
+@using Ava.WebApp.Components.Dialogs
+@using Ava.Shared.Models.Results.Flights
+
+<h3>Flight Booking Info Test</h3>
+
+<FlightBookingInfoDialog @ref="_dialog"
+                         Title="Flight Info"
+                         FlightResult="@_sampleFlightResult" />
+
+<MudButton Variant="Variant.Filled" OnClick="ShowDialog">
+    Show Info
+</MudButton>
+
+@code {
+    private FlightBookingInfoDialog? _dialog;
+
+    private FlightResultV1 _sampleFlightResult = new()
+    {
+        IsOneWay = true,
+        LastTicketingDate = DateTime.UtcNow,
+        NumberOfBookableSeats = 1,
+        TotalNumberOfItineraries = 1,
+        ItineraryGroup = new List<ItineraryV1>
+        {
+            new ItineraryV1
+            {
+                ItineraryV1Position = 0,
+                NumberOfSegments = 1,
+                TravelTime = TimeSpan.Zero,
+                SegmentGroup = new List<SegmentV1>
+                {
+                    new SegmentV1
+                    {
+                        Departure = new DepartureV1
+                        {
+                            IataCode = "SYD",
+                            Terminal = "1",
+                            At = DateTime.UtcNow
+                        },
+                        Arrival = new ArrivalV1
+                        {
+                            IataCode = "ADL",
+                            Terminal = "2",
+                            At = DateTime.UtcNow.AddHours(3)
+                        },
+                        CarrierCode = "QF",
+                        OperatingCarrierCode = "QF",
+                        Number = "73",
+                        Aircraft = "Big One",
+                        NumberOfStops = 0,
+                        CabinClass = "ECONOMY",
+                        Id = "0"
+                    }
+                }
+            }
+        },
+        CurrencyCode = "AUD",
+        GrandTotal = 1223.23m,
+        TotalTravelTime = TimeSpan.Zero
+    };
+
+    private async Task ShowDialog()
+    {
+        await _dialog!.ShowAsync();
+    }
+}

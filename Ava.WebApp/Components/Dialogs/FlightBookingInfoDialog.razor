@@ -1,0 +1,70 @@
+@namespace Ava.WebApp.Components.Dialogs
+@using LeafletForBlazor
+@inject IIataLookupService IataLookupService
+
+<MudMessageBox @ref="_mudMessageBox"
+               Title="@Title"
+               Style="width: 800px; height: 600px;">
+    <MessageContent>
+        @if (FlightResult != null)
+        {
+            <MudText Typo="Typo.h6">Flight Route: @GetAirportRoute()</MudText>
+            <RealTimeMap @ref="_map" height="300px" width="100%" Parameters="@_mapParams" />
+        }
+        else
+        {
+            <MudText Typo="Typo.body2" Color="Color.Error">
+                No flight info available.
+            </MudText>
+        }
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Success"
+                   StartIcon="@Icons.Material.Filled.Done">
+            OK
+        </MudButton>
+    </YesButton>
+</MudMessageBox>
+
+@code {
+    private MudMessageBox? _mudMessageBox;
+    private RealTimeMap? _map;
+    private RealTimeMap.LoadParameters _mapParams = new();
+
+    [Parameter] public string Title { get; set; } = "Booking Info";
+    [Parameter] public FlightResultV1? FlightResult { get; set; }
+
+    public async Task ShowAsync()
+    {
+        if (FlightResult?.ItineraryGroup?.FirstOrDefault()?.SegmentGroup?.FirstOrDefault()?.Departure is { } dep)
+        {
+            _mapParams = new RealTimeMap.LoadParameters
+            {
+                location = new RealTimeMap.Location
+                {
+                    latitude = await IataLookupService.GetLatitudeAsync(dep.IataCode) ?? 0.00,
+                    longitude = await IataLookupService.GetLongitudeAsync(dep.IataCode) ?? 0.00,
+                },
+                zoomLevel = 5
+            };
+        }
+
+        await _mudMessageBox!.ShowAsync();
+    }
+
+    private string GetAirportRoute()
+    {
+        var segments = FlightResult?.ItineraryGroup?.FirstOrDefault()?.SegmentGroup;
+        if (segments is null || segments.Count == 0) return "Unknown route";
+
+        var codes = segments.SelectMany((seg, index) =>
+        {
+            if (index == 0)
+                return new[] { seg.Departure?.IataCode, seg.Arrival?.IataCode };
+            return new[] { seg.Arrival?.IataCode };
+        }).Where(code => !string.IsNullOrWhiteSpace(code)).Distinct();
+
+        return string.Join(" → ", codes!);
+    }
+}
