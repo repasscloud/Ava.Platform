@@ -86,6 +86,7 @@ public class Program
         builder.Services.AddScoped<IAuthenticationInfoService, AuthenticationInfoService>();
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
         builder.Services.AddScoped<IGithubCDNService, GithubCDNService>();
+        builder.Services.AddScoped<IIataLookupService, IataLookupService>();
         // Add Blazored.LocalStorage (for cookies and stuff)
         builder.Services.AddBlazoredLocalStorage();
 
