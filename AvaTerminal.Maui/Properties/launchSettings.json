@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "AvaTerminal.Maui": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "framework": "net9.0-maccatalyst"
+    }
+  }
+}
