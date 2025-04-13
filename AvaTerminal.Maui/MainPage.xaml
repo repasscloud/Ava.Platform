@@ -10,7 +10,7 @@
         <VerticalStackLayout Padding="24" Spacing="20">
 
             <!-- App Title -->
-            <Label Text="AvaTerminal Admin Console"
+            <Label Text="AvaAI Terminal Admin Console"
                    FontSize="26"
                    FontAttributes="Bold"
                    TextColor="White"
@@ -34,6 +34,7 @@
        WidthRequest="120"
        ReturnType="Done"
        Completed="CodeEntry_Completed" />
+
 
 
 

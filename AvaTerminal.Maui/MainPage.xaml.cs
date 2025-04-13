@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
+using AvaTerminal.Maui.Pages;
+
 
 namespace AvaTerminal.Maui;
 
@@ -50,24 +52,33 @@ public partial class MainPage : ContentPage
         { "AUT", "auth" },
         { "CNF", "config" },
         { "UPD", "updates" },
-        { "EXT", "exit" }
+        { "EXT", "exit" },
+        { "HLP", "help" } // this won’t be a real page route, but it lets us detect the input
     };
 
     public MainPage()
     {
         InitializeComponent();
         BindingContext = this;
+
+        Loaded += (_, _) => CodeEntry.Focus();
     }
 
     public ICommand SubmitCommand => new Command(async () => await OnCodeSubmitted());
 
-    // Called by both the Go button and Enter key
     private async Task OnCodeSubmitted()
     {
         var code = CodeEntry.Text?.Trim().ToUpperInvariant();
 
         if (string.IsNullOrWhiteSpace(code))
             return;
+
+        if (code == "HLP")
+        {
+            await ShowHelpPopup();
+            CodeEntry.Text = string.Empty;
+            return;
+        }
 
         if (_routeMap.TryGetValue(code, out var route))
         {
@@ -78,7 +89,9 @@ public partial class MainPage : ContentPage
             }
 
             Console.WriteLine($"Navigating to: {route}");
-            await Shell.Current.GoToAsync(route);
+            CodeEntry.Text = string.Empty;
+            CodeEntry.Unfocus();
+            await Shell.Current.GoToAsync($"//{route}");
         }
         else
         {
@@ -86,16 +99,25 @@ public partial class MainPage : ContentPage
         }
     }
 
-    // Go button handler
+
     private async void OnGoClicked(object sender, EventArgs e)
     {
         await OnCodeSubmitted();
     }
 
     private void CodeEntry_Completed(object sender, EventArgs e)
-{
-    // mimic the Go button
-    _ = OnCodeSubmitted();
-}
+    {
+        _ = OnCodeSubmitted();
+    }
 
+    public async Task ShowHelpPopup()
+    {
+        await Navigation.PushModalAsync(new HelpPopupPage(
+            "User Management Help",
+            "This page allows you to view and manage user accounts.\n\n" +
+            "• USR → View all users\n" +
+            "• NEW → Create a new user\n" +
+            "• EXT → Exit"
+        ));
+    }
 }
