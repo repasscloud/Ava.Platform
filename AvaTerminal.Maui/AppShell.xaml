@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Shell
-    x:Class="AvaTerminal.Maui.AppShell"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:AvaTerminal.Maui"
-    Shell.FlyoutBehavior="Flyout"
-    Title="AvaTerminal.Maui">
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:core="clr-namespace:AvaTerminal.Maui"
+       xmlns:pages="clr-namespace:AvaTerminal.Maui.Pages"
+       x:Class="AvaTerminal.Maui.AppShell">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <ShellContent Title="Main" ContentTemplate="{DataTemplate core:MainPage}" Route="main" />
 
+    <ShellContent Title="Flight Booking" ContentTemplate="{DataTemplate pages:FlightBookingPage}" Route="flight" />
+    <ShellContent Title="Travel Policies" ContentTemplate="{DataTemplate pages:TravelPolicyPage}" Route="policy" />
+    <ShellContent Title="Client Management" ContentTemplate="{DataTemplate pages:ClientPage}" Route="client" />
+    <ShellContent Title="User Directory" ContentTemplate="{DataTemplate pages:UserDirectoryPage}" Route="users" />
+    <ShellContent Title="Booking References" ContentTemplate="{DataTemplate pages:PnrPage}" Route="pnr" />
+    <ShellContent Title="Ticketing Dashboard" ContentTemplate="{DataTemplate pages:TicketingPage}" Route="ticketing" />
+    <ShellContent Title="Reconciliation Monitor" ContentTemplate="{DataTemplate pages:ReconciliationPage}" Route="reconciliation" />
+    <ShellContent Title="Support Tickets" ContentTemplate="{DataTemplate pages:SupportPage}" Route="support" />
+    <ShellContent Title="Sales Stats" ContentTemplate="{DataTemplate pages:SalesPage}" Route="sales" />
+    <ShellContent Title="Inventory Viewer" ContentTemplate="{DataTemplate pages:InventoryPage}" Route="inventory" />
+    <ShellContent Title="Route Map" ContentTemplate="{DataTemplate pages:MapPage}" Route="map" />
+    <ShellContent Title="Transactions &amp; Billing" ContentTemplate="{DataTemplate pages:TransactionPage}" Route="transactions" />
+    <ShellContent Title="Notifications &amp; Alerts" ContentTemplate="{DataTemplate pages:NotificationsPage}" Route="notifications" />
+    <ShellContent Title="Test Environments" ContentTemplate="{DataTemplate pages:EnvironmentPage}" Route="environment" />
+    <ShellContent Title="Debug Tools" ContentTemplate="{DataTemplate pages:DebugPage}" Route="debug" />
+    <ShellContent Title="Activity Logs" ContentTemplate="{DataTemplate pages:ActivityLogPage}" Route="activity" />
+    <ShellContent Title="Authentication" ContentTemplate="{DataTemplate pages:AuthPage}" Route="auth" />
+    <ShellContent Title="Configuration Center" ContentTemplate="{DataTemplate pages:ConfigPage}" Route="config" />
+    <ShellContent Title="Patch Notes" ContentTemplate="{DataTemplate pages:PatchNotesPage}" Route="updates" />
 </Shell>
