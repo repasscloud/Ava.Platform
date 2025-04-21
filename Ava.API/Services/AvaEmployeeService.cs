@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Http.HttpResults;
-
 namespace Ava.API.Services;
 
 public class AvaEmployeeService : IAvaEmployeeService
@@ -7,12 +5,14 @@ public class AvaEmployeeService : IAvaEmployeeService
     private readonly ApplicationDbContext _context;
     private readonly ILoggerService _loggerService;
     private readonly ICustomPasswordHasher _passwordHasher;
+    private readonly IResend _resend;
 
-    public AvaEmployeeService(ApplicationDbContext context, ILoggerService logger, ICustomPasswordHasher passwordHasher)
+    public AvaEmployeeService(ApplicationDbContext context, ILoggerService logger, ICustomPasswordHasher passwordHasher, IResend resend)
     {
         _context = context;
         _loggerService = logger;
         _passwordHasher = passwordHasher;
+        _resend = resend;
     }
 
     public async Task<AvaEmployeeRecord?> GetByIdAsync(string id)
@@ -136,7 +136,7 @@ public class AvaEmployeeService : IAvaEmployeeService
         await _loggerService.LogInfoAsync($"AvaEmployee with Id '{id}' has requested password reset successfully.");
         await _context.SaveChangesAsync();
 
-        //TODO: Create a service to email the verification token to the user now
+        await EmailVerificationCode(verificationCode: user.VerificationToken, receipientEmailAddress: user.Email.ToLowerInvariant());
 
         return true;
     }
@@ -165,6 +165,75 @@ public class AvaEmployeeService : IAvaEmployeeService
         return true;
     }
 
+    public async Task EmailVerificationCode(string verificationCode, string receipientEmailAddress)
+    {
+        var htmlBody = $@"
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <meta charset=""UTF-8"">
+            <title>Password Reset Token</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    color: #333333;
+                    background-color: #f9f9f9;
+                    padding: 20px;
+                }}
+                .container {{
+                    background-color: #ffffff;
+                    border-radius: 8px;
+                    padding: 30px;
+                    max-width: 600px;
+                    margin: auto;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+                }}
+                .token {{
+                    font-size: 1.5em;
+                    font-weight: bold;
+                    background-color: #f1f1f1;
+                    padding: 10px 20px;
+                    border-radius: 6px;
+                    display: inline-block;
+                    margin: 20px 0;
+                    letter-spacing: 2px;
+                }}
+                .footer {{
+                    font-size: 0.9em;
+                    color: #777777;
+                    margin-top: 30px;
+                }}
+            </style>
+            </head>
+            <body>
+            <div class=""container"">
+                <h2>AvaAI Terminal2 Password Reset Request</h2>
+                <p>Hello,</p>
+                <p>We received a request to reset your password. To proceed, please open <strong>AvaAI Terminal2</strong> and navigate to the <code>AVF</code> route.</p>
+                <p>When prompted, enter the verification token below:</p>
+
+                <div class=""token"">{verificationCode}</div>
+
+                <p>If you did not request this reset, please ignore this message.</p>
+
+                <div class=""footer"">
+                — AvaAI Support Team<br/>
+                This token is valid for a limited time only.
+                </div>
+            </div>
+            </body>
+            </html>";
+
+        var message = new EmailMessage();
+        message.From = "AvaAI <no-reply@support.repasscloud.com>";
+        message.To.Add( receipientEmailAddress );
+        message.Subject = "AvaAI Terminal2 Password Reset";
+        message.HtmlBody = htmlBody;
+
+        var resp = await _resend.EmailSendAsync( message );
+        await _loggerService.LogInfoAsync($"AvaEmployee verification code email send with Id '{resp.Content}'.");
+    }
+    
     public Task<bool> UpdatePasswordAsync(string id, string newPassword, string oldPassword)
     {
         throw new NotImplementedException();

@@ -7,7 +7,7 @@ public class CustomPasswordHasher : ICustomPasswordHasher
     public CustomPasswordHasher(IConfiguration configuration)
     {
         _globalSalt = configuration["AvaSettings:GlobalSalt"]
-                      ?? throw new InvalidOperationException("GlobalSalt missing in configuration");
+                      ?? throw new InvalidOperationException("AvaSettings:GlobalSalt missing in configuration.");
     }
 
     public string HashPassword(string privateKey, string password)

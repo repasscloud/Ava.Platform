@@ -12,5 +12,6 @@ public interface IAvaEmployeeService
     Task<bool> UpdatePasswordAsync(string id, string newPassword, string oldPassword);
     Task<bool> ResetPasswordAsync(string id);
     Task<bool> VerifyAccountAsync(AvaEmployeeVerifyAccountDTO dto);
+    Task EmailVerificationCode(string verificationCode, string receipientEmailAddress);
     Task<bool> ImpersonateAsRoleAsync(string role);
 }

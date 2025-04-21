@@ -29,15 +29,24 @@ public class Program
         // Register LoggerService (custom)
         builder.Services.AddScoped<ILoggerService, LoggerService>();
         
-       // REgister License Generator & Validator
-       builder.Services.AddScoped<IAvaLicenseGenerator, AvaLicenseGenerator>();
-       builder.Services.AddScoped<IAvaLicenseValidator, AvaLicenseValidator>();
+        // REgister License Generator & Validator
+        builder.Services.AddScoped<IAvaLicenseGenerator, AvaLicenseGenerator>();
+        builder.Services.AddScoped<IAvaLicenseValidator, AvaLicenseValidator>();
 
-       // Ava Employee Service
-       builder.Services.AddScoped<IAvaEmployeeService, AvaEmployeeService>();
+        // Ava Employee Service
+        builder.Services.AddScoped<IAvaEmployeeService, AvaEmployeeService>();
 
-       // CustomPasswordHasher
-       builder.Services.AddSingleton<ICustomPasswordHasher, CustomPasswordHasher>();
+        // CustomPasswordHasher
+        builder.Services.AddSingleton<ICustomPasswordHasher, CustomPasswordHasher>();
+
+        builder.Services.AddOptions();
+        builder.Services.AddHttpClient<ResendClient>();
+        builder.Services.Configure<ResendClientOptions>(options =>
+        {
+            options.ApiToken = builder.Configuration.GetValue<string>("AvaSettings:ResendKey")
+                ?? throw new InvalidOperationException("AvaSettings:ResendKey missing in configuration.");
+        });
+        builder.Services.AddTransient<IResend, ResendClient>();
 
         // Register AmadeusUrlBuilder
         builder.Services.AddSingleton<AmadeusUrlBuilder>();

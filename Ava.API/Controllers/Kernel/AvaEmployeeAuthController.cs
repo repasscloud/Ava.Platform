@@ -117,8 +117,8 @@ public class AvaEmployeeAuthController : ControllerBase
     }
 
     [HttpPost("reset-password")]
-    public async Task<IActionResult> ResetPassword(string emailOrId)
-        => (await _avaEmployeeService.ResetPasswordAsync(emailOrId)) 
+    public async Task<IActionResult> ResetPassword([FromBody] PasswordResetDTO dto)
+        => (await _avaEmployeeService.ResetPasswordAsync(dto.Email)) 
             ? Ok("If an account exists for the provided information, a password reset has been initiated.")
             : Ok("If an account exists for the provided information, a password reset has been initiated.");
 
