@@ -5,13 +5,13 @@ namespace Ava.API.Services;
 public class AvaEmployeeService : IAvaEmployeeService
 {
     private readonly ApplicationDbContext _context;
-    private readonly ILoggerService _logger;
+    private readonly ILoggerService _loggerService;
     private readonly ICustomPasswordHasher _passwordHasher;
 
     public AvaEmployeeService(ApplicationDbContext context, ILoggerService logger, ICustomPasswordHasher passwordHasher)
     {
         _context = context;
-        _logger = logger;
+        _loggerService = logger;
         _passwordHasher = passwordHasher;
     }
 
@@ -49,33 +49,35 @@ public class AvaEmployeeService : IAvaEmployeeService
 
         _context.AvaEmployees.Remove(user);
         await _context.SaveChangesAsync();
+        await _loggerService.LogInfoAsync($"User '{user.Id}' has been deleted.");
+
         return true;
     }
 
-    public async Task<AvaEmployeeRecord?> UpdateAsync(string id, string password, string? firstName, string? lastName, string? email, bool? isActive, string? employeeType, InternalRole? role)
+    public async Task<bool> UpdateAsync(string id, AvaEmployeeUpdateDTO dto)
     {
         var user = await _context.AvaEmployees.FindAsync(id);
-        if (user == null) return null;
+        if (user == null) return false;
 
-        if (!string.IsNullOrWhiteSpace(firstName)) user.FirstName = firstName;
-        if (!string.IsNullOrWhiteSpace(lastName)) user.LastName = lastName;
-        if (!string.IsNullOrWhiteSpace(email)) user.Email = email;
-        if (isActive.HasValue) user.IsActive = (bool)isActive;
-        if (!string.IsNullOrWhiteSpace(employeeType)) user.EmployeeType = employeeType;
-        if (role.HasValue) user.Role = role.Value;
-        user.VerificationToken = null;
-        user.PasswordHash = null;
-        if (!string.IsNullOrWhiteSpace(password))
+        if (!string.IsNullOrWhiteSpace(dto.Password))
         {
-            user.PasswordHash = _passwordHasher.HashPassword(user, password);
-        }
-        else
-        {
-            return null;
-        }
+            if (!string.IsNullOrWhiteSpace(dto.Email)) user.Email = dto.Email;
+            if (!string.IsNullOrWhiteSpace(dto.FirstName)) user.FirstName = dto.FirstName;
+            if (!string.IsNullOrWhiteSpace(dto.LastName)) user.LastName = dto.LastName;
+            if (dto.IsActive.HasValue) user.IsActive = (bool)dto.IsActive;
+            if (!string.IsNullOrWhiteSpace(dto.EmployeeType)) user.EmployeeType = dto.EmployeeType;
+            if (dto.Role.HasValue) user.Role = dto.Role.Value;
+            user.VerificationToken = null;
+            user.PasswordHash = null;
+            
+            user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password);
 
-        await _context.SaveChangesAsync();
-        return user;
+            await _loggerService.LogInfoAsync($"User '{user.Id}' was successfully updated.");
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        
+        return false;
     }
 
     public async Task<bool> SetNewPasswordAsync(string id, string newPassword, string verificationToken)
@@ -110,7 +112,6 @@ public class AvaEmployeeService : IAvaEmployeeService
         return Task.FromResult(Enum.TryParse(typeof(InternalRole), role, true, out _));
     }
 
-    //Task<bool> ResetPasswordAsync(string id);
     public async Task<bool> ResetPasswordAsync(string id)
     {
         var existing = await _context.AvaEmployees.FirstOrDefaultAsync(u =>
@@ -119,19 +120,22 @@ public class AvaEmployeeService : IAvaEmployeeService
         );
 
         if (existing is null)
-            return false;
-
+        {
+            await _loggerService.LogInfoAsync($"User with Id '{id}' was not found when requesting password reset.");
+            return true;
+        }
+            
         existing.PasswordHash = null;
         existing.VerificationToken = Nanoid.Generate(size: 16);
+
+        await _loggerService.LogInfoAsync($"User with Id '{id}' has requested password reset successfully.");
 
         await _context.SaveChangesAsync();
         return true;
     }
-
 
     public Task<bool> UpdatePasswordAsync(string id, string newPassword, string oldPassword)
     {
         throw new NotImplementedException();
     }
 }
-

@@ -4,7 +4,7 @@ namespace Ava.API.Controllers.Kernel;
 
 [ApiController]
 [Route("api/v1/auth")]
-public class AvaEmployeeAUthController : ControllerBase
+public class AvaEmployeeAuthController : ControllerBase
 {
     private readonly IJwtTokenService _jwtTokenService;
     private readonly IAvaEmployeeService _avaEmployeeService;
@@ -12,7 +12,7 @@ public class AvaEmployeeAUthController : ControllerBase
     private readonly ICustomPasswordHasher _passwordHasher;
     private readonly ILoggerService _loggerService;
 
-    public AvaEmployeeAUthController(
+    public AvaEmployeeAuthController(
         IJwtTokenService jwtTokenService,
         IAvaEmployeeService avaEmployeeService,
         AppDbContext context,
@@ -123,39 +123,19 @@ public class AvaEmployeeAUthController : ControllerBase
 
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword(string emailOrId)
-    {
-        var result = await _avaEmployeeService.ResetPasswordAsync(emailOrId);
-        if (result)
-        {
-            await _loggerService.LogInfoAsync($"User with Id '{emailOrId}' has requested password reset successfully.");
-        }
-        else
-        {
-            await _loggerService.LogWarningAsync($"User with Id '{emailOrId}' has requested password reset unsuccessfully.");
-        }
-        
-        return Ok("Check your email.");
-    }
+        => (await _avaEmployeeService.ResetPasswordAsync(emailOrId)) 
+            ? Ok("If an account exists for the provided information, a password reset has been initiated.")
+            : Ok("If an account exists for the provided information, a password reset has been initiated.");
 
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+        => (await _avaEmployeeService.DeleteAsync(id)) ? Ok() : NotFound();
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(string id, [FromBody] AvaEmployeeUpdateDTO dto)
+        => (await _avaEmployeeService.UpdateAsync(id, dto)) ? Ok() : NotFound();
 }
 
-//     [HttpPost("reset-password")]
-//     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
-//     {
-//         var result = await _userService.ResetPasswordAsync(dto.UserId, dto.NewPassword);
-//         return result ? Ok() : NotFound();
-//     }
-
-//     [HttpDelete("{id}")]
-//     public async Task<IActionResult> Delete(Guid id)
-//         => await _userService.DeleteAsync(id) ? Ok() : NotFound();
-
-//     [HttpPut("{id}")]
-//     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserDto dto)
-//     {
-//         var updated = await _userService.UpdateAsync(id, dto.Username, dto.Password, dto.Role);
-//         return updated == null ? NotFound() : Ok(updated);
-//     }
 
 //     [HttpPost("impersonate")]
 //     public async Task<IActionResult> Impersonate([FromQuery] string role)
@@ -166,32 +146,8 @@ public class AvaEmployeeAUthController : ControllerBase
 // }
 
 
-// // Dtos/LoginDto.cs
-// public class LoginDto
-// {
-//     public string Username { get; set; } = string.Empty;
-//     public string Password { get; set; } = string.Empty;
-// }
 
-// public class RegisterDto
-// {
-//     public string Username { get; set; } = string.Empty;
-//     public string Password { get; set; } = string.Empty;
-//     public InternalRole Role { get; set; }
-// }
 
-// public class ResetPasswordDto
-// {
-//     public Guid UserId { get; set; }
-//     public string NewPassword { get; set; } = string.Empty;
-// }
-
-// public class UpdateUserDto
-// {
-//     public string? Username { get; set; }
-//     public string? Password { get; set; }
-//     public InternalRole? Role { get; set; }
-// }
 
 
 // // JwtTokenService.cs (add this method)

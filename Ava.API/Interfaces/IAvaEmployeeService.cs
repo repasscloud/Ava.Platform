@@ -6,7 +6,7 @@ public interface IAvaEmployeeService
     Task<List<AvaEmployeeRecord>> GetAllAsync();
     Task<AvaEmployeeRecord> CreateAsync(string firstName, string lastName, string email, bool isActive, string employeeType, string password, InternalRole role);
     Task<bool> DeleteAsync(string id);
-    Task<AvaEmployeeRecord?> UpdateAsync(string id, string password, string? firstName, string? lastName, string? email, bool? isActive, string? employeeType, InternalRole? role);
+    Task<bool> UpdateAsync(string id, AvaEmployeeUpdateDTO dto);
     Task<bool> SetNewPasswordAsync(string id, string newPassword, string verificationToken);
     Task<bool> UpdatePasswordAsync(string id, string newPassword, string oldPassword);
     Task<bool> ResetPasswordAsync(string id);
