@@ -82,3 +82,4 @@ global using Ava.WebApp.Extensions;
 global using Microsoft.AspNetCore.Localization;
 global using Ava.Shared.Models.Search.Travel;
 global using Ava.Shared.Models.Static.Travel;
+global using Ava.Shared.Models.ExternalLib.Wikipedia;

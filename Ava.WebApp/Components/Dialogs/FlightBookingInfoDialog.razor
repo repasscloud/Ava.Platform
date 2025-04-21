@@ -9,51 +9,96 @@
     <MessageContent>
         @if (FlightResult?.ItineraryGroup is not null)
         {
-            int flightIndex = 1;
+            int flightIndex = 0;
             foreach (var itinerary in FlightResult.ItineraryGroup)
             {
                 foreach (var segment in itinerary.SegmentGroup)
                 {
-                    <MudPaper Class="pa-3 mb-4" Elevation="2">
-                        <MudText Typo="Typo.subtitle1" Class="mb-2">
-                            Flight @flightIndex: @segment.Departure?.IataCode → @segment.Arrival?.IataCode
-                        </MudText>
+                    <MudGrid Class="pa-3 mb-1" Style="border-radius: 6px;">
 
-                        <MudGrid>
-                            <MudItem xs="12" sm="6">
-                                <MudText Typo="Typo.caption">Carrier:</MudText>
-                                <MudText>@segment.CarrierCode @segment.Number</MudText>
+                        <!-- Airline logo -->
+                        <MudItem xs="12" sm="3" Class="d-flex align-center justify-center">
+                            <MudImage Src="@segment.OperatingCarrierCode.ToAirlineImageUrl()"
+                                    Alt="@segment.OperatingCarrierCode"
+                                    Width="120" Height="120"
+                                    Style="border-radius: 4px; mb-4" />
+                        </MudItem>
 
-                                <MudText Typo="Typo.caption">Operated By:</MudText>
-                                <MudText>@segment.OperatingCarrierCode</MudText>
+                        <!-- Flight info -->
+                        <MudItem xs="12" sm="4">
+                            <MudText Typo="Typo.h6" Class="mb-1">@segment.CarrierCode@segment.Number (@segment.Departure.IataCode → @segment.Arrival.IataCode)</MudText>
+                            @if (segment.CarrierCode != segment.OperatingCarrierCode)
+                            {
+                                <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mb-2">
+                                    Operated by @segment.OperatingCarrierCode
+                                </MudText>
+                            }
 
-                                <MudText Typo="Typo.caption">Aircraft:</MudText>
-                                <MudText>@segment.Aircraft</MudText>
+                            <MudStack Spacing="1">
+                                <MudText Typo="Typo.caption">Aircraft: <b>@segment.Aircraft</b></MudText>
+                                <MudText Typo="Typo.caption">Cabin Class: <b>@segment.CabinClass</b></MudText>
+                                <MudDivider />
+                                <MudText Typo="Typo.caption">
+                                    <b>Departure:</b> @segment.Departure?.IataCode (Terminal @segment.Departure?.Terminal)<br />
+                                    @segment.Departure?.At.ToLocalTime().ToString("ddd, dd MMM yyyy HH:mm")
+                                </MudText>
+                                <MudText Typo="Typo.caption">
+                                    <b>Arrival:</b> @segment.Arrival?.IataCode (Terminal @segment.Arrival?.Terminal)<br />
+                                    @segment.Arrival?.At.ToLocalTime().ToString("ddd, dd MMM yyyy HH:mm")
+                                </MudText>
 
-                                <MudText Typo="Typo.caption">Cabin Class:</MudText>
-                                <MudText>@segment.CabinClass</MudText>
-
-                                <MudText Typo="Typo.caption">Departure:</MudText>
-                                <MudText>@segment.Departure?.IataCode - Terminal @segment.Departure?.Terminal</MudText>
-                                <MudText>@segment.Departure?.At.ToLocalTime().ToString("ddd, dd MMM yyyy HH:mm")</MudText>
-
-                                <MudText Typo="Typo.caption">Arrival:</MudText>
-                                <MudText>@segment.Arrival?.IataCode - Terminal @segment.Arrival?.Terminal</MudText>
-                                <MudText>@segment.Arrival?.At.ToLocalTime().ToString("ddd, dd MMM yyyy HH:mm")</MudText>
-                            </MudItem>
-
-                            <MudItem xs="12" sm="6">
-                                @if (_mapParams.TryGetValue(segment.Departure?.IataCode ?? string.Empty, out var param))
+                                @if (segment.AmenityGroup != null &&
+                                    segment.AmenityGroup?.Count > 0)
                                 {
-                                    <RealTimeMap height="250px" width="100%" Parameters="@param" />
+                                    List<AmenityV1> amenities = segment.AmenityGroup;
+                                    <MudDivider />
+                                    <MudText Typo="Typo.caption"><b>Airline Amenities</b></MudText>
+                                    <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                                        @foreach (var amenity in amenities)
+                                        {
+                                            <MudTooltip Text="@amenity.Description">
+                                                <div style="position: relative;">
+                                                    @* Base icon based on description *@
+                                                    @if (!string.IsNullOrWhiteSpace(amenity.Description))
+                                                    {
+                                                        <MudIcon Icon="@GetAmenityIcon(amenity.Description)" Size="Size.Small" />
+
+                                                        @if (amenity.IsChargeable)
+                                                        {
+                                                            <MudIcon Icon="@Icons.Material.Filled.AttachMoney"
+                                                                Size="Size.Small"
+                                                                Color="Color.Error"
+                                                                Style="position: absolute; bottom: 1px; right: -4px; background-color: white; border-radius: 50%; padding: 0.5px; font-size: 0.8em;" />
+                                                        }
+                                                    }
+                                                </div>
+                                            </MudTooltip>
+                                        }
+                                    </div>
                                 }
-                                else
-                                {
-                                    <MudText Typo="Typo.caption" Color="Color.Warning">Map unavailable for @segment.Departure?.IataCode</MudText>
-                                }
-                            </MudItem>
-                        </MudGrid>
-                    </MudPaper>
+                            </MudStack>
+                        </MudItem>
+
+                        <!-- Map -->
+                        <MudItem xs="12" sm="5">
+                            @if (_mapParams.TryGetValue(segment.Departure?.IataCode ?? string.Empty, out var param))
+                            {
+                                <RealTimeMap height="250px" width="100%" Parameters="@param" />
+                                <MudText Typo="Typo.caption" Class="mt-1 d-block" Style="font-size: 11px; text-align: right;">
+                                    © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">
+                                        OpenStreetMap contributors
+                                    </a>
+                                </MudText>
+
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.caption" Color="Color.Warning">
+                                    Map unavailable for @segment.Departure?.IataCode
+                                </MudText>
+                            }
+                        </MudItem>
+                    </MudGrid>
 
                     flightIndex++;
                 }
@@ -61,8 +106,47 @@
 
             <MudDivider Class="my-3" />
 
-            <MudText Typo="Typo.subtitle1">Pricing Summary</MudText>
-            <MudText Typo="Typo.body2">Total Price: @FlightResult.GrandTotal.ToString("C") (@FlightResult.CurrencyCode)</MudText>
+            <MudGrid>
+                <!-- MudGrid Col 1 -->
+                <MudItem xs="5">
+                    <MudStack>
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.h6">Pricing Summary</MudText>
+                            @* <MudText Typo="Typo.subtitle1">Pricing Summary</MudText> *@
+                        </MudItem>
+                        <MudGrid>
+                            <MudItem xs="6">
+                                <MudStack Spacing="1">
+                                    <MudText Typo="Typo.body2">Flight:</MudText>
+                                    <MudText Typo="Typo.body2">Booking Fee:</MudText>
+                                    <MudText Typo="Typo.body2">Tax:</MudText>
+                                    <MudText Typo="Typo.body2"><b>Total Price:</b></MudText>
+                                </MudStack>
+                            </MudItem>
+
+                            <MudItem xs="6">
+                                <MudStack Spacing="1" AlignItems="AlignItems.End">
+                                    <MudText Typo="Typo.body2">@FlightResult.GrandTotal.ToString("C") (@FlightResult.CurrencyCode)</MudText>
+                                    <MudText Typo="Typo.body2">@BookingFee.ToString("C") (@FlightResult.CurrencyCode)</MudText>
+                                    <MudText Typo="Typo.body2">@TaxRage.ToString("C") (@FlightResult.CurrencyCode)</MudText>
+                                    <MudText Typo="Typo.body2"><b>@FlightResult.GrandTotal.ToString("C") (@FlightResult.CurrencyCode)</b></MudText>
+                                </MudStack>
+                            </MudItem>
+                        </MudGrid>
+                        
+                    </MudStack>
+                </MudItem>
+
+                <!-- MudGrid Col 2 -->
+                <MudItem xs="2">
+                    <!-- DO NOT USE -->
+                </MudItem>
+                    
+                <!-- MudGrid Col 3 -->
+                <MudItem xs="5">
+                    
+                </MudItem>
+            </MudGrid>
         }
         else
         {
@@ -92,10 +176,12 @@
 
         var options = new DialogOptions
         {
-            MaxWidth = MaxWidth.ExtraLarge,
+            MaxWidth = MaxWidth.Medium,
             FullWidth = true,
+            CloseOnEscapeKey = true,
             CloseButton = true,
             BackdropClick = false,
+            NoHeader = true,
         };
 
         if (FlightResult?.ItineraryGroup is not null)
@@ -122,5 +208,86 @@
         }
 
         await _mudMessageBox!.ShowAsync(options);
+    }
+
+
+    // money things
+    private decimal BookingFee = 50.00m;
+    private decimal TaxRage = 10.00m;
+
+    private string GetAmenityIcon(string description)
+    {
+        return description.ToUpperInvariant() switch
+        {
+            "175 PCT  QMILES ACCUMULATION" => Icons.Material.Filled.TrendingUp,
+            "1PC MAX 15LB 7KG 115LCM" => Icons.Material.Filled.WorkOutline,
+            "1PC MAX 23KG 158LCM EACH" => Icons.Material.Filled.WorkOutline,
+            "200 PCT  QMILES ACCUMULATION" => Icons.Material.Filled.TrendingUp,
+            "3000 EXTRA MILES" => Icons.Material.Filled.Add,
+            "50 PCT QMILES ACCUMULATION" => Icons.Material.Filled.TrendingFlat,
+            "50KG BAGGAGE ALLOWANCE" => Icons.Material.Filled.Luggage,
+            "70 PERCENT MILES EARNED" => Icons.Material.Filled.TrendingFlat,
+            "75 PCT  QMILES ACCUMULATION" => Icons.Material.Filled.TrendingUp,
+            "ALCOHOLIC DRINK" => Icons.Material.Filled.WineBar,
+            "BAG INCLUDED" => Icons.Material.Filled.Work,
+            "BEVERAGE" => Icons.Material.Filled.LocalCafe,
+            "BID TO UPGRADE" => Icons.Material.Filled.Upgrade,
+            "CABIN BAG 1 PIECE 7 KG" => Icons.Material.Filled.Cabin,
+            "CARRY ON BAGGAGE" => Icons.Material.Filled.Cases,
+            "CHANGE AFTER DEPARTURE" => Icons.Material.Filled.EditCalendar,
+            "CHANGE BEFORE DEPARTURE" => Icons.Material.Filled.EditCalendar,
+            "CHANGEABLE TICKET" => Icons.Material.Filled.ChangeCircle,
+            "CHECKED BAG 1 PC 23 KG EACH" => Icons.Material.Filled.Work,
+            "CHECKED BAG 2 PCS 23 KG EACH" => Icons.Material.Filled.Work,
+            "CHECKED BAG 2 PCS 32 KG EACH" => Icons.Material.Filled.Work,
+            "CHECKED BAG FIRST" => Icons.Material.Filled.Luggage,
+            "CHECKED BAG SECOND" => Icons.Material.Filled.Luggage,
+            "COMPLIMENTARY BEVERAGES" => Icons.Material.Filled.LocalCafe,
+            "DEDICATED CHECK IN" => Icons.Material.Filled.AssignmentInd,
+            "DOMESTIC NAME CHANGE FEE" => Icons.Material.Filled.EditNote,
+            "EXCESS BAGGAGE" => Icons.Material.Filled.WorkOff,
+            "EXCESS WEIGHT SPECIAL CHARGE" => Icons.Material.Filled.Scale,
+            "FAST TRACK" => Icons.Material.Filled.Speed,
+            "FAST TRACK IF AVAILABLE" => Icons.Material.Filled.Speed,
+            "FOOD AND BEVERAGE" => Icons.Material.Filled.Restaurant,
+            "FREE CHECKED BAGGAGE ALLOWANCE" => Icons.Material.Filled.CheckCircle,
+            "FRONT SEAT SELECTION" => Icons.Material.Filled.EventSeat,
+            "MEAL" => Icons.Material.Filled.Restaurant,
+            "MEAL AND BEVERAGE" => Icons.Material.Filled.LocalDining,
+            "MEAL BEVERAGE" => Icons.Material.Filled.LocalDining,
+            "MEAL OR SNACK" => Icons.Material.Filled.RestaurantMenu,
+            "MEAL SERVICE" => Icons.Material.Filled.RoomService,
+            "MEAL SERVICES" => Icons.Material.Filled.RoomService,
+            "MEAL VOUCHER" => Icons.Material.Filled.ReceiptLong,
+            "MILEAGE ACCRUAL" => Icons.Material.Filled.Loyalty,
+            "NO SHOW FEE" => Icons.Material.Filled.Block,
+            "NON ALCOHOLIC DRINK" => Icons.Material.Filled.LocalDrink,
+            "ONLINE MESSAGE RIGHT" => Icons.Material.Filled.MarkChatRead,
+            "POINTS ACCRUAL" => Icons.Material.Filled.Star,
+            "PRE PAID BAGGAGE" => Icons.Material.Filled.AttachMoney,
+            "PRE RESERVED SEAT ASSIGNMENT" => Icons.Material.Filled.EventSeat,
+            "PRE SEAT ASSIGNMENT" => Icons.Material.Filled.EventSeat,
+            "PREMIUM CHECK IN" => Icons.Material.Filled.Star,
+            "PREMIUM SEAT" => Icons.Material.Filled.AirlineSeatReclineExtra,
+            "PRIORITY ACCESS" => Icons.Material.Filled.FlightTakeoff,
+            "PRIORITY BAGGAGE" => Icons.Material.Filled.LocalShipping,
+            "PRIORITY BOARDING" => Icons.Material.Filled.DirectionsWalk,
+            "PRIORITY CHECK IN" => Icons.Material.Filled.Login,
+            "PRIORITY CHKIN AT CERTAIN PORT" => Icons.Material.Filled.Login,
+            "PRIORITY SECURITY" => Icons.Material.Filled.VerifiedUser,
+            "QR LOUNGE ACCESS OS" => Icons.Material.Filled.MeetingRoom,
+            "REFUND AFTER DEPARTURE" => Icons.Material.Filled.MoneyOff,
+            "REFUND BEFORE DEPARTURE" => Icons.Material.Filled.MoneyOffCsred,
+            "REFUNDABLE TICKET" => Icons.Material.Filled.Receipt,
+            "SEAT ASSIGNMENT" => Icons.Material.Filled.EventSeat,
+            "SEAT SELECTION" => Icons.Material.Filled.EventSeat,
+            "SNACK" => Icons.Material.Filled.Fastfood,
+            "STANDARD SEAT" => Icons.Material.Filled.EventSeat,
+            "STANDARD SEAT SELECTION" => Icons.Material.Filled.EventSeat,
+            "STATUS CREDIT ACCRUAL" => Icons.Material.Filled.TrendingUp,
+            "UPGRADE" => Icons.Material.Filled.Upgrade,
+            "UPGRADE ELIGIBILITY" => Icons.Material.Filled.CheckCircleOutline,
+            _ => Icons.Material.Filled.Info
+        };
     }
 } 

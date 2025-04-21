@@ -1,4 +1,4 @@
-﻿namespace AvaTerminal.Maui;
+﻿namespace AvaAITerminal;
 
 public partial class App : Application
 {

@@ -48,5 +48,8 @@ global using Ava.Shared.Services;
 global using Ava.Shared.DependencyInjection;
 global using Ava.Shared.Models.Search.Travel;
 global using Ava.Shared.Models.Static.Travel;
+global using Ava.Shared.Models.ExternalLib.Wikipedia;
 
 global using NanoidDotNet;
+global using Ava.Shared.Models.Static.Jwt;
+global using Microsoft.AspNetCore.Http;

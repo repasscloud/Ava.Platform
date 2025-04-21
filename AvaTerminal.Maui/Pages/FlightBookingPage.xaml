@@ -1,6 +1,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="AvaTerminal.Maui.Pages.FlightBookingPage"
+             x:Class="AvaAITerminal.Pages.FlightBookingPage"
              Title="Flight Booking Page">
     <VerticalStackLayout Padding="20">
         <Label Text="Flight Booking Page Placeholder"

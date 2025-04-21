@@ -44,6 +44,9 @@ public class AppDbContext : DbContext
     public DbSet<QantasCustomIATACode> QantasCustomIATACodes { get; set; }
     public DbSet<QantasCustomBookingRequest> QantasCustomBookingRequest { get; set; }
 
+    // Wikipedia classes
+    public DbSet<AircraftTypeDesignator> AircraftTypeDesignators { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Mark Coordinates as an Owned Entity

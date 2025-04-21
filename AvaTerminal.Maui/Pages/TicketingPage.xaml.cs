@@ -1,4 +1,4 @@
-namespace AvaTerminal.Maui.Pages;
+namespace AvaAITerminal.Pages;
 
 public partial class TicketingPage : ContentPage
 {

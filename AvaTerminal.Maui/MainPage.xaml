@@ -2,10 +2,10 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
 
-             x:Class="AvaTerminal.Maui.MainPage"
+             x:Class="AvaAITerminal.MainPage"
              BackgroundColor="#1E1E1E"
-             Title="AvaTerminal">
-             <!-- xmlns:behaviors="clr-namespace:AvaTerminal.Maui.Behaviors" -->
+             Title="AvaAITerminal">
+             <!-- xmlns:behaviors="clr-namespace:AvaAITerminal.Behaviors" -->
     <ScrollView>
         <VerticalStackLayout Padding="24" Spacing="20">
 
@@ -26,17 +26,14 @@
 
                     <HorizontalStackLayout>
                         <Entry x:Name="CodeEntry"
-       Placeholder="e.g. FLT"
-       TextColor="White"
-       FontSize="16"
-       FontFamily="Courier New"
-       BackgroundColor="#1E1E1E"
-       WidthRequest="120"
-       ReturnType="Done"
-       Completed="CodeEntry_Completed" />
-
-
-
+                               Placeholder="e.g. FLT"
+                               TextColor="White"
+                               FontSize="16"
+                               FontFamily="Courier New"
+                               BackgroundColor="#1E1E1E"
+                               WidthRequest="120"
+                               ReturnType="Done"
+                               Completed="CodeEntry_Completed" />
 
                         <Button Text="Go"
                                 Margin="12,0,0,0"

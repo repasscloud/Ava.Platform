@@ -54,6 +54,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<QantasCustomIATACode> QantasCustomIATACodes { get; set; }
     public DbSet<QantasCustomBookingRequest> QantasCustomBookingRequest { get; set; }
 
+    // Wikipedia classes
+    public DbSet<AircraftTypeDesignator> AircraftTypeDesignators { get; set; }
+
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

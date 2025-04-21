@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace AvaTerminal.Maui;
+namespace AvaAITerminal;
 
 [Register("AppDelegate")]
 public class AppDelegate : MauiUIApplicationDelegate

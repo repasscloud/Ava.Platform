@@ -1,9 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using AvaTerminal.Maui.Pages;
+using AvaAITerminal.Pages;
 
 
-namespace AvaTerminal.Maui;
+namespace AvaAITerminal;
 
 public partial class MainPage : ContentPage
 {
@@ -110,14 +110,17 @@ public partial class MainPage : ContentPage
         _ = OnCodeSubmitted();
     }
 
-    public async Task ShowHelpPopup()
+    private bool _isHelpOpen = false;
+    private async Task ShowHelpPopup()
     {
+        if (_isHelpOpen) return;
+        _isHelpOpen = true;
+
         await Navigation.PushModalAsync(new HelpPopupPage(
-            "User Management Help",
-            "This page allows you to view and manage user accounts.\n\n" +
-            "• USR → View all users\n" +
-            "• NEW → Create a new user\n" +
-            "• EXT → Exit"
+            "Main Help",
+            "FLT → Flight Booking\nPOL → Travel Policies\nEXT → Exit"
         ));
+
+        _isHelpOpen = false;
     }
 }

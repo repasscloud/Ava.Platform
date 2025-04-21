@@ -17,9 +17,9 @@
 <noscript><style>img.lazyload { display: none; }</style></noscript><base href="http://localhost:1313/docs/dev-notes/">
 
   <link rel="canonical" href="http://localhost:1313/docs/dev-notes/">
-<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/docs/dev-notes/index.xml" title="Dev Notes | My Docs"><link rel="sitemap" type="application/xml" href="http://localhost:1313/docs/dev-notes/sitemap.xml" title="Dev Notes | My Docs">
 
-<title>Dev Notes  |  My Docs</title>
+
+<title>  |  My Docs</title>
 <meta name="description" content="Congrats on setting up a new Doks project!">
 
     
@@ -49,18 +49,20 @@
 
 <meta property="og:url" content="http://localhost:1313/docs/dev-notes/">
   <meta property="og:site_name" content="My Docs">
-  <meta property="og:title" content="Dev Notes">
-  <meta property="og:description" content="Congrats on setting up a new Doks project!">
+  <meta property="og:title" content="My Docs">
+  <meta property="og:description" content="Project Creation dotnet new maui -n ProjectNameSuccessfully created a new .NET MAUI project called ProjectName. Project directory and .csproj file were generated as expected. Post-Creation Restore Attempt Fails Restoring ... ProjectName.csproj: error NETSDK1147: To build this project, the following workloads must be installed: macosThis error indicates that MAUI’s macOS workload was not yet installed. It suggests running: dotnet workoad restoreRestore Fails Due to Permissions Fails with:">
   <meta property="og:locale" content="en">
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
     <meta property="og:image" content="http://localhost:1313/cover.png">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="http://localhost:1313/cover.png">
-  <meta name="twitter:title" content="Dev Notes">
-  <meta name="twitter:description" content="Congrats on setting up a new Doks project!">
+  <meta name="twitter:title" content="My Docs">
+  <meta name="twitter:description" content="Project Creation dotnet new maui -n ProjectNameSuccessfully created a new .NET MAUI project called ProjectName. Project directory and .csproj file were generated as expected. Post-Creation Restore Attempt Fails Restoring ... ProjectName.csproj: error NETSDK1147: To build this project, the following workloads must be installed: macosThis error indicates that MAUI’s macOS workload was not yet installed. It suggests running: dotnet workoad restoreRestore Fails Due to Permissions Fails with:">
       <meta name="twitter:site" content="@getdoks">
 
+    
     
     <script type="application/ld+json">
   {
@@ -81,8 +83,14 @@
      },
      {
        "@type": "ListItem",
+       "item": "http://localhost:1313/docs/dev-notes/",
        "name": "Dev Notes",
        "position": 3
+     },
+     {
+       "@type": "ListItem",
+       "name": "",
+       "position": 4
      }
    ]
  }
@@ -95,7 +103,7 @@
 </head>
 
   
-  <body class="list section docs" data-bs-spy="scroll" data-bs-target="#toc" data-bs-root-margin="0px 0px -60%" data-bs-smooth-scroll="true" tabindex="0">
+  <body class="single section docs" data-bs-spy="scroll" data-bs-target="#toc" data-bs-root-margin="0px 0px -60%" data-bs-smooth-scroll="true" tabindex="0">
     <div class="sticky-top">
 <header class="navbar navbar-expand-lg">
   <div class="container-lg">
@@ -164,11 +172,23 @@
   <li>
       <a href="/docs/reference/license-agreement-billing-model/">💳 License Agreement Billing Model</a>
   </li>
+
+  <li>
+    <details open>
+      <summary>Partner Onboarding</summary>
+      <ul class="list-unstyled list-nested">
+
+  <li>
+      <a href="/docs/reference/partner-onboarding/minimum-requirements/">Minimum Requirements</a>
+  </li>
+      </ul>
+    </details>
+  </li>
       </ul>
     </details>
   </li>
 
-  <li class="active" >
+  <li>
     <details open open>
       <summary>Dev Notes</summary>
       <ul class="list-unstyled list-nested">
@@ -178,7 +198,27 @@
   </li>
 
   <li>
+      <a href="/docs/dev-notes/openstreetmap-contribution/">OpenStreetMap Contribution</a>
+  </li>
+
+  <li>
+      <a href="/docs/dev-notes/recursive-search-replace-with-gnu-sed/">Recursive Search &amp; Replace with GNU sed</a>
+  </li>
+
+  <li>
       <a href="/docs/dev-notes/travel-search-record/">Travel Search Record</a>
+  </li>
+
+  <li>
+    <details open>
+      <summary>API Setup</summary>
+      <ul class="list-unstyled list-nested">
+
+  <li>
+      <a href="/docs/dev-notes/api-setup/upload-aircraftdesignators.ps1/">Upload-AircraftDesignators.ps1</a>
+  </li>
+      </ul>
+    </details>
   </li>
 
   <li>
@@ -192,17 +232,9 @@
       </ul>
     </details>
   </li>
-      </ul>
-    </details>
-  </li>
 
-  <li>
-    <details open>
-      <summary>Partner Onboarding</summary>
-      <ul class="list-unstyled list-nested">
-
-  <li>
-      <a href="/docs/partner-onboarding/minimum-requirements/">Minimum Requirements</a>
+  <li class="active" >
+      <a aria-current="page" href="/docs/dev-notes/"></a>
   </li>
       </ul>
     </details>
@@ -343,64 +375,612 @@
       <div class="content">
       
         
-<div class="row justify-content-center">
-  <div class="col-md-12 col-lg-10 col-xl-8">
-    <article>
-      <h1 class="text-center">Dev Notes</h1>
-      
-			<div class="card-list">
-				
-				
-					
-				
-					
-				
-					
-				
-					
-				
-					
-				
-					
-				
-					
-						<div class="card my-3">
-							<div class="card-body">
-								<a class="stretched-link" href="/docs/dev-notes/ava-shared/flightresultv1/">FlightResultV1 &rarr;</a>
-							</div>
-						</div>
-					
-				
-					
-						<div class="card my-3">
-							<div class="card-body">
-								<a class="stretched-link" href="/docs/dev-notes/git-101/">Git 101 &rarr;</a>
-							</div>
-						</div>
-					
-				
-					
-				
-					
-				
-					
-				
-					
-				
-					
-				
-					
-						<div class="card my-3">
-							<div class="card-body">
-								<a class="stretched-link" href="/docs/dev-notes/travel-search-record/">Travel Search Record &rarr;</a>
-							</div>
-						</div>
-					
-				
-			</div>
-    </article>
-  </div>
+	<div class="row flex-xl-nowrap">
+		<div class="col-lg-5 col-xl-4 docs-sidebar d-none d-lg-block">
+			
+  
+    
+<nav class="section-nav docs-links">
+  <ul class="list-unstyled">
+
+  <li>
+    <details open>
+      <summary>Guides</summary>
+      <ul class="list-unstyled list-nested">
+
+  <li>
+      <a href="/docs/guides/example-guide/">Example Guide</a>
+  </li>
+      </ul>
+    </details>
+  </li>
+
+  <li>
+    <details>
+      <summary>Reference</summary>
+      <ul class="list-unstyled list-nested">
+
+  <li>
+      <a href="/docs/reference/example-reference/">Example Reference</a>
+  </li>
+
+  <li>
+      <a href="/docs/reference/license-agreement-billing-model/">💳 License Agreement Billing Model</a>
+  </li>
+
+  <li>
+    <details open>
+      <summary>Partner Onboarding</summary>
+      <ul class="list-unstyled list-nested">
+
+  <li>
+      <a href="/docs/reference/partner-onboarding/minimum-requirements/">Minimum Requirements</a>
+  </li>
+      </ul>
+    </details>
+  </li>
+      </ul>
+    </details>
+  </li>
+
+  <li>
+    <details open open>
+      <summary>Dev Notes</summary>
+      <ul class="list-unstyled list-nested">
+
+  <li>
+      <a href="/docs/dev-notes/git-101/">Git 101</a>
+  </li>
+
+  <li>
+      <a href="/docs/dev-notes/openstreetmap-contribution/">OpenStreetMap Contribution</a>
+  </li>
+
+  <li>
+      <a href="/docs/dev-notes/recursive-search-replace-with-gnu-sed/">Recursive Search &amp; Replace with GNU sed</a>
+  </li>
+
+  <li>
+      <a href="/docs/dev-notes/travel-search-record/">Travel Search Record</a>
+  </li>
+
+  <li>
+    <details open>
+      <summary>API Setup</summary>
+      <ul class="list-unstyled list-nested">
+
+  <li>
+      <a href="/docs/dev-notes/api-setup/upload-aircraftdesignators.ps1/">Upload-AircraftDesignators.ps1</a>
+  </li>
+      </ul>
+    </details>
+  </li>
+
+  <li>
+    <details open>
+      <summary>Ava Shared</summary>
+      <ul class="list-unstyled list-nested">
+
+  <li>
+      <a href="/docs/dev-notes/ava-shared/flightresultv1/">FlightResultV1</a>
+  </li>
+      </ul>
+    </details>
+  </li>
+
+  <li class="active" >
+      <a aria-current="page" href="/docs/dev-notes/"></a>
+  </li>
+      </ul>
+    </details>
+  </li>
+
+  <li>
+      <a href="/docs/api/">API</a>
+  </li>
+  </ul>
+</nav>
+
+  
+
+		</div>
+		
+		<nav class="docs-toc d-none d-xl-block col-xl-3" aria-label="Secondary navigation">
+			<div class="page-links">
+  <h3>On this page</h3>
+    <nav id="toc">
+  <ul>
+    <li><a href="#project-creation">Project Creation</a>
+      <ul>
+        <li><a href="#post-creation-restore-attempt-fails">Post-Creation Restore Attempt Fails</a></li>
+        <li><a href="#restore-fails-due-to-permissions">Restore Fails Due to Permissions</a></li>
+        <li><a href="#successful-restore-with-sudo">Successful Restore with <code>sudo</code></a></li>
+        <li><a href="#minor-warning-at-the-end">Minor Warning at the End</a></li>
+      </ul>
+    </li>
+    <li><a href="#your-dotnet-run-failed-due-to-missing-dependencies-for-maui-platforms">Your <code>dotnet run</code> Failed Due to Missing Dependencies for MAUI Platforms</a>
+      <ul>
+        <li><a href="#android-failure">Android Failure</a></li>
+      </ul>
+    </li>
+    <li><a href="#accept-android-sdk-licenses">Accept Android SDK Licenses</a></li>
+    <li><a href="#xcode-is-outdated">Xcode Is Outdated</a></li>
+    <li><a href="#use-mas-for-latest-stable">Use <code>mas</code> for Latest Stable</a></li>
+    <li><a href="#run-xcodebuild--runfirstlaunch">Run xcodebuild -runFirstLaunch</a></li>
+    <li><a href="#accept-license-if-prompted-or-skipped">Accept License (if prompted or skipped)</a></li>
+    <li><a href="#ios-build-error-details">iOS Build Error Details</a>
+      <ul>
+        <li><a href="#fix-ios-simulator-error">Fix iOS Simulator Error</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
 </div>
+
+		</nav>
+		<main class="docs-content col-lg-11 col-xl-9 mx-xl-auto">
+		
+			<h1></h1>
+			
+			<nav class="toc-mobile d-xl-none" aria-label="Quaternary navigation">
+				<details>
+    <summary>On this page</summary>
+    <div class="page-links">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#project-creation">Project Creation</a>
+      <ul>
+        <li><a href="#post-creation-restore-attempt-fails">Post-Creation Restore Attempt Fails</a></li>
+        <li><a href="#restore-fails-due-to-permissions">Restore Fails Due to Permissions</a></li>
+        <li><a href="#successful-restore-with-sudo">Successful Restore with <code>sudo</code></a></li>
+        <li><a href="#minor-warning-at-the-end">Minor Warning at the End</a></li>
+      </ul>
+    </li>
+    <li><a href="#your-dotnet-run-failed-due-to-missing-dependencies-for-maui-platforms">Your <code>dotnet run</code> Failed Due to Missing Dependencies for MAUI Platforms</a>
+      <ul>
+        <li><a href="#android-failure">Android Failure</a></li>
+      </ul>
+    </li>
+    <li><a href="#accept-android-sdk-licenses">Accept Android SDK Licenses</a></li>
+    <li><a href="#xcode-is-outdated">Xcode Is Outdated</a></li>
+    <li><a href="#use-mas-for-latest-stable">Use <code>mas</code> for Latest Stable</a></li>
+    <li><a href="#run-xcodebuild--runfirstlaunch">Run xcodebuild -runFirstLaunch</a></li>
+    <li><a href="#accept-license-if-prompted-or-skipped">Accept License (if prompted or skipped)</a></li>
+    <li><a href="#ios-build-error-details">iOS Build Error Details</a>
+      <ul>
+        <li><a href="#fix-ios-simulator-error">Fix iOS Simulator Error</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+  </details>
+
+			</nav>
+			<h2 id="project-creation">Project Creation<a href="#project-creation" class="anchor" aria-hidden="true">#</a> </h2>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dotnet new maui -n ProjectName</span></span></code></pre></div>
+  </figure>
+</div>
+<ul>
+<li>Successfully created a new .NET MAUI project called <code>ProjectName</code>.</li>
+<li>Project directory and <code>.csproj</code> file were generated as expected.</li>
+</ul>
+<h3 id="post-creation-restore-attempt-fails">Post-Creation Restore Attempt Fails<a href="#post-creation-restore-attempt-fails" class="anchor" aria-hidden="true">#</a> </h3>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Restoring ... ProjectName.csproj:
+</span></span><span class="line"><span class="cl">error NETSDK1147: To build this project, the following workloads must be installed: macos</span></span></code></pre></div>
+  </figure>
+</div>
+<ul>
+<li>This error indicates that MAUI’s macOS workload was not yet installed.</li>
+<li>It suggests running:</li>
+</ul>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dotnet workoad restore</span></span></code></pre></div>
+  </figure>
+</div>
+<h3 id="restore-fails-due-to-permissions">Restore Fails Due to Permissions<a href="#restore-fails-due-to-permissions" class="anchor" aria-hidden="true">#</a> </h3>
+<p>Fails with:</p>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Inadequate permissions. Run the <span class="nb">command</span> with elevated privileges.</span></span></code></pre></div>
+  </figure>
+</div>
+<p>Because installing workloads affects system-wide SDK paths, it requires <strong>admin rights</strong>.</p>
+<h3 id="successful-restore-with-sudo">Successful Restore with <code>sudo</code><a href="#successful-restore-with-sudo" class="anchor" aria-hidden="true">#</a> </h3>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo dotnet workload restore</span></span></code></pre></div>
+  </figure>
+</div>
+<ul>
+<li>You successfully ran the restore with elevated permissions</li>
+<li>Workloads were installed, including:
+<ul>
+<li><code>microsoft.net.sdk.macos</code></li>
+<li><code>microsoft.net.sdk.maui</code></li>
+<li><code>microsoft.net.sdk.ios</code>, <code>android</code>, <code>tvos</code>, <code>maccatalyst</code></li>
+</ul>
+</li>
+<li><code>.NET CLI</code> also displayed telemetry info and certificate installation notices</li>
+</ul>
+<h3 id="minor-warning-at-the-end">Minor Warning at the End<a href="#minor-warning-at-the-end" class="anchor" aria-hidden="true">#</a> </h3>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Warning: Workload garbage collection failed...</span></span></code></pre></div>
+  </figure>
+</div>
+<ul>
+<li>A warning was raised because a previously installed workload path was no longer found. This can happen when switching SDK versions.</li>
+<li>Not critical and can be ignored unless it persists.</li>
+</ul>
+<h2 id="your-dotnet-run-failed-due-to-missing-dependencies-for-maui-platforms">Your <code>dotnet run</code> Failed Due to Missing Dependencies for MAUI Platforms<a href="#your-dotnet-run-failed-due-to-missing-dependencies-for-maui-platforms" class="anchor" aria-hidden="true">#</a> </h2>
+<p>This is a MAUI multi-platform build issue — and multiple targets failed:</p>
+<h3 id="android-failure">Android Failure<a href="#android-failure" class="anchor" aria-hidden="true">#</a> </h3>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">error XA5207: Could not find android.jar <span class="k">for</span> API level <span class="m">35</span></span></span></code></pre></div>
+  </figure>
+</div>
+<ul>
+<li>
+<p>Your app targets Android API level 35, but the SDK for that level isn&rsquo;t installed</p>
+</li>
+<li>
+<p>It&rsquo;s expected at:</p>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">~/Library/Developer/Xamarin/android-sdk-macosx/platforms/android-35/android.jar</span></span></code></pre></div>
+  </figure>
+</div>
+</li>
+</ul>
+<p>With the java sdk version set to v17, i tried to build again:</p>
+<p>dotnet build -t:InstallAndroidDependencies <br>
+-f net9.0-android <br>
+-p:AndroidSdkDirectory=$HOME/Library/Developer/Xamarin/android-sdk-macosx</p>
+<p>Error:
+AvaTerminal.Maui net9.0-android failed with 1 error(s) (1.5s)
+/usr/local/share/dotnet/packs/Microsoft.Android.Sdk.Darwin/35.0.61/tools/Xamarin.Installer.Common.targets(19,3): error : The Android SDK license agreements were not accepted, please set <code>$(AcceptAndroidSDKLicenses)</code> to accept.</p>
+<p>The Android SDK license agreements were not accepted. When installing Android SDK componenets manually for via <code>dotnet</code>, you must explicicty accept the SDK licenses, or hte installer will bail.</p>
+<h2 id="accept-android-sdk-licenses">Accept Android SDK Licenses<a href="#accept-android-sdk-licenses" class="anchor" aria-hidden="true">#</a> </h2>
+<p>Run the command again with this additional parameter:</p>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dotnet build -t:InstallAndroidDependencies <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  -f net9.0-android <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  -p:AndroidSdkDirectory<span class="o">=</span><span class="nv">$HOME</span>/Library/Developer/Xamarin/android-sdk-macosx <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  -p:AcceptAndroidSDKLicenses<span class="o">=</span>true</span></span></code></pre></div>
+  </figure>
+</div>
+<p>This tells MSBuild to auto-accept the Android SDK license terms.</p>
+<p>Once it completes successfully, you&rsquo;ll be able to:</p>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dotnet build
+</span></span><span class="line"><span class="cl">dotnet run</span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="xcode-is-outdated">Xcode Is Outdated<a href="#xcode-is-outdated" class="anchor" aria-hidden="true">#</a> </h2>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dotnet build                                                                                                                                                                          ─╯
+</span></span><span class="line"><span class="cl">Restore <span class="nb">complete</span> <span class="o">(</span>0.4s<span class="o">)</span>
+</span></span><span class="line"><span class="cl">  AvaTerminal.Maui net9.0-ios failed with <span class="m">4</span> error<span class="o">(</span>s<span class="o">)</span> and <span class="m">1</span> warning<span class="o">(</span>s<span class="o">)</span> <span class="o">(</span>0.9s<span class="o">)</span> → bin/Debug/net9.0-ios/iossimulator-arm64/AvaTerminal.Maui.dll
+</span></span><span class="line"><span class="cl">    ILLINK : warning MT0079: The recommended Xcode version <span class="k">for</span> Microsoft.iOS 18.4.9288 is Xcode 16.3 or later. The current Xcode version <span class="o">(</span>found in /Applications/Xcode.app/Contents/Developer<span class="o">)</span> is 16.2.
+</span></span><span class="line"><span class="cl">    ILLink : unknown error IL7000: An error occurred <span class="k">while</span> executing the custom linker steps. Please review the build log <span class="k">for</span> more information.
+</span></span><span class="line"><span class="cl">    ILLINK : error MT0180: This version of Microsoft.iOS requires the iOS 18.4 SDK <span class="o">(</span>shipped with Xcode 16.3<span class="o">)</span>. Either upgrade Xcode to get the required header files or <span class="nb">set</span> the managed linker behaviour to Link Framework SDKs Only in your project<span class="s1">&#39;s iOS Build Options &gt; Linker Behavior (to try to avoid the new APIs).
+</span></span></span><span class="line"><span class="cl"><span class="s1">    ILLINK : error MT2301: The linker step &#39;</span>Setup<span class="s1">&#39; failed during processing: This version of Microsoft.iOS requires the iOS 18.4 SDK (shipped with Xcode 16.3). Either upgrade Xcode to get the required header files or set the managed linker behaviour to Link Framework SDKs Only in your project&#39;</span>s iOS Build Options &gt; Linker Behavior <span class="o">(</span>to try to avoid the new APIs<span class="o">)</span>.
+</span></span><span class="line"><span class="cl">    /Users/danijeljw/.nuget/packages/microsoft.net.illink.tasks/9.0.3/build/Microsoft.NET.ILLink.targets<span class="o">(</span>96,5<span class="o">)</span>: error NETSDK1144: Optimizing assemblies <span class="k">for</span> size failed.
+</span></span><span class="line"><span class="cl">  AvaTerminal.Maui net9.0-maccatalyst failed with <span class="m">4</span> error<span class="o">(</span>s<span class="o">)</span> and <span class="m">1</span> warning<span class="o">(</span>s<span class="o">)</span> <span class="o">(</span>0.9s<span class="o">)</span> → bin/Debug/net9.0-maccatalyst/maccatalyst-arm64/AvaTerminal.Maui.dll
+</span></span><span class="line"><span class="cl">    ILLINK : warning MT0079: The recommended Xcode version <span class="k">for</span> Microsoft.MacCatalyst 18.4.9288 is Xcode 16.3 or later. The current Xcode version <span class="o">(</span>found in /Applications/Xcode.app/Contents/Developer<span class="o">)</span> is 16.2.
+</span></span><span class="line"><span class="cl">    ILLink : unknown error IL7000: An error occurred <span class="k">while</span> executing the custom linker steps. Please review the build log <span class="k">for</span> more information.
+</span></span><span class="line"><span class="cl">    ILLINK : error MT0180: This version of Microsoft.MacCatalyst requires the MacCatalyst 18.4 SDK <span class="o">(</span>shipped with Xcode 16.3<span class="o">)</span>. Either upgrade Xcode to get the required header files or <span class="nb">set</span> the managed linker behaviour to Link Framework SDKs Only in your project<span class="s1">&#39;s iOS Build Options &gt; Linker Behavior (to try to avoid the new APIs).
+</span></span></span><span class="line"><span class="cl"><span class="s1">    ILLINK : error MT2301: The linker step &#39;</span>Setup<span class="s1">&#39; failed during processing: This version of Microsoft.MacCatalyst requires the MacCatalyst 18.4 SDK (shipped with Xcode 16.3). Either upgrade Xcode to get the required header files or set the managed linker behaviour to Link Framework SDKs Only in your project&#39;</span>s iOS Build Options &gt; Linker Behavior <span class="o">(</span>to try to avoid the new APIs<span class="o">)</span>.
+</span></span><span class="line"><span class="cl">    /Users/danijeljw/.nuget/packages/microsoft.net.illink.tasks/9.0.3/build/Microsoft.NET.ILLink.targets<span class="o">(</span>96,5<span class="o">)</span>: error NETSDK1144: Optimizing assemblies <span class="k">for</span> size failed.</span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="use-mas-for-latest-stable">Use <code>mas</code> for Latest Stable<a href="#use-mas-for-latest-stable" class="anchor" aria-hidden="true">#</a> </h2>
+<ol>
+<li>Install <code>mas</code> (Mac App Store CLI)</li>
+</ol>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">brew install mas</span></span></code></pre></div>
+  </figure>
+</div>
+<ol>
+<li>Sign into Mac App Store (once)</li>
+</ol>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">mas account</span></span></code></pre></div>
+  </figure>
+</div>
+<p>If you&rsquo;re not signed in, open App Store → SIgn In.</p>
+<ol>
+<li>Install or Update Xcode</li>
+</ol>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">mas install <span class="m">497799835</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># OR, if already installed:</span>
+</span></span><span class="line"><span class="cl">mas upgrade <span class="m">497799835</span></span></span></code></pre></div>
+  </figure>
+</div>
+<p>App ID <code>497799835</code> is Xcode in the Mac App Store.</p>
+<ol>
+<li>Accept Xcode License</li>
+</ol>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo xcodebuild -license accept</span></span></code></pre></div>
+  </figure>
+</div>
+<ol>
+<li>Confirm Installation</li>
+</ol>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">xcode-select -p
+</span></span><span class="line"><span class="cl"><span class="c1"># → should be /Applications/Xcode.app/Contents/Developer</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">xcodebuild -version
+</span></span><span class="line"><span class="cl"><span class="c1"># → should say Xcode 16.3</span>
+</span></span><span class="line"><span class="cl">               Build version 16E140</span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="run-xcodebuild--runfirstlaunch">Run xcodebuild -runFirstLaunch<a href="#run-xcodebuild--runfirstlaunch" class="anchor" aria-hidden="true">#</a> </h2>
+<p>In your terminal:</p>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo xcodebuild -runFirstLaunch</span></span></code></pre></div>
+  </figure>
+</div>
+<p>This will:</p>
+<ul>
+<li>Install additional required components</li>
+<li>Accept Xcode license if not already done</li>
+<li>Configure internal plugins (like <code>actool</code>) for iOS/MacCatalyst</li>
+</ul>
+<h2 id="accept-license-if-prompted-or-skipped">Accept License (if prompted or skipped)<a href="#accept-license-if-prompted-or-skipped" class="anchor" aria-hidden="true">#</a> </h2>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo xcodebuild -license accept</span></span></code></pre></div>
+  </figure>
+</div>
+<h2 id="ios-build-error-details">iOS Build Error Details<a href="#ios-build-error-details" class="anchor" aria-hidden="true">#</a> </h2>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">actool error : No simulator runtime version from <span class="o">[</span><span class="s2">&#34;21A328&#34;</span>, <span class="s2">&#34;21C62&#34;</span>, <span class="s2">&#34;22A3351&#34;</span>, <span class="s2">&#34;22D8075&#34;</span><span class="o">]</span> available to use with iphonesimulator SDK version 22E235</span></span></code></pre></div>
+  </figure>
+</div>
+<p>What this means:</p>
+<ul>
+<li>Your current iPhone simulator runtimes (like iOS 16.0, 16.2) are too old for the SDK that came with Xcode 16.3 (which expects iOS 17.4 simulator or similar).</li>
+<li>MAUI is trying to build for a simulator that doesn’t exist yet on your system.</li>
+</ul>
+<h3 id="fix-ios-simulator-error">Fix iOS Simulator Error<a href="#fix-ios-simulator-error" class="anchor" aria-hidden="true">#</a> </h3>
+<h4 id="option-a-install-the-latest-ios-simulator-from-xcode">Option A: Install the Latest iOS Simulator from Xcode<a href="#option-a-install-the-latest-ios-simulator-from-xcode" class="anchor" aria-hidden="true">#</a> </h4>
+<p>Open Xcode → Settings → Platforms</p>
+<p>Under Simulator Runtimes, install:</p>
+<ul>
+<li>iOS 17.4 Simulator</li>
+<li>watchOS / tvOS only if needed (not required for MAUI)</li>
+</ul>
+<p>Once installed, rebuild:</p>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dotnet build -f net9.0-ios</span></span></code></pre></div>
+  </figure>
+</div>
+<h4 id="option-b-avoid-ios-for-now">Option B: Avoid iOS for Now<a href="#option-b-avoid-ios-for-now" class="anchor" aria-hidden="true">#</a> </h4>
+<p>If you&rsquo;re not testing iOS yet, focus on:</p>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dotnet run -f net9.0-android</span></span></code></pre></div>
+  </figure>
+</div>
+
+
+
+<div class="expressive-code">
+  <figure class="frame is-terminal not-content">
+  <figcaption class="header">
+    <span class="title"></span>
+  </figcaption>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dotnet build                                                                                                                                                                          ─╯
+</span></span><span class="line"><span class="cl">Restore <span class="nb">complete</span> <span class="o">(</span>0.5s<span class="o">)</span>
+</span></span><span class="line"><span class="cl">  AvaTerminal.Maui net9.0-android succeeded <span class="o">(</span>0.9s<span class="o">)</span> → bin/Debug/net9.0-android/AvaTerminal.Maui.dll
+</span></span><span class="line"><span class="cl">  AvaTerminal.Maui net9.0-ios failed with <span class="m">4</span> error<span class="o">(</span>s<span class="o">)</span> <span class="o">(</span>2.4s<span class="o">)</span>
+</span></span><span class="line"><span class="cl">    /usr/local/share/dotnet/packs/Microsoft.iOS.Sdk.net9.0_18.4/18.4.9288/tools/msbuild/Xamarin.Shared.targets<span class="o">(</span>977,3<span class="o">)</span>: error :
+</span></span><span class="line"><span class="cl">      /usr/bin/xcrun exited with code 134:
+</span></span><span class="line"><span class="cl">      A required plugin failed to load. Please ensure system content is up-to-date — try running <span class="s1">&#39;xcodebuild -runFirstLaunch&#39;</span>.
+</span></span><span class="line"><span class="cl">    /Users/danijeljw/Developer/dotnet-dev/Ava.Development/AvaPlatform/AvaTerminal.Maui/obj/Debug/net9.0-ios/iossimulator-arm64/actool/cloned-assets/Assets.xcassets : error :
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      A required plugin failed to load. Please ensure system content is up-to-date — try running <span class="s1">&#39;xcodebuild -runFirstLaunch&#39;</span>.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    /usr/local/share/dotnet/packs/Microsoft.iOS.Sdk.net9.0_18.4/18.4.9288/tools/msbuild/Xamarin.Shared.targets<span class="o">(</span>977,3<span class="o">)</span>: error :
+</span></span><span class="line"><span class="cl">      actool exited with code <span class="m">134</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    /usr/local/share/dotnet/packs/Microsoft.iOS.Sdk.net9.0_18.4/18.4.9288/tools/msbuild/Xamarin.Shared.targets<span class="o">(</span>977,3<span class="o">)</span>: error :
+</span></span><span class="line"><span class="cl">      Failed to load actool log file <span class="sb">`</span>obj/Debug/net9.0-ios/iossimulator-arm64/actool/asset-manifest.plist<span class="sb">`</span>: Failed to parse PList data type:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  AvaTerminal.Maui net9.0-maccatalyst failed with <span class="m">4</span> error<span class="o">(</span>s<span class="o">)</span> <span class="o">(</span>2.4s<span class="o">)</span>
+</span></span><span class="line"><span class="cl">    /usr/local/share/dotnet/packs/Microsoft.MacCatalyst.Sdk.net9.0_18.4/18.4.9288/tools/msbuild/Xamarin.Shared.targets<span class="o">(</span>977,3<span class="o">)</span>: error :
+</span></span><span class="line"><span class="cl">      /usr/bin/xcrun exited with code 134:
+</span></span><span class="line"><span class="cl">      A required plugin failed to load. Please ensure system content is up-to-date — try running <span class="s1">&#39;xcodebuild -runFirstLaunch&#39;</span>.
+</span></span><span class="line"><span class="cl">    /Users/danijeljw/Developer/dotnet-dev/Ava.Development/AvaPlatform/AvaTerminal.Maui/obj/Debug/net9.0-maccatalyst/maccatalyst-arm64/actool/cloned-assets/Assets.xcassets : error :
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      A required plugin failed to load. Please ensure system content is up-to-date — try running <span class="s1">&#39;xcodebuild -runFirstLaunch&#39;</span>.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    /usr/local/share/dotnet/packs/Microsoft.MacCatalyst.Sdk.net9.0_18.4/18.4.9288/tools/msbuild/Xamarin.Shared.targets<span class="o">(</span>977,3<span class="o">)</span>: error :
+</span></span><span class="line"><span class="cl">      actool exited with code <span class="m">134</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    /usr/local/share/dotnet/packs/Microsoft.MacCatalyst.Sdk.net9.0_18.4/18.4.9288/tools/msbuild/Xamarin.Shared.targets<span class="o">(</span>977,3<span class="o">)</span>: error :
+</span></span><span class="line"><span class="cl">      Failed to load actool log file <span class="sb">`</span>obj/Debug/net9.0-maccatalyst/maccatalyst-arm64/actool/asset-manifest.plist<span class="sb">`</span>: Failed to parse PList data type:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Build failed with <span class="m">8</span> error<span class="o">(</span>s<span class="o">)</span> in 3.4s</span></span></code></pre></div>
+  </figure>
+</div>
+
+			<div class="page-footer-meta d-flex flex-column flex-md-row justify-content-between">
+				</div>
+			<div class="page-nav d-flex flex-column flex-sm-row">
+	
+	<div class="card w-100">
+			<div class="card-body d-flex">
+				<div class="d-flex flex-column justify-content-center">
+					<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-left" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+						<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+						<path d="M5 12l14 0"></path>
+						<path d="M5 12l6 6"></path>
+						<path d="M5 12l6 -6"></path>
+				 	</svg>
+				</div>
+				<div class="d-flex flex-column">
+					<div class="text-body-secondary">Prev</div>
+					<a href="/docs/resources/" class="stretched-link text-reset text-decoration-none">Resources</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+			
+		</main>
+		
+	</div>
 
       
       </div>

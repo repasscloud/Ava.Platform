@@ -3,7 +3,7 @@
 // using Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;
 // using System.Windows.Input;
 
-// namespace AvaTerminal.Maui.Behaviors;
+// namespace AvaAITerminal.Behaviors;
 
 // public class EntryCompletedBehavior : Behavior<Microsoft.Maui.Controls.Entry>
 // {

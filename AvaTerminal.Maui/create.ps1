@@ -20,7 +20,7 @@ $pages = @(
     "PatchNotesPage"
 )
 
-$namespace = "AvaTerminal.Maui.Pages"
+$namespace = "AvaAITerminal.Pages"
 
 $pages | ForEach-Object {
     $pageName = $_
@@ -50,7 +50,7 @@ $pages | ForEach-Object {
 "@
 
     $xaml2 = @"
-namespace AvaTerminal.Maui.Pages;
+namespace AvaAITerminal.Pages;
 
 public partial class $pageName : ContentPage
 {

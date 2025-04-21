@@ -6,7 +6,10 @@ public class AvaEmployeeRecord
     public string Id { get; set; } = Nanoid.Generate();
 
     [Required]
-    public required string Name { get; set; }
+    public required string FirstName { get; set; }
+
+    [Required]
+    public required string LastName { get; set; }
 
     [Required]
     [EmailAddress]
@@ -25,4 +28,8 @@ public class AvaEmployeeRecord
     [RegularExpression("^(AvaEmployee|AvaAgent|AvaExternal|AvaContractor|System)$", 
         ErrorMessage = "EmployeeType must be AvaEmployee, AvaAgent, AvaExternal, or AvaContractor.")]
     public required string EmployeeType { get; set; }
+
+    public InternalRole Role { get; set; }
+    public string? PasswordHash { get; set; }
+    public string? VerificationToken { get; set; }
 }

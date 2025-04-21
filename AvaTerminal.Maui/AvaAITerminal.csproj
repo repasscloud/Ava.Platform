@@ -14,14 +14,14 @@
 		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
 		<OutputType>Exe</OutputType>
-		<RootNamespace>AvaTerminal.Maui</RootNamespace>
+		<RootNamespace>AvaAITerminal</RootNamespace>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>AvaTerminal</ApplicationTitle>
+		<ApplicationTitle>AvaAITerminal</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.repasscloud.ava.terminal.maui</ApplicationId>
@@ -60,8 +60,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.4" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.4" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.4" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.4" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+		<PackageReference Include="System.Net.Http.Json" Version="9.0.4" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -73,5 +78,11 @@
 	<!-- <ItemGroup>
 		<ProjectReference Include="..\Ava.Shared\Ava.Shared.csproj" />
 	</ItemGroup> -->
+
+	<ItemGroup>
+		<None Update="appsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  		</None>
+	</ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@ using System;
 using Microsoft.Maui;
 using Microsoft.Maui.Hosting;
 
-namespace AvaTerminal.Maui;
+namespace AvaAITerminal;
 
 class Program : MauiApplication
 {

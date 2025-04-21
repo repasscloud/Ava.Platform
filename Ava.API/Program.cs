@@ -33,6 +33,9 @@ public class Program
        builder.Services.AddScoped<IAvaLicenseGenerator, AvaLicenseGenerator>();
        builder.Services.AddScoped<IAvaLicenseValidator, AvaLicenseValidator>();
 
+       // CustomPasswordHasher
+       builder.Services.AddSingleton<ICustomPasswordHasher, CustomPasswordHasher>();
+
         // Register AmadeusUrlBuilder
         builder.Services.AddSingleton<AmadeusUrlBuilder>();
 

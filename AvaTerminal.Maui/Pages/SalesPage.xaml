@@ -1,6 +1,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="AvaTerminal.Maui.Pages.SalesPage"
+             x:Class="AvaAITerminal.Pages.SalesPage"
              Title="Sales Page">
     <VerticalStackLayout Padding="20">
         <Label Text="Sales Page Placeholder"

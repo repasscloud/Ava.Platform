@@ -25,4 +25,17 @@ public class IataLookupService : IIataLookupService
         
         return result?.Longitude is decimal lon ? (double?)lon : null;
     }
+
+    public async Task<string> GetIataAircraftTypeDesignator(string iataCode)
+    {
+        var result = await _context.AircraftTypeDesignators
+            .FirstOrDefaultAsync(x => x.IATATypeCode == iataCode);
+        
+        if (result is null)
+        {
+            return "UNKNOWN";
+        }
+
+        return result.Model;
+    }
 }

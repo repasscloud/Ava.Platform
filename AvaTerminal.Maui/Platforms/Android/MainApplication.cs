@@ -1,7 +1,7 @@
 ﻿using Android.App;
 using Android.Runtime;
 
-namespace AvaTerminal.Maui;
+namespace AvaAITerminal;
 
 [Application]
 public class MainApplication : MauiApplication

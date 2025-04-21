@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>API Setup on My Docs</title>
+    <link>http://localhost:1313/docs/dev-notes/api-setup/</link>
+    <description>Recent content in API Setup on My Docs</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <copyright>Copyright (c) 2020-2024 Thulite</copyright>
+    <lastBuildDate>Thu, 07 Sep 2023 16:13:18 +0200</lastBuildDate>
+    <atom:link href="http://localhost:1313/docs/dev-notes/api-setup/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Upload-AircraftDesignators.ps1</title>
+      <link>http://localhost:1313/docs/dev-notes/api-setup/upload-aircraftdesignators.ps1/</link>
+      <pubDate>Thu, 07 Sep 2023 16:13:18 +0200</pubDate>
+      <guid>http://localhost:1313/docs/dev-notes/api-setup/upload-aircraftdesignators.ps1/</guid>
+      <description>&lt;p&gt;This script is used to &lt;strong&gt;ingest aircraft type designator data&lt;/strong&gt; from a public CSV file into a local API database. The CSV file is auto-generated weekly by a GitHub Action that scrapes &lt;a href=&#34;https://en.wikipedia.org/wiki/List_of_aircraft_type_designators&#34;&gt;Wikipedia’s aircraft type designators&lt;/a&gt; and saves a clean version to the repository.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

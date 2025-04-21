@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-       xmlns:core="clr-namespace:AvaTerminal.Maui"
-       xmlns:pages="clr-namespace:AvaTerminal.Maui.Pages"
-       x:Class="AvaTerminal.Maui.AppShell">
+       xmlns:core="clr-namespace:AvaAITerminal"
+       xmlns:pages="clr-namespace:AvaAITerminal.Pages"
+       x:Class="AvaAITerminal.AppShell">
 
     <ShellContent Title="Main" ContentTemplate="{DataTemplate core:MainPage}" Route="main" />
 

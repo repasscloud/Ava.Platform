@@ -1,6 +1,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="AvaTerminal.Maui.Pages.TravelPolicyPage"
+             x:Class="AvaAITerminal.Pages.TravelPolicyPage"
              Title="Travel Policy Page">
     <VerticalStackLayout Padding="20">
         <Label Text="Travel Policy Page Placeholder"

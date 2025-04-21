@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace AvaTerminal.Maui;
+namespace AvaAITerminal;
 
 public class Program
 {
