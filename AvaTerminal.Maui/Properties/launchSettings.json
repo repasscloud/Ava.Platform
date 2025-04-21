@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "AvaAITerminal": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "framework": "net9.0-maccatalyst"
-    }
-  }
-}
