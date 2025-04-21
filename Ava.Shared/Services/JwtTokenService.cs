@@ -3,16 +3,13 @@ namespace Ava.Shared.Services;
 public class JwtTokenService : IJwtTokenService
 {
     private readonly ApplicationDbContext _context;
-    //private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
 
     public JwtTokenService(
         ApplicationDbContext context,
-        //IHttpClientFactory httpClientFactory,
         IConfiguration configuration)
     {
         _context = context;
-        //_httpClient = httpClientFactory.CreateClient("AvaAPI");
         _configuration = configuration;
     }
 
@@ -68,5 +65,12 @@ public class JwtTokenService : IJwtTokenService
     public Task<bool> ValidateTokenAsync(string jwtToken)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<bool> SaveTokenToDbAsync(AvaJwtTokenResponse jwtToken)
+    {
+        await _context.AvaJwtTokenResponses.AddAsync(jwtToken);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }
