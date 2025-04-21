@@ -33,6 +33,9 @@ public class Program
        builder.Services.AddScoped<IAvaLicenseGenerator, AvaLicenseGenerator>();
        builder.Services.AddScoped<IAvaLicenseValidator, AvaLicenseValidator>();
 
+       // Ava Employee Service
+       builder.Services.AddScoped<IAvaEmployeeService, AvaEmployeeService>();
+
        // CustomPasswordHasher
        builder.Services.AddSingleton<ICustomPasswordHasher, CustomPasswordHasher>();
 

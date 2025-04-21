@@ -8,14 +8,14 @@ public class AvaEmployeeAuthController : ControllerBase
 {
     private readonly IJwtTokenService _jwtTokenService;
     private readonly IAvaEmployeeService _avaEmployeeService;
-    private readonly AppDbContext _context;
+    private readonly ApplicationDbContext _context;
     private readonly ICustomPasswordHasher _passwordHasher;
     private readonly ILoggerService _loggerService;
 
     public AvaEmployeeAuthController(
         IJwtTokenService jwtTokenService,
         IAvaEmployeeService avaEmployeeService,
-        AppDbContext context,
+        ApplicationDbContext context,
         ICustomPasswordHasher passwordHasher,
         ILoggerService loggerService)
     {
@@ -29,30 +29,19 @@ public class AvaEmployeeAuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] AvaEmployeeLoginDTO dto)
     {
-        var user = await _avaEmployeeService.GetAllAsync();
-        var existing = user.FirstOrDefault(u => 
-            u.Id.Equals(dto.Username, StringComparison.InvariantCulture) ||
-            u.Email.Equals(dto.Username, StringComparison.OrdinalIgnoreCase)
-        );
+        var user = await _avaEmployeeService.GetByIdOrEmailAsync(dto.Username);
 
-        if (existing is null)
-            return Unauthorized();
+        if (user is null)
+            return Unauthorized("User not found.");
         
-        var _tmpUser = existing;
-        _tmpUser.VerificationToken = null;
-        _tmpUser.PasswordHash = null;
-
-        // get the saved user's password hash
-        var thisHash = _passwordHasher.HashPassword(_tmpUser, dto.Password);
-
-        // does thisHash match existingHash?
-        if (thisHash != null && thisHash == existing.PasswordHash)
+        if (!string.IsNullOrEmpty(user.PasswordHash) && 
+            _passwordHasher.VerifyPassword(user.PrivateKey, dto.Password, user.PasswordHash))
         {
             // crate JWT Token now
             var token = await _jwtTokenService.GenerateTokenAsync(
-                existing.Id,
-                existing.Email,
-                existing.Role.ToString(),
+                user.Id,
+                user.Email,
+                user.Role.ToString(),
                 expiryMinutes: 480
             );
 
@@ -66,44 +55,50 @@ public class AvaEmployeeAuthController : ControllerBase
             };
 
             // save the token to the DB
-            await _context.AvaJwtTokenResponses.AddAsync(savedToken);
-            await _context.SaveChangesAsync();
-            
-            return Ok(token);
+            var result = await _jwtTokenService.SaveTokenToDbAsync(savedToken);
+            if (result)
+            {
+                return Ok(token);
+            }
+            else
+            {
+                return BadRequest("Token not saved to db.");
+            }
         }
-        return Unauthorized();
+
+        return Unauthorized("Password incorrect.");
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] AvaEmployeeRegisterDTO dto)
     {
-        var token = TokenUtils.GetBearerToken(HttpContext);
-        if (token == null)
-        {
-            await _loggerService.LogErrorAsync($"Missing Bearer token for creating user with email '{dto.Email}'.");
-            return BadRequest("Missing Bearer token.");
-        }
+        // var token = TokenUtils.GetBearerToken(HttpContext);
+        // if (token == null)
+        // {
+        //     await _loggerService.LogErrorAsync($"Missing Bearer token for creating user with email '{dto.Email}'.");
+        //     return BadRequest("Missing Bearer token.");
+        // }
 
-        var existingToken = await _context.AvaJwtTokenResponses
-            .FirstOrDefaultAsync(x => x.JwtToken == token);
+        // var existingToken = await _context.AvaJwtTokenResponses
+        //     .FirstOrDefaultAsync(x => x.JwtToken == token);
 
-        if (existingToken == null)
-        {
-            await _loggerService.LogErrorAsync($"Token not found for creating user with email '{dto.Email}'.");
-            return BadRequest("Token not found.");
-        }
+        // if (existingToken == null)
+        // {
+        //     await _loggerService.LogErrorAsync($"Token not found for creating user with email '{dto.Email}'.");
+        //     return BadRequest("Token not found.");
+        // }
 
-        if (!existingToken.IsValid)
-        {
-            await _loggerService.LogErrorAsync($"Token is marked as invalid for creating user with email '{dto.Email}'.");
-            return BadRequest("Token is marked as invalid.");
-        }
+        // if (!existingToken.IsValid)
+        // {
+        //     await _loggerService.LogErrorAsync($"Token is marked as invalid for creating user with email '{dto.Email}'.");
+        //     return BadRequest("Token is marked as invalid.");
+        // }
             
-        if (existingToken.Expires <= DateTime.UtcNow)
-        {
-            await _loggerService.LogErrorAsync($"Token '{token}' has expired for creating user with email '{dto.Email}'.");
-            return BadRequest("Token '{token}' has expired for creating user with email '{dto.Email}'.");
-        }
+        // if (existingToken.Expires <= DateTime.UtcNow)
+        // {
+        //     await _loggerService.LogErrorAsync($"Token '{token}' has expired for creating user with email '{dto.Email}'.");
+        //     return BadRequest("Token '{token}' has expired for creating user with email '{dto.Email}'.");
+        // }
 
         // create the new user object          
         var newUser = new AvaEmployeeRecord()
@@ -112,13 +107,13 @@ public class AvaEmployeeAuthController : ControllerBase
             LastName = dto.LastName,
             Email = dto.Email.ToLowerInvariant(),
             EmployeeType = dto.EmployeeType,
-            VerificationToken = Nanoid.Generate(size:10)
+            VerificationToken = Nanoid.Generate(size:18)
         };
 
         await _context.AvaEmployees.AddAsync(newUser);
         await _context.SaveChangesAsync();
 
-        return Ok(new { newUser.Id });
+        return Ok(new { newUser.VerificationToken });
     }
 
     [HttpPost("reset-password")]
@@ -134,6 +129,10 @@ public class AvaEmployeeAuthController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(string id, [FromBody] AvaEmployeeUpdateDTO dto)
         => (await _avaEmployeeService.UpdateAsync(id, dto)) ? Ok() : NotFound();
+
+    [HttpPost("verify-account")]
+    public async Task<IActionResult> VerifyAccount([FromBody] AvaEmployeeVerifyAccountDTO dto)
+        => (await _avaEmployeeService.VerifyAccountAsync(dto)) ? Ok() : NotFound();
 }
 
 

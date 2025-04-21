@@ -10,19 +10,21 @@ public class CustomPasswordHasher : ICustomPasswordHasher
                       ?? throw new InvalidOperationException("GlobalSalt missing in configuration");
     }
 
-    public string HashPassword(object userObject, string password)
+    public string HashPassword(string privateKey, string password)
     {
-        var userJson = JsonSerializer.Serialize(userObject);
-        var combined = $"{password}:{userJson}:{_globalSalt}";
+        if (string.IsNullOrWhiteSpace(privateKey))
+            throw new ArgumentException("privateKey must not be empty", nameof(privateKey));
+
+        var combined = $"{password}:{privateKey}:{_globalSalt}";
 
         using var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(_globalSalt));
         var hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(combined));
         return Convert.ToBase64String(hashBytes);
     }
 
-    public bool VerifyPassword(object userObject, string password, string storedHash)
+    public bool VerifyPassword(string privateKey, string password, string storedHash)
     {
-        var computedHash = HashPassword(userObject, password);
+        var computedHash = HashPassword(privateKey, password);
         return SlowEquals(storedHash, computedHash);
     }
 

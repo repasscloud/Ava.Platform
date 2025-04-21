@@ -18,6 +18,12 @@ public class AvaEmployeeService : IAvaEmployeeService
     public async Task<AvaEmployeeRecord?> GetByIdAsync(string id)
         => await _context.AvaEmployees.FindAsync(id);
 
+    public async Task<AvaEmployeeRecord?> GetByIdOrEmailAsync(string emailOrId)
+    {
+        return await _context.AvaEmployees
+            .FirstOrDefaultAsync(u => u.Id == emailOrId || u.Email == emailOrId.ToLower());
+    }
+
     public async Task<List<AvaEmployeeRecord>> GetAllAsync()
         => await _context.AvaEmployees.ToListAsync();
     
@@ -28,7 +34,7 @@ public class AvaEmployeeService : IAvaEmployeeService
             Id = Nanoid.Generate(),
             FirstName = firstName,
             LastName = lastName,
-            Email = email,
+            Email = email.ToLower(),
             PrivateKey = Nanoid.Generate(),
             CreatedAt = DateTime.UtcNow,
             IsActive = isActive,
@@ -36,9 +42,10 @@ public class AvaEmployeeService : IAvaEmployeeService
             Role = role,
         };
 
-        employee.PasswordHash = _passwordHasher.HashPassword(employee, password);
+        employee.PasswordHash = _passwordHasher.HashPassword(employee.PrivateKey, password);
         _context.AvaEmployees.Add(employee);
         await _context.SaveChangesAsync();
+        await _loggerService.LogInfoAsync($"AvaEmployee with Id '{employee.Id}' and email '{employee.Email.ToLower()}' created successfully.");
         return employee;
     }
 
@@ -49,7 +56,7 @@ public class AvaEmployeeService : IAvaEmployeeService
 
         _context.AvaEmployees.Remove(user);
         await _context.SaveChangesAsync();
-        await _loggerService.LogInfoAsync($"User '{user.Id}' has been deleted.");
+        await _loggerService.LogInfoAsync($"AvaEmployee with Id '{user.Id}' has been deleted.");
 
         return true;
     }
@@ -59,7 +66,9 @@ public class AvaEmployeeService : IAvaEmployeeService
         var user = await _context.AvaEmployees.FindAsync(id);
         if (user == null) return false;
 
-        if (!string.IsNullOrWhiteSpace(dto.Password))
+        var hashedPassword = _passwordHasher.HashPassword(user.PrivateKey, dto.Password);
+
+        if (hashedPassword == user.PasswordHash)
         {
             if (!string.IsNullOrWhiteSpace(dto.Email)) user.Email = dto.Email;
             if (!string.IsNullOrWhiteSpace(dto.FirstName)) user.FirstName = dto.FirstName;
@@ -68,11 +77,8 @@ public class AvaEmployeeService : IAvaEmployeeService
             if (!string.IsNullOrWhiteSpace(dto.EmployeeType)) user.EmployeeType = dto.EmployeeType;
             if (dto.Role.HasValue) user.Role = dto.Role.Value;
             user.VerificationToken = null;
-            user.PasswordHash = null;
-            
-            user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password);
 
-            await _loggerService.LogInfoAsync($"User '{user.Id}' was successfully updated.");
+            await _loggerService.LogInfoAsync($"AvaEmployoee with Id '{user.Id}' was successfully updated.");
             await _context.SaveChangesAsync();
             return true;
         }
@@ -97,7 +103,7 @@ public class AvaEmployeeService : IAvaEmployeeService
             user.PasswordHash = null;
 
             // generate new user password hash
-            user.PasswordHash = _passwordHasher.HashPassword(user, newPassword);
+            user.PasswordHash = _passwordHasher.HashPassword(user.PrivateKey, newPassword);
 
             await _context.SaveChangesAsync();
             return true;        
@@ -114,21 +120,46 @@ public class AvaEmployeeService : IAvaEmployeeService
 
     public async Task<bool> ResetPasswordAsync(string id)
     {
-        var existing = await _context.AvaEmployees.FirstOrDefaultAsync(u =>
-            u.Id.Equals(id, StringComparison.Ordinal) ||
-            u.Email.Equals(id, StringComparison.OrdinalIgnoreCase)
-        );
+        var lowered = id.ToLowerInvariant();
+        var user = await _context.AvaEmployees.FirstOrDefaultAsync(u =>
+            u.Id == id || u.Email.ToLower() == lowered);
 
-        if (existing is null)
+        if (user is null)
         {
-            await _loggerService.LogInfoAsync($"User with Id '{id}' was not found when requesting password reset.");
-            return true;
+            await _loggerService.LogInfoAsync($"AvaEmployee with Id '{id}' was not found when requesting password reset.");
+            return false;
         }
             
-        existing.PasswordHash = null;
-        existing.VerificationToken = Nanoid.Generate(size: 16);
+        user.PasswordHash = null;
+        user.VerificationToken = Nanoid.Generate(size: 16);
 
-        await _loggerService.LogInfoAsync($"User with Id '{id}' has requested password reset successfully.");
+        await _loggerService.LogInfoAsync($"AvaEmployee with Id '{id}' has requested password reset successfully.");
+        await _context.SaveChangesAsync();
+
+        //TODO: Create a service to email the verification token to the user now
+
+        return true;
+    }
+
+    public async Task<bool> VerifyAccountAsync(AvaEmployeeVerifyAccountDTO dto)
+    {
+        var user = await _context.AvaEmployees.FirstOrDefaultAsync(u =>
+            u.VerificationToken == dto.VerificationCode);
+
+        if (user is null)
+        {
+            await _loggerService.LogInfoAsync($"AvaEmployee with VerificationToken '{dto.VerificationCode}' was not found during account verification.");
+            return false;
+        }
+
+        // Clear the verification token to mark as verified
+        user.VerificationToken = null;
+        
+        // Clear the user password hash to ensure it's not calculated in hashing
+        user.PasswordHash = null;
+
+        // Set the new password hash
+        user.PasswordHash = _passwordHasher.HashPassword(user.PrivateKey, dto.Password);
 
         await _context.SaveChangesAsync();
         return true;
