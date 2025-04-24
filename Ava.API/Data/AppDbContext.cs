@@ -47,6 +47,9 @@ public class AppDbContext : DbContext
     // Wikipedia classes
     public DbSet<AircraftTypeDesignator> AircraftTypeDesignators { get; set; }
 
+    // GitHub
+    public DbSet<GitHubRepoOAuthToken> GitHubRepoOAuthTokens { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Mark Coordinates as an Owned Entity

@@ -1,7 +1,7 @@
 namespace Ava.API.Controllers.Kernel;
 
-[Route("api/jwt-token-request")]
 [ApiController]
+[Route("api/jwt-token-request")]
 public class JwtTokenController : ControllerBase
 {
     private readonly ApplicationDbContext _context;

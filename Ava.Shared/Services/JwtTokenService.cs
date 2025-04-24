@@ -62,9 +62,15 @@ public class JwtTokenService : IJwtTokenService
         return jwtToken;
     }
 
-    public Task<bool> ValidateTokenAsync(string jwtToken)
+    public async Task<bool> ValidateTokenAsync(string jwtToken)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(jwtToken))
+            return false;
+
+        var record = await _context.AvaJwtTokenResponses
+            .FirstOrDefaultAsync(j => j.JwtToken == jwtToken);
+
+        return record?.IsValid == true;
     }
 
     public async Task<bool> SaveTokenToDbAsync(AvaJwtTokenResponse jwtToken)

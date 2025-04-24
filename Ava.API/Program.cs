@@ -39,6 +39,19 @@ public class Program
         // CustomPasswordHasher
         builder.Services.AddSingleton<ICustomPasswordHasher, CustomPasswordHasher>();
 
+        // GitHub Ticket Service
+        builder.Services.Configure<GitHubSettings>(builder.Configuration.GetSection("GitHub"));
+        builder.Services.AddHttpClient("GitHubIssuesAPI", client =>
+        {
+            client.BaseAddress = new Uri("https://api.github.com"); // GitHub base
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
+        builder.Services.AddScoped<IGitHubTicketService, GitHubTicketService>();
+
+
+        // Github service
+        builder.Services.AddScoped<IGitHubService, GitHubService>();
+
         builder.Services.AddOptions();
         builder.Services.AddHttpClient<ResendClient>();
         builder.Services.Configure<ResendClientOptions>(options =>

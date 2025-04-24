@@ -268,6 +268,31 @@ namespace Ava.Shared.Migrations
                     b.ToTable("AmadeusOAuthTokens");
                 });
 
+            modelBuilder.Entity("Ava.Shared.Models.ExternalLib.GitHub.GitHubRepoOAuthToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Owner")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Repo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GitHubRepoOAuthTokens");
+                });
+
             modelBuilder.Entity("Ava.Shared.Models.ExternalLib.IATA.IATAAirportCodes", b =>
                 {
                     b.Property<int>("Id")

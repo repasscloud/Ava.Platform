@@ -1,7 +1,7 @@
 namespace Ava.API.Controllers.Kernel;
 
-[Route("api/tp/iata/city-codes")]
 [ApiController]
+[Route("api/tp/iata/city-codes")]
 public class TPCityIATACodeController : ControllerBase
 {
     private readonly ITPCityIATACodeService _cityService;

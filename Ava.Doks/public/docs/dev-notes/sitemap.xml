@@ -2,6 +2,13 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
     <url>
+      <loc>http://localhost:1313/docs/dev-notes/razor-directive-order-in-blazor-maui/</loc>
+      <lastmod>2025-04-22T23:00:00+10:00</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.5</priority>
+    </url>
+    
+    <url>
       <loc>http://localhost:1313/docs/dev-notes/git-101/</loc>
       <lastmod>2023-09-07T16:13:18+02:00</lastmod>
       <changefreq>monthly</changefreq>
@@ -23,8 +30,22 @@
     </url>
     
     <url>
+      <loc>http://localhost:1313/docs/dev-notes/run-github-cli-in-isolated-alpine-docker-container/</loc>
+      <lastmod>2023-09-07T16:13:18+02:00</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.5</priority>
+    </url>
+    
+    <url>
       <loc>http://localhost:1313/docs/dev-notes/travel-search-record/</loc>
       <lastmod>2023-09-07T16:13:18+02:00</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.5</priority>
+    </url>
+    
+    <url>
+      <loc>http://localhost:1313/docs/dev-notes/securestorage-vs-preferences-in-.net-maui-blazor-hybrid-apps/</loc>
+      <lastmod>2025-04-22T21:16:00+10:00</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.5</priority>
     </url>

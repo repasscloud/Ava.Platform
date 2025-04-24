@@ -1,7 +1,7 @@
 namespace Ava.API.Controllers.Kernel;
 
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
 public class AvaUserController : ControllerBase
 {
     private readonly ApplicationDbContext _context;

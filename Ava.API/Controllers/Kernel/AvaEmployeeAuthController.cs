@@ -1,5 +1,3 @@
-using Ava.API.Data;
-
 namespace Ava.API.Controllers.Kernel;
 
 [ApiController]
@@ -58,7 +56,7 @@ public class AvaEmployeeAuthController : ControllerBase
             var result = await _jwtTokenService.SaveTokenToDbAsync(savedToken);
             if (result)
             {
-                return Ok(token);
+                return Ok(new AvaEmployeeLoginResponseDTO { Token = token });
             }
             else
             {

@@ -54,3 +54,4 @@ global using NanoidDotNet;
 global using Ava.Shared.Models.Static.Jwt;
 global using Microsoft.AspNetCore.Http;
 global using Resend;
+global using Ava.Shared.Models.ExternalLib.GitHub;
