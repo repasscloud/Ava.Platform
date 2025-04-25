@@ -34,6 +34,7 @@ RUN dotnet new console -n TempProject \
     && dotnet add package Microsoft.IdentityModel.Tokens --version 8.6.1 \
     && dotnet add package Microsoft.AspNetCore.OpenApi --version 9.0.3 \
     && dotnet add package System.IdentityModel.Tokens.Jwt --version 8.6.1 \
+    && dotnet add package HtmlAgilityPack --version 1.12.1 \
     && dotnet restore \
     && cd .. \
     && rm -rf TempProject
