@@ -48,9 +48,11 @@ public class Program
         });
         builder.Services.AddScoped<IGitHubTicketService, GitHubTicketService>();
 
-
         // Github service
         builder.Services.AddScoped<IGitHubService, GitHubService>();
+
+        // TaxValidation Service
+        builder.Services.AddScoped<ITaxValidationService, TaxValidationService>();
 
         builder.Services.AddOptions();
         builder.Services.AddHttpClient<ResendClient>();
