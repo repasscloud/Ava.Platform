@@ -7,16 +7,28 @@ public class AvaClient
 
     [Required]
     [MaxLength(10)]
-    public required string CliendID { get; set; }
+    public required string ClientID { get; set; }
 
     [Required]
     public required string CompanyName { get; set; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? TaxIDType { get; set; }
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? TaxID { get; set; }
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public DateTime? TaxLastValidated { get; set; }
+    
     [Required]
     public required string ContactPersonFirstName { get; set; }
 
     [Required]
     public required string ContactPersonLastName { get; set; }
+
+    [Required]
+    public required string ContactPersonCountryCode { get; set; }
 
     [Required]
     public required string ContactPersonPhone { get; set; }
@@ -34,6 +46,9 @@ public class AvaClient
     public required string BillingPersonLastName { get; set; }
 
     [Required]
+    public required string BillingPersonCountryCode { get; set; }
+    
+    [Required]
     public required string BillingPersonPhone { get; set; }
 
     [Required]
@@ -48,6 +63,9 @@ public class AvaClient
     [Required]
     public required string AdminPersonLastName { get; set; }
 
+    [Required]
+    public required string AdminPersonCountryCode { get; set; }
+    
     [Required]
     public required string AdminPersonPhone { get; set; }
 
@@ -89,6 +107,9 @@ public class AvaClient
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public TravelPolicy? DefaultTravelPolicy { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? LicenseAgreementId { get; set; }
     
     // A company can have several travel policies
     public ICollection<TravelPolicy> TravelPolicies { get; set; } = new List<TravelPolicy>();

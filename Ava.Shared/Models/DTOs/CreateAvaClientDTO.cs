@@ -5,16 +5,19 @@ public class CreateAvaClientDTO
     public required string CompanyName { get; set; }
     public required string ContactPersonFirstName { get; set; }
     public required string ContactPersonLastName { get; set; }
+    public required string ContactPersonCountryCode { get; set; }
     public required string ContactPersonPhone { get; set; }
     public required string ContactPersonEmail { get; set; }
     public string? ContactPersonJobTitle { get; set; }
     public required string BillingPersonFirstName { get; set; }
     public required string BillingPersonLastName { get; set; }
+    public required string BillingPersonCountryCode { get; set; }
     public required string BillingPersonPhone { get; set; }
     public required string BillingPersonEmail { get; set; }
     public string? BillingPersonJobTitle { get; set; }
     public required string AdminPersonFirstName { get; set; }
     public required string AdminPersonLastName { get; set; }
+    public required string AdminPersonCountryCode { get; set; }
     public required string AdminPersonPhone { get; set; }
     public required string AdminPersonEmail { get; set; }
     public string? AdminPersonJobTitle { get; set; }
