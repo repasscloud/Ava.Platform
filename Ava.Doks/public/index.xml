@@ -7,7 +7,7 @@
     <generator>Hugo</generator>
     <language>en</language>
     <copyright>Copyright (c) 2020-2024 Thulite</copyright>
-    <lastBuildDate>Tue, 22 Apr 2025 23:00:00 +1000</lastBuildDate>
+    <lastBuildDate>Fri, 25 Apr 2025 12:00:00 +1000</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Example Post</title>
@@ -22,6 +22,20 @@
       <pubDate>Thu, 07 Sep 2023 16:04:48 +0200</pubDate>
       <guid>http://localhost:1313/docs/guides/example-guide/</guid>
       <description>&lt;p&gt;Guides lead a user through a specific task they want to accomplish, often with a sequence of steps. Writing a good guide requires thinking about what your users are trying to do.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Docker &amp; Compose 101</title>
+      <link>http://localhost:1313/docs/dev-notes/docker-compose-101/</link>
+      <pubDate>Fri, 25 Apr 2025 12:00:00 +1000</pubDate>
+      <guid>http://localhost:1313/docs/dev-notes/docker-compose-101/</guid>
+      <description>&lt;h2 id=&#34;goal&#34;&gt;Goal&lt;/h2&gt;&#xA;&lt;p&gt;Provide a concise reference for essential Docker and Docker Compose commands and explain how Docker’s build cache works.&lt;/p&gt;&#xA;&lt;h2 id=&#34;requirements&#34;&gt;Requirements&lt;/h2&gt;&#xA;&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;Tool&lt;/th&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;Why it&amp;rsquo;s needed&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;docker&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;CLI for building, running, and managing containers&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;docker-compose&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Compose tool for multi-container application stacks&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;BuildKit&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;(Optional) advanced build cache and mount caching&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;✅ Docker Engine ≥ 19.03 for BuildKit support.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Bot: [short title here]</title>
+      <link>http://localhost:1313/docs/dev-notes/bot-short-title-here/</link>
+      <pubDate>Wed, 23 Apr 2025 10:45:00 +1000</pubDate>
+      <guid>http://localhost:1313/docs/dev-notes/bot-short-title-here/</guid>
+      <description>&lt;h2 id=&#34;goal&#34;&gt;Goal&lt;/h2&gt;&#xA;&lt;p&gt;Explain what this bot is doing, who runs it, and what repo(s) or services it&amp;rsquo;s tied to.&lt;/p&gt;&#xA;&lt;h2 id=&#34;bot-requirements&#34;&gt;Bot Requirements&lt;/h2&gt;&#xA;&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;Scope/API&lt;/th&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;Why it&amp;rsquo;s needed&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;repo&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Full control of private repos (issues etc.)&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;public_repo&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Public repos only&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;workflow&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Dispatch workflows&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;&lt;code&gt;write:discussion&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;For interacting with GitHub Discussions&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;✅ Include exact GitHub token scope or GitHub App permission.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Razor Directive Order in Blazor MAUI</title>
@@ -64,20 +78,6 @@
       <pubDate>Thu, 07 Sep 2023 16:13:18 +0200</pubDate>
       <guid>http://localhost:1313/docs/dev-notes/openstreetmap-contribution/</guid>
       <description>How to correctly display attribution when using OpenStreetMap tiles in a Blazor project, and when to use &lt;div&gt; or &lt;MudText&gt;.</description>
-    </item>
-    <item>
-      <title>Recursive Search &amp; Replace with GNU sed</title>
-      <link>http://localhost:1313/docs/dev-notes/recursive-search-replace-with-gnu-sed/</link>
-      <pubDate>Thu, 07 Sep 2023 16:13:18 +0200</pubDate>
-      <guid>http://localhost:1313/docs/dev-notes/recursive-search-replace-with-gnu-sed/</guid>
-      <description>How to recursively search and replace strings in-place using GNU sed and grep—ideal for renaming across large codebases.</description>
-    </item>
-    <item>
-      <title>Run GitHub CLI in Isolated Alpine Docker Container</title>
-      <link>http://localhost:1313/docs/dev-notes/run-github-cli-in-isolated-alpine-docker-container/</link>
-      <pubDate>Thu, 07 Sep 2023 16:13:18 +0200</pubDate>
-      <guid>http://localhost:1313/docs/dev-notes/run-github-cli-in-isolated-alpine-docker-container/</guid>
-      <description>&lt;h2 id=&#34;-run-github-cli-in-an-isolated-container&#34;&gt;🚀 Run GitHub CLI in an Isolated Container&lt;/h2&gt;&#xA;&lt;p&gt;Useful for testing GitHub CLI (&lt;code&gt;gh&lt;/code&gt;) commands in a clean shell.&lt;/p&gt;&#xA;&lt;h3 id=&#34;-one-liner-ad-hoc&#34;&gt;🧪 One-liner (Ad-hoc)&lt;/h3&gt;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&lt;div class=&#34;expressive-code&#34;&gt;&#xD;&#xA;  &lt;figure class=&#34;frame is-terminal not-content&#34;&gt;&#xD;&#xA;  &lt;figcaption class=&#34;header&#34;&gt;&#xD;&#xA;    &lt;span class=&#34;title&#34;&gt;&lt;/span&gt;&#xD;&#xA;  &lt;/figcaption&gt;&#xD;&#xA;  &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker run -it --rm alpine /bin/sh&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&#xD;&#xA;  &lt;/figure&gt;&#xD;&#xA;&lt;/div&gt;&#xD;&#xA;&lt;p&gt;Inside the container:&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>
