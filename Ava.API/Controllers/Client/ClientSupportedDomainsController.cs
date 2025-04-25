@@ -44,7 +44,7 @@ public class ClientSupportedDomainsController : ControllerBase
         }
 
         // find the client by clientId first
-        var clientFound = _context.AvaClients.Where(c => c.CliendID == clientId).FirstOrDefault();
+        var clientFound = _context.AvaClients.Where(c => c.ClientID == clientId).FirstOrDefault();
         if (clientFound is null)
         {
             return Problem(
@@ -62,7 +62,7 @@ public class ClientSupportedDomainsController : ControllerBase
             SupportedEmailDomain = emailDomain.ToUpperInvariant(),
             AvaClientId = clientFound.Id,
             AvaClient = clientFound,
-            ClientCode = clientFound.CliendID
+            ClientCode = clientFound.ClientID
         };
 
         _context.AvaClientSupportedDomains.Add(domain);
