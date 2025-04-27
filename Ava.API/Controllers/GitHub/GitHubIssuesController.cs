@@ -139,6 +139,19 @@ public class GitHubIssuesController : ControllerBase
         return result ? Ok() : BadRequest("Unable to reassign ticket.");
     }
 
+    [HttpPost("internal")]
+    public async Task<IActionResult> CreateInternalIssue([FromBody] InternalSupportTicket supportTicket)
+    {
+        var (isValid, error) = await ValidateBearerTokenAsync();
+        if (!isValid)
+        {
+            return error!;
+        }
+
+        var result = await _ticketService.CreateInternalTicketAsync(supportTicket);
+        return result ? Ok() : BadRequest("Unable to reassign ticket.");
+    }
+
     private async Task<(bool IsValid, IActionResult? ErrorResult)> ValidateBearerTokenAsync()
     {
         if (!Request.Headers.TryGetValue("Authorization", out var authHeader) || string.IsNullOrWhiteSpace(authHeader))
