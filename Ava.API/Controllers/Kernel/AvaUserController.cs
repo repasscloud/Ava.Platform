@@ -34,7 +34,7 @@ public class AvaUserController : ControllerBase
         // if .ClientId is provided, look up default policy/policyId and attach to avaUser object
         if (avaUser.ClientId is not null)
         {
-            var matchedClientRecord = await _context.AvaClients.FirstOrDefaultAsync(c => c.ClientID == avaUser.ClientId);
+            var matchedClientRecord = await _context.AvaClients.FirstOrDefaultAsync(c => c.ClientId == avaUser.ClientId);
             if (matchedClientRecord is not null)
             {
                 avaUser.TravelPolicy = matchedClientRecord.DefaultTravelPolicy;
@@ -70,7 +70,7 @@ public class AvaUserController : ControllerBase
             {
                 avaUser.TravelPolicy = matchedClientRecord.DefaultTravelPolicy;
                 avaUser.TravelPolicyId = matchedClientRecord.DefaultTravelPolicyId;
-                avaUser.ClientId = matchedClientRecord.ClientID;
+                avaUser.ClientId = matchedClientRecord.ClientId;
                 avaUser.DefaultCurrencyCode = matchedClientRecord.DefaultTravelPolicy?.DefaultCurrencyCode ?? "AUD";
                 avaUser.DefaultFlightSeating = matchedClientRecord.DefaultTravelPolicy?.DefaultFlightSeating ?? "ECONOMY";
                 avaUser.MaxFlightSeating = matchedClientRecord.DefaultTravelPolicy?.MaxFlightSeating ?? "ECONOMY";
