@@ -360,11 +360,15 @@ public class AvaClientController : ControllerBase
                 PostalCode = dto.PostalCode ?? string.Empty,
                 Country = dto.Country ?? string.Empty,
                 DefaultCurrency = dto.DefaultCurrency ?? "AUD",
-                DefaultTravelPolicyId = dto.DefaultTravelPolicyId ?? string.Empty,
-                LicenseAgreementId = dto.LicenseAgreementId ?? string.Empty
+                DefaultTravelPolicyId = dto?.DefaultTravelPolicyId is { Length: > 0 }
+                    ? dto?.DefaultTravelPolicyId
+                    : null,
+                LicenseAgreementId = dto?.LicenseAgreementId is { Length: > 0 }
+                    ? dto?.LicenseAgreementId
+                    : null,
             };
 
-            if (!string.IsNullOrEmpty(dto.TaxId) && !string.IsNullOrEmpty(dto.Country))
+            if (!string.IsNullOrWhiteSpace(dto?.TaxId) && !string.IsNullOrWhiteSpace(dto?.Country))
             {
                 newClient.TaxLastValidated = await _taxValidation.ValidateTaxRegistrationAsync(dto.TaxId, dto.Country);
                 await _loggerService.LogDebugAsync($"Tax validation result for {dto.TaxId}, {dto.Country}: {newClient.TaxLastValidated}");
@@ -373,6 +377,26 @@ public class AvaClientController : ControllerBase
             await _context.AvaClients.AddAsync(newClient);
             await _context.SaveChangesAsync();
             await _loggerService.LogInfoAsync($"New AvaClient created with Id: {newClient.Id}, ClientId: {newClient.ClientId}");
+
+            // create the default policy
+            var defaultPolicy = new TravelPolicy
+            {
+                Id                     = Nanoid.Generate(Nanoid.Alphabets.HexadecimalUppercase, 10),
+                PolicyName             = $"{dto?.CompanyName} Default Policy",
+                AvaClientId            = newClient.Id,
+                DefaultCurrencyCode    = dto?.DefaultCurrency ?? "AUD",
+            };
+
+            _context.TravelPolicies.Add(defaultPolicy);
+
+            newClient.DefaultTravelPolicyId = defaultPolicy.Id;
+            newClient.DefaultTravelPolicy   = defaultPolicy;
+
+            await _context.SaveChangesAsync();
+
+            await _loggerService.LogInfoAsync($"Default TravelPolicy created with Id: '{defaultPolicy.Id}' for AvaClientId: '{newClient.Id}'.");
+            await _loggerService.LogDebugAsync($"Updated AvaClientId: '{newClient.Id}' with DefaultTravelPolicyId '{defaultPolicy.Id}'.");
+            
             return Ok();
         }
         else
@@ -414,8 +438,13 @@ public class AvaClientController : ControllerBase
             existingClient.AdminPersonJobTitle = dto?.AdminPersonJobTitle ?? "UNKNOWN";
 
             existingClient.DefaultCurrency = dto?.DefaultCurrency ?? "AUD";
-            existingClient.DefaultTravelPolicyId = dto?.DefaultTravelPolicyId ?? null;
-            existingClient.LicenseAgreementId = dto?.LicenseAgreementId ?? null;
+
+            existingClient.DefaultTravelPolicyId = dto?.DefaultTravelPolicyId is { Length: > 0 }
+                    ? dto?.DefaultTravelPolicyId
+                    : null;
+            existingClient.LicenseAgreementId = dto?.LicenseAgreementId is { Length: > 0 }
+                    ? dto?.LicenseAgreementId
+                    : null;
 
             if (!string.IsNullOrEmpty(dto?.Country) && !string.IsNullOrEmpty(dto?.TaxId))
             {
