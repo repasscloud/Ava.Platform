@@ -6,6 +6,10 @@ public class LicenseAgreement
     [MaxLength(12)]
     public string Id { get; set; } = Nanoid.Generate(size: 12);
 
+    [Required]
+    [MaxLength(10)]
+    public required string AvaClientId { get; set; }
+
     public BillingTerms PaymentTerms { get; set; } = BillingTerms.Net0;
     public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.Stripe;
     public BillingType BillingType { get; set; } = BillingType.Prepaid;
@@ -23,7 +27,7 @@ public class LicenseAgreement
     [CurrencyTypeValidation]
     public required string CurrencyCode { get; set; } = "AUD";
 
-    [MarkupPrecision]
+    [TaxPrecision]
     public decimal TaxRate { get; set; } = 0m;
     public DateTime? TrialEndsOn { get; set; }
     public Discount? Discount { get; set; }
