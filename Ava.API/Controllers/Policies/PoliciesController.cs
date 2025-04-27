@@ -31,10 +31,10 @@ public class PoliciesController : ControllerBase
     }
 
     [HttpGet("travel/inter-result/{travelPolicyId}")]
-    public async Task<IActionResult> GetTravelPolicyInterResultById(string id)
+    public async Task<IActionResult> GetTravelPolicyInterResultById(string travelPolicyId)
     {
         var tp = await _context.TravelPolicies
-            .Where(c => c.Id == id)
+            .Where(c => c.Id == travelPolicyId)
             .Select(tp => new TravelPolicyBookingContextDTO
             {
                 Id = tp.Id,
