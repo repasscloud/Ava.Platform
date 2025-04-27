@@ -25,14 +25,28 @@ public class AvaClientController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateAvaClient([FromBody] CreateAvaClientDTO dto)
     {
+        // Validate token
+        var (isValid, errorResult) = await ValidateBearerTokenAsync();
+        if (!isValid)
+        {
+            var dtoJson = JsonSerializer.Serialize(dto, new JsonSerializerOptions
+            {
+                WriteIndented = false
+            });
+            await _loggerService.LogWarningAsync(
+                $"Unauthorized call to CreateAvaClient for '{dto}'."
+            );
+            return errorResult!;
+        }
+
         await _loggerService.LogTraceAsync("Entering CreateAvaClient");
         await _loggerService.LogDebugAsync($"CreateAvaClient called with CompanyName={dto.CompanyName}, CreateDefaultTravelPolicy={dto.CreateDefaultTravelPolicy}");
 
         try
         {
-            // generate a brand new AvaClientID
-            string _avaClientID = Nanoid.Generate(Nanoid.Alphabets.HexadecimalUppercase, 10);
-            await _loggerService.LogInfoAsync($"Generated new AvaClientID: {_avaClientID}");
+            // generate a brand new AvaClientId
+            string _avaClientId = Nanoid.Generate(Nanoid.Alphabets.HexadecimalUppercase, 10);
+            await _loggerService.LogInfoAsync($"Generated new AvaClientId: {_avaClientId}");
 
             // Create the AvaClient entity.
             AvaClient client = new()
@@ -57,13 +71,13 @@ public class AvaClientController : ControllerBase
                 AdminPersonPhone = dto.AdminPersonPhone,
                 AdminPersonEmail = dto.AdminPersonEmail.ToLowerInvariant(),
                 AdminPersonJobTitle = dto.AdminPersonJobTitle,
-                ClientID = _avaClientID,
+                ClientId = _avaClientId,
                 DefaultCurrency = dto.DefaultBillingCurrency ?? "AUD",
             };
 
             _context.AvaClients.Add(client);
             await _context.SaveChangesAsync();
-            await _loggerService.LogInfoAsync($"AvaClient created with Id: {client.Id}, ClientID: {client.ClientID}");
+            await _loggerService.LogInfoAsync($"AvaClient created with Id: {client.Id}, ClientId: {client.ClientId}");
 
             // Optionally create a default travel policy if indicated.
             if (dto.CreateDefaultTravelPolicy)
@@ -107,6 +121,16 @@ public class AvaClientController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAvaClient(int id)
     {
+        // Validate token
+        var (isValid, errorResult) = await ValidateBearerTokenAsync();
+        if (!isValid)
+        {
+            await _loggerService.LogWarningAsync(
+                $"Unauthorized call to GetAvaClient for '{id}'."
+            );
+            return errorResult!;
+        }
+        
         await _loggerService.LogTraceAsync("Entering GetAvaClient");
         await _loggerService.LogDebugAsync($"GetAvaClient called with Id={id}");
 
@@ -125,25 +149,35 @@ public class AvaClientController : ControllerBase
         return Ok(client);
     }
 
-    // GET: api/avaClient/clientID/{clientID}
-    [HttpGet("clientID/{clientID}")]
-    public async Task<IActionResult> GetAvaClientByClientId(string clientID)
+    // GET: api/avaClient/clientId/{clientId}
+    [HttpGet("clientId/{clientId}")]
+    public async Task<IActionResult> GetAvaClientByClientId(string clientId)
     {
+        // Validate token
+        var (isValid, errorResult) = await ValidateBearerTokenAsync();
+        if (!isValid)
+        {
+            await _loggerService.LogWarningAsync(
+                $"Unauthorized call to GetAvaClientByClientId for '{clientId}'."
+            );
+            return errorResult!;
+        }
+        
         await _loggerService.LogTraceAsync("Entering GetAvaClientByClientId");
-        await _loggerService.LogDebugAsync($"GetAvaClientByClientId called with ClientID={clientID}");
+        await _loggerService.LogDebugAsync($"GetAvaClientByClientId called with ClientId={clientId}");
 
         var client = await _context.AvaClients
             .Include(c => c.DefaultTravelPolicy)
             .Include(c => c.TravelPolicies)
-            .FirstOrDefaultAsync(c => c.ClientID == clientID);
+            .FirstOrDefaultAsync(c => c.ClientId == clientId);
 
         if (client == null)
         {
-            await _loggerService.LogWarningAsync($"AvaClient not found with ClientID: {clientID}");
+            await _loggerService.LogWarningAsync($"AvaClient not found with ClientId: {clientId}");
             return NotFound();
         }
 
-        await _loggerService.LogInfoAsync($"Retrieved AvaClient with ClientID: {clientID}");
+        await _loggerService.LogInfoAsync($"Retrieved AvaClient with ClientId: {clientId}");
         return Ok(client);
     }
 
@@ -151,6 +185,16 @@ public class AvaClientController : ControllerBase
     [HttpGet("contactEmail/{email}")]
     public async Task<IActionResult> GetAvaClientByEmail(string email)
     {
+        // Validate token
+        var (isValid, errorResult) = await ValidateBearerTokenAsync();
+        if (!isValid)
+        {
+            await _loggerService.LogWarningAsync(
+                $"Unauthorized call to GetAvaClientByEmail for '{email}'."
+            );
+            return errorResult!;
+        }
+
         await _loggerService.LogTraceAsync("Entering GetAvaClientByEmail");
         await _loggerService.LogDebugAsync($"GetAvaClientByEmail called with email={email}");
 
@@ -175,28 +219,39 @@ public class AvaClientController : ControllerBase
     [HttpGet("~/api/v1/avaclient/by-client-id/{clientId}")]
     public async Task<IActionResult> GetAvaClientByClientIdV1(string clientId)
     {
+        // Validate token
+        var (isValid, errorResult) = await ValidateBearerTokenAsync();
+        if (!isValid)
+        {
+            await _loggerService.LogWarningAsync(
+                $"Unauthorized call to GetAvaClientByClientIdV1 for '{clientId}'."
+            );
+            return errorResult!;
+        }
+
         await _loggerService.LogTraceAsync("Entering GetAvaClientByClientIdV1");
         await _loggerService.LogDebugAsync($"GetAvaClientByClientIdV1 called with clientId={clientId}");
 
         var client = await _context.AvaClients
-            .Where(c => c.ClientID == clientId)
+            .Where(c => c.ClientId == clientId)
             .FirstOrDefaultAsync();
 
         if (client == null)
         {
-            await _loggerService.LogWarningAsync($"AvaClient V1 not found with ClientID: {clientId}");
+            await _loggerService.LogWarningAsync($"AvaClient V1 not found with ClientId: {clientId}");
             return NotFound();
         }
 
-        await _loggerService.LogInfoAsync($"Retrieved AvaClient V1 with ClientID: {clientId}");
+        await _loggerService.LogInfoAsync($"Retrieved AvaClient V1 with ClientId: {clientId}");
         var result = new AvaClientDTO
         {
-            ClientId = client.ClientID,
+            ClientId = client.ClientId,
             CompanyName = client.CompanyName,
 
-            TaxIDType = client?.TaxIDType ?? null,
-            TaxID = client?.TaxID ?? null,
+            TaxIdType = client?.TaxIdType ?? null,
+            TaxId = client?.TaxId ?? null,
             TaxLastValidated = client?.TaxLastValidated ?? null,
+            LastUpdated = DateTime.UtcNow,
             
             AddressLine1 = client?.AddressLine1 ?? null,
             AddressLine2 = client?.AddressLine2 ?? null,
@@ -239,24 +294,39 @@ public class AvaClientController : ControllerBase
     [HttpPost("~/api/v1/avaclient/new-or-update")]
     public async Task<IActionResult> CreateOrUpdateAvaClientV1([FromBody] AvaClientDTO dto)
     {
+        // // Validate token
+        // var (isValid, errorResult) = await ValidateBearerTokenAsync();
+        // if (!isValid)
+        // {
+        //     var dtoJson = JsonSerializer.Serialize(dto, new JsonSerializerOptions
+        //     {
+        //         WriteIndented = false
+        //     });
+        //     await _loggerService.LogWarningAsync(
+        //         $"Unauthorized call to CreateOrUpdateAvaClientV1 for '{dtoJson}'."
+        //     );
+        //     return errorResult!;
+        // }
+
         await _loggerService.LogTraceAsync("Entering CreateOrUpdateAvaClientV1");
         await _loggerService.LogDebugAsync($"CreateOrUpdateAvaClientV1 called with ClientId={dto.ClientId}");
 
         var existingClient = await _context.AvaClients
-            .Where(c => c.ClientID == dto.ClientId)
+            .Where(c => c.ClientId == dto.ClientId)
             .FirstOrDefaultAsync();
 
         if (existingClient == null)
         {
-            await _loggerService.LogInfoAsync($"No existing client—creating new AvaClient with ClientID: {dto.ClientId}");
+            await _loggerService.LogInfoAsync($"No existing client—creating new AvaClient with ClientId: {dto.ClientId}");
             AvaClient newClient = new AvaClient
             {
                 Id = 0,
-                ClientID = dto.ClientId,
+                ClientId = dto.ClientId,
                 CompanyName = dto.CompanyName,
-                TaxIDType = dto.TaxIDType ?? null,
-                TaxID = dto.TaxID ?? null,
+                TaxIdType = dto.TaxIdType ?? null,
+                TaxId = dto.TaxId ?? null,
                 TaxLastValidated = dto.TaxLastValidated ?? null,
+                LastUpdated = DateTime.UtcNow,
                 ContactPersonFirstName = dto.ContactPersonFirstName ?? "UNKNOWN",
                 ContactPersonLastName = dto.ContactPersonLastName ?? "UNKNOWN",
                 ContactPersonCountryCode = dto.ContactPersonCountryCode ?? string.Empty,
@@ -287,24 +357,25 @@ public class AvaClientController : ControllerBase
                 LicenseAgreementId = dto.LicenseAgreementId ?? string.Empty
             };
 
-            if (!string.IsNullOrEmpty(dto.TaxID) && !string.IsNullOrEmpty(dto.Country))
+            if (!string.IsNullOrEmpty(dto.TaxId) && !string.IsNullOrEmpty(dto.Country))
             {
-                newClient.TaxLastValidated = await _taxValidation.ValidateTaxRegistrationAsync(dto.TaxID, dto.Country);
-                await _loggerService.LogDebugAsync($"Tax validation result for {dto.TaxID}, {dto.Country}: {newClient.TaxLastValidated}");
+                newClient.TaxLastValidated = await _taxValidation.ValidateTaxRegistrationAsync(dto.TaxId, dto.Country);
+                await _loggerService.LogDebugAsync($"Tax validation result for {dto.TaxId}, {dto.Country}: {newClient.TaxLastValidated}");
             }
 
             await _context.AvaClients.AddAsync(newClient);
             await _context.SaveChangesAsync();
-            await _loggerService.LogInfoAsync($"New AvaClient created with Id: {newClient.Id}, ClientID: {newClient.ClientID}");
+            await _loggerService.LogInfoAsync($"New AvaClient created with Id: {newClient.Id}, ClientId: {newClient.ClientId}");
             return Ok();
         }
         else
         {
-            await _loggerService.LogInfoAsync($"Updating existing AvaClient with Id: {existingClient.Id}, ClientID: {existingClient.ClientID}");
+            await _loggerService.LogInfoAsync($"Updating existing AvaClient with Id: {existingClient.Id}, ClientId: {existingClient.ClientId}");
             existingClient.CompanyName = dto.CompanyName;
-            existingClient.TaxIDType = dto?.TaxIDType ?? null;
-            existingClient.TaxID = dto?.TaxID ?? null;
+            existingClient.TaxIdType = dto?.TaxIdType ?? null;
+            existingClient.TaxId = dto?.TaxId ?? null;
             existingClient.TaxLastValidated = dto?.TaxLastValidated ?? null;
+            existingClient.LastUpdated = DateTime.UtcNow;
 
             existingClient.AddressLine1 = dto?.AddressLine1 ?? null;
             existingClient.AddressLine2 = dto?.AddressLine2 ?? null;
@@ -339,10 +410,10 @@ public class AvaClientController : ControllerBase
             existingClient.DefaultTravelPolicyId = dto?.DefaultTravelPolicyId ?? null;
             existingClient.LicenseAgreementId = dto?.LicenseAgreementId ?? null;
 
-            if (!string.IsNullOrEmpty(dto?.Country) && !string.IsNullOrEmpty(dto?.TaxID))
+            if (!string.IsNullOrEmpty(dto?.Country) && !string.IsNullOrEmpty(dto?.TaxId))
             {
-                existingClient.TaxLastValidated = await _taxValidation.ValidateTaxRegistrationAsync(dto.TaxID, dto.Country);
-                await _loggerService.LogDebugAsync($"Tax validation result for update {dto.TaxID}, {dto.Country}: {existingClient.TaxLastValidated}");
+                existingClient.TaxLastValidated = await _taxValidation.ValidateTaxRegistrationAsync(dto.TaxId, dto.Country);
+                await _loggerService.LogDebugAsync($"Tax validation result for update {dto.TaxId}, {dto.Country}: {existingClient.TaxLastValidated}");
             }
 
             await _context.SaveChangesAsync();
@@ -350,6 +421,55 @@ public class AvaClientController : ControllerBase
             return Ok();
         }
     }
+
+    // V1: Search everything for record match
+    [HttpPost("~/api/v1/avaclient/search-everything/{searchValue}")]
+    public async Task<IActionResult> SearchEverythingV1(string searchValue)
+    {
+        // Validate token
+        var (isValid, errorResult) = await ValidateBearerTokenAsync();
+        if (!isValid)
+        {
+            await _loggerService.LogWarningAsync(
+                $"Unauthorized call to SearchEverythingV1 for '{searchValue}'."
+            );
+            return errorResult!;
+        }
+
+        // Entering and input debug
+        await _loggerService.LogTraceAsync("Entering SearchEverythingV1");
+        await _loggerService.LogDebugAsync($"SearchEverythingV1 called with searchValue={searchValue}");
+
+        // Lookup
+        var client = await _context.AvaClients
+            .FirstOrDefaultAsync(c =>
+                c.ClientId              == searchValue ||
+                c.CompanyName           == searchValue ||
+                c.TaxId                 == searchValue ||
+                c.AdminPersonEmail      == searchValue ||
+                c.BillingPersonEmail    == searchValue ||
+                c.ContactPersonEmail    == searchValue ||
+                c.AdminPersonPhone      == searchValue ||
+                c.BillingPersonPhone    == searchValue ||
+                c.ContactPersonPhone    == searchValue ||
+                c.DefaultTravelPolicyId == searchValue ||
+                c.LicenseAgreementId    == searchValue
+            );
+
+        if (client is null)
+        {
+            await _loggerService.LogInfoAsync(
+                $"SearchEverythingV1: no client found matching “{searchValue}”"
+            );
+            return NotFound($"No client found matching '{searchValue}'.");
+        }
+
+        await _loggerService.LogInfoAsync(
+            $"SearchEverythingV1: found client with ClientId={client.ClientId}"
+        );
+        return Ok(new { clientId = client.ClientId });
+    }
+
 
     private async Task<(bool IsValid, IActionResult? ErrorResult)> ValidateBearerTokenAsync()
     {
