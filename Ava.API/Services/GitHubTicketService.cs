@@ -1,10 +1,3 @@
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using Microsoft.Extensions.Options;
-using Ava.Shared.Models.ExternalLib.GitHub;
-
 namespace Ava.API.Services;
 
 public class GitHubTicketService : IGitHubTicketService
@@ -118,4 +111,53 @@ public class GitHubTicketService : IGitHubTicketService
         var res = await _client.SendAsync(req);
         return res.IsSuccessStatusCode;
     }
+
+    public async Task<bool> EnsureLabelExistsAsync(string labelName, string color = "ededed")
+    {
+        // try to fetch the label
+        var getReq = CreateRequest(HttpMethod.Get, $"/repos/{_repo.Owner}/{_repo.Repo}/labels/{labelName}");
+        var getRes = await _client.SendAsync(getReq);
+        if (getRes.IsSuccessStatusCode)
+            return true;    // already exists
+
+        // if it's not found, create it
+        if (getRes.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            var payload = JsonSerializer.Serialize(new { name = labelName, color = color });
+            var postReq = CreateRequest(HttpMethod.Post, $"/repos/{_repo.Owner}/{_repo.Repo}/labels", payload);
+            var postRes = await _client.SendAsync(postReq);
+            return postRes.IsSuccessStatusCode;
+        }
+
+        // some other error
+        return false;
+    }
+
+
+    public async Task<bool> CreateInternalTicketAsync(InternalSupportTicket ticket)
+    {
+        if (await EnsureLabelExistsAsync($"internal_{ticket.UserId}"))
+        {
+            // Build the JSON payload, mixing hard-coded values with model data
+            var payload = new
+            {
+                title     = ticket.Subject,                                    // dynamic title
+                body      = $"**IssueId:** {ticket.IssueId}\n" +
+                            $"**Category:** {ticket.Category}\n" +
+                            $"**UserID:** {ticket.UserId}\n\n" +
+                            $"{ticket.Message}",                               // include model fields in the body
+                assignees = new[] { "danijeljw-rpc" },                         // hard-coded assignee
+                labels    = new[] { $"internal_{ticket.UserId}" }              // hard-coded prefix + model IssueId
+            };
+
+            var json    = JsonSerializer.Serialize(payload);
+            var request = CreateRequest(HttpMethod.Post, RepoPath, json);
+            var response = await _client.SendAsync(request);
+
+            return response.IsSuccessStatusCode;
+        }
+
+        return false;
+    }
+
 }

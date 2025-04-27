@@ -12,4 +12,6 @@ public interface IGitHubTicketService
     Task<bool> ReplaceTagAsync(int ticketNumber, string fromTag, string toTag);
     Task<bool> DeleteTicketAsync(int ticketNumber);
     Task<bool> ReassignTicketAsync(int ticketNumber);
+    Task<bool> EnsureLabelExistsAsync(string labelName, string color = "B60205");
+    Task<bool> CreateInternalTicketAsync(InternalSupportTicket internalSupportTicket);
 }
