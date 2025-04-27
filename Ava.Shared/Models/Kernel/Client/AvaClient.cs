@@ -65,7 +65,6 @@ public class AvaClient
     public string? ContactPersonJobTitle { get; set; }
 
     // billing person
-
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? BillingPersonFirstName { get; set; }
 

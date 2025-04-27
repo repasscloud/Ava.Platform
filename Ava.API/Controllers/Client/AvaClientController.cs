@@ -34,7 +34,7 @@ public class AvaClientController : ControllerBase
                 WriteIndented = false
             });
             await _loggerService.LogWarningAsync(
-                $"Unauthorized call to CreateAvaClient for '{dto}'."
+                $"Unauthorized call to CreateAvaClient for '{dtoJson}'."
             );
             return errorResult!;
         }
@@ -45,8 +45,13 @@ public class AvaClientController : ControllerBase
         try
         {
             // generate a brand new AvaClientId
-            string _avaClientId = Nanoid.Generate(Nanoid.Alphabets.HexadecimalUppercase, 10);
-            await _loggerService.LogInfoAsync($"Generated new AvaClientId: {_avaClientId}");
+            string _avaClientId = string.Empty;
+            if (dto.ClientId?.Length == 0)
+            {
+                _avaClientId = Nanoid.Generate(Nanoid.Alphabets.HexadecimalUppercase, 10);
+                await _loggerService.LogInfoAsync($"Generated new AvaClientId: {_avaClientId}");
+            }
+            
 
             // Create the AvaClient entity.
             AvaClient client = new()
@@ -58,21 +63,23 @@ public class AvaClientController : ControllerBase
                 ContactPersonCountryCode = dto.ContactPersonCountryCode,
                 ContactPersonPhone = dto.ContactPersonPhone,
                 ContactPersonEmail = dto.ContactPersonEmail.ToLowerInvariant(),
-                ContactPersonJobTitle = dto.ContactPersonJobTitle,
-                BillingPersonFirstName = dto.BillingPersonFirstName,
-                BillingPersonLastName = dto.BillingPersonLastName,
-                BillingPersonCountryCode = dto.BillingPersonCountryCode,
-                BillingPersonPhone = dto.BillingPersonPhone,
-                BillingPersonEmail = dto.BillingPersonEmail.ToLowerInvariant(),
-                BillingPersonJobTitle = dto.BillingPersonJobTitle,
-                AdminPersonFirstName = dto.AdminPersonFirstName,
-                AdminPersonLastName = dto.AdminPersonLastName,
-                AdminPersonCountryCode = dto.AdminPersonCountryCode,
-                AdminPersonPhone = dto.AdminPersonPhone,
-                AdminPersonEmail = dto.AdminPersonEmail.ToLowerInvariant(),
-                AdminPersonJobTitle = dto.AdminPersonJobTitle,
-                ClientId = _avaClientId,
-                DefaultCurrency = dto.DefaultBillingCurrency ?? "AUD",
+                ContactPersonJobTitle = dto?.ContactPersonJobTitle,
+                BillingPersonFirstName = dto?.BillingPersonFirstName ?? null,
+                BillingPersonLastName = dto?.BillingPersonLastName ?? null,
+                BillingPersonCountryCode = dto?.BillingPersonCountryCode ?? null,
+                BillingPersonPhone = dto?.BillingPersonPhone ?? null,
+                BillingPersonEmail = dto?.BillingPersonEmail?.ToLowerInvariant() ?? null,
+                BillingPersonJobTitle = dto?.BillingPersonJobTitle ?? null,
+                AdminPersonFirstName = dto?.AdminPersonFirstName ?? null,
+                AdminPersonLastName = dto?.AdminPersonLastName ?? null,
+                AdminPersonCountryCode = dto?.AdminPersonCountryCode ?? null,
+                AdminPersonPhone = dto?.AdminPersonPhone ?? null,
+                AdminPersonEmail = dto?.AdminPersonEmail?.ToLowerInvariant(),
+                AdminPersonJobTitle = dto?.AdminPersonJobTitle ?? null,
+                ClientId = dto?.ClientId is { Length: > 0 }
+                    ? dto.ClientId
+                    : _avaClientId,
+                DefaultCurrency = dto?.DefaultBillingCurrency ?? "AUD",
             };
 
             _context.AvaClients.Add(client);
@@ -80,7 +87,7 @@ public class AvaClientController : ControllerBase
             await _loggerService.LogInfoAsync($"AvaClient created with Id: {client.Id}, ClientId: {client.ClientId}");
 
             // Optionally create a default travel policy if indicated.
-            if (dto.CreateDefaultTravelPolicy)
+            if (dto!.CreateDefaultTravelPolicy)
             {
                 await _loggerService.LogDebugAsync("CreateDefaultTravelPolicy is true; creating default TravelPolicy");
                 if (string.IsNullOrEmpty(dto.CompanyName))
