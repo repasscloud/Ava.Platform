@@ -4,9 +4,10 @@ public class AvaClientDTO
 {
     public string ClientId { get; set; } = null!;
     public string CompanyName { get; set; } = null!;
-    public string? TaxIDType { get; set; }
-    public string? TaxID { get; set; }
+    public string? TaxIdType { get; set; }
+    public string? TaxId { get; set; }
     public DateTime? TaxLastValidated { get; set; }
+    public DateTime? LastUpdated { get; set; }
     
     public string? AddressLine1 { get; set; }
     public string? AddressLine2 { get; set; }

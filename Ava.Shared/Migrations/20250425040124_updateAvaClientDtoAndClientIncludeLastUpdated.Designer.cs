@@ -3,6 +3,7 @@ using System;
 using Ava.Shared.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ava.Shared.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250425040124_updateAvaClientDtoAndClientIncludeLastUpdated")]
+    partial class updateAvaClientDtoAndClientIncludeLastUpdated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -557,45 +560,55 @@ namespace Ava.Shared.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("AdminPersonCountryCode")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("AdminPersonEmail")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("AdminPersonFirstName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("AdminPersonJobTitle")
                         .HasColumnType("text");
 
                     b.Property<string>("AdminPersonLastName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("AdminPersonPhone")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("BillingPersonCountryCode")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("BillingPersonEmail")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("BillingPersonFirstName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("BillingPersonJobTitle")
                         .HasColumnType("text");
 
                     b.Property<string>("BillingPersonLastName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("BillingPersonPhone")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("City")
                         .HasColumnType("text");
 
-                    b.Property<string>("ClientId")
+                    b.Property<string>("ClientID")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
@@ -650,10 +663,10 @@ namespace Ava.Shared.Migrations
                     b.Property<string>("State")
                         .HasColumnType("text");
 
-                    b.Property<string>("TaxId")
+                    b.Property<string>("TaxID")
                         .HasColumnType("text");
 
-                    b.Property<string>("TaxIdType")
+                    b.Property<string>("TaxIDType")
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("TaxLastValidated")

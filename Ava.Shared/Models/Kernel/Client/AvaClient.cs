@@ -7,73 +7,21 @@ public class AvaClient
 
     [Required]
     [MaxLength(10)]
-    public required string ClientID { get; set; }
+    public required string ClientId { get; set; }
 
     [Required]
     public required string CompanyName { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? TaxIDType { get; set; }
+    public string? TaxIdType { get; set; }
     
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? TaxID { get; set; }
+    public string? TaxId { get; set; }
     
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DateTime? TaxLastValidated { get; set; }
-    
-    [Required]
-    public required string ContactPersonFirstName { get; set; }
 
-    [Required]
-    public required string ContactPersonLastName { get; set; }
-
-    [Required]
-    public required string ContactPersonCountryCode { get; set; }
-
-    [Required]
-    public required string ContactPersonPhone { get; set; }
-
-    [Required]
-    public required string ContactPersonEmail { get; set; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? ContactPersonJobTitle { get; set; }
-
-    [Required]
-    public required string BillingPersonFirstName { get; set; }
-
-    [Required]
-    public required string BillingPersonLastName { get; set; }
-
-    [Required]
-    public required string BillingPersonCountryCode { get; set; }
-    
-    [Required]
-    public required string BillingPersonPhone { get; set; }
-
-    [Required]
-    public required string BillingPersonEmail { get; set; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? BillingPersonJobTitle { get; set; }
-
-    [Required]
-    public required string AdminPersonFirstName { get; set; }
-
-    [Required]
-    public required string AdminPersonLastName { get; set; }
-
-    [Required]
-    public required string AdminPersonCountryCode { get; set; }
-    
-    [Required]
-    public required string AdminPersonPhone { get; set; }
-
-    [Required]
-    public required string AdminPersonEmail { get; set; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? AdminPersonJobTitle { get; set; }
+    public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
 
     // address
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -96,10 +44,72 @@ public class AvaClient
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Country { get; set; }
+    
+    // contact person
+    [Required]
+    public required string ContactPersonFirstName { get; set; }
 
+    [Required]
+    public required string ContactPersonLastName { get; set; }
+
+    [Required]
+    public required string ContactPersonCountryCode { get; set; }
+
+    [Required]
+    public required string ContactPersonPhone { get; set; }
+
+    [Required]
+    public required string ContactPersonEmail { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? ContactPersonJobTitle { get; set; }
+
+    // billing person
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? BillingPersonFirstName { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? BillingPersonLastName { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? BillingPersonCountryCode { get; set; }
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? BillingPersonPhone { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? BillingPersonEmail { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? BillingPersonJobTitle { get; set; }
+
+    // admin person
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? AdminPersonFirstName { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? AdminPersonLastName { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? AdminPersonCountryCode { get; set; }
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? AdminPersonPhone { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? AdminPersonEmail { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? AdminPersonJobTitle { get; set; }
+    
+    // financial
     [StringLength(3)]
     [CurrencyTypeValidation]
     public required string DefaultCurrency { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? LicenseAgreementId { get; set; }
     
     // policies
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -107,9 +117,6 @@ public class AvaClient
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public TravelPolicy? DefaultTravelPolicy { get; set; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? LicenseAgreementId { get; set; }
     
     // A company can have several travel policies
     public ICollection<TravelPolicy> TravelPolicies { get; set; } = new List<TravelPolicy>();
