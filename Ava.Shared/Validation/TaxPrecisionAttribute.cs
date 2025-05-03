@@ -7,7 +7,7 @@ namespace Ava.Shared.Validation;
 [AttributeUsage(AttributeTargets.Property)]
 public class TaxPrecisionAttribute : PrecisionAttribute
 {
-    public TaxPrecisionAttribute() : base(5, 4)
+    public TaxPrecisionAttribute() : base(6, 4)
     {
     }
 }
