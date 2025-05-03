@@ -18,6 +18,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     // Add DbSets for your models
     public DbSet<AvaClient> AvaClients { get; set; }
+    public DbSet<LicenseAgreement> LicenseAgreements { get; set; }
+    public DbSet<LateFeeConfig> LateFeeConfigs { get; set; }
     public DbSet<AvaUser> AvaUsers { get; set; }
     public DbSet<AvaUserSysPreference> AvaUserSysPreferences { get; set; }
     

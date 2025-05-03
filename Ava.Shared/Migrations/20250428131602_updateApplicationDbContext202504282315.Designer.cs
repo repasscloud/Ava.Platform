@@ -3,6 +3,7 @@ using System;
 using Ava.Shared.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ava.Shared.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250428131602_updateApplicationDbContext202504282315")]
+    partial class updateApplicationDbContext202504282315
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -460,28 +463,20 @@ namespace Ava.Shared.Migrations
             modelBuilder.Entity("Ava.Shared.Models.Kernel.Billing.LateFeeConfig", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(12)
-                        .HasColumnType("character varying(12)");
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.Property<decimal>("FixedAmount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                        .HasColumnType("numeric");
 
                     b.Property<int>("GracePeriodDays")
                         .HasColumnType("integer");
 
-                    b.Property<string>("LicenseAgreementId")
-                        .IsRequired()
-                        .HasMaxLength(14)
-                        .HasColumnType("character varying(14)");
-
-                    b.Property<decimal>("MaxLateFeeCap")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                    b.Property<decimal?>("MaxLateFeeCap")
+                        .HasColumnType("numeric");
 
                     b.Property<decimal>("PercentOfInvoice")
-                        .HasPrecision(5, 4)
-                        .HasColumnType("numeric(5,4)");
+                        .HasColumnType("numeric");
 
                     b.Property<int>("RecurringOption")
                         .HasColumnType("integer");
@@ -584,8 +579,8 @@ namespace Ava.Shared.Migrations
 
                     b.Property<string>("LateFeeConfigId")
                         .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("character varying(12)");
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("integer");

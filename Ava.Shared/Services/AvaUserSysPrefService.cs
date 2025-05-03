@@ -3,7 +3,7 @@ namespace Ava.Shared.Services;
 public class AvaUserSysPrefService : IAvaUserSysPrefService
 {
     private readonly ApplicationDbContext _context;
-    private readonly UserManager<ApplicationUser> _userManager;        
+    private readonly UserManager<ApplicationUser> _userManager;
     private readonly ILoggerService _logger;
 
     public AvaUserSysPrefService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ILoggerService logger)

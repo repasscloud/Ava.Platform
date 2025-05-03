@@ -1,3 +1,5 @@
+using Ava.Shared.Models.Kernel.Billing;
+
 namespace Ava.API.Controllers;
 
 [ApiController]
@@ -8,17 +10,23 @@ public class AvaClientController : ControllerBase
     private readonly IJwtTokenService _jwtTokenService;
     private readonly ITaxValidationService _taxValidation;
     private readonly ILoggerService _loggerService;
+    private readonly ILicenseAgreementService _licenseService;
+    private readonly ILateFeeConfigService   _lateFeeService;
 
     public AvaClientController(
         ApplicationDbContext context,
         IJwtTokenService jwtTokenService,
         ITaxValidationService taxValidation,
-        ILoggerService loggerService)
+        ILoggerService loggerService,
+        ILicenseAgreementService licenseService,
+        ILateFeeConfigService lateFeeService)
     {
         _context = context;
         _jwtTokenService = jwtTokenService;
         _taxValidation = taxValidation;
         _loggerService = loggerService;
+        _licenseService = licenseService;
+        _lateFeeService = lateFeeService;
     }
 
     // POST: api/avaClient
@@ -506,7 +514,113 @@ public class AvaClientController : ControllerBase
         return Ok(new { clientId = client.ClientId });
     }
 
+    // --- LicenseAgreement endpoints ---
+    [HttpGet("~/api/v1/avaclient/license/byid/{id}")]
+    public async Task<ActionResult<LicenseAgreement>> GetLicenseAgreementById(string id)
+    {
+        var ag = await _licenseService.GetByIdAsync(id);
+        if (ag is null) return NotFound($"LicenseAgreement '{id}' not found.");
+        return Ok(ag);
+    }
 
+    [HttpPost("~/api/v1/avaclient/license")]
+    public async Task<ActionResult<LicenseAgreement>> CreateLicenseAgreement([FromBody] LicenseAgreement agreement)
+    {
+        var created = await _licenseService.CreateAsync(agreement);
+        return CreatedAtAction(
+            nameof(GetLicenseAgreementById),
+            new { id = created.Id },
+            created
+        );
+    }
+
+    [HttpPut("~/api/v1/avaclient/license/byid/{id}")]
+    public async Task<IActionResult> UpdateLicenseAgreement(string id, [FromBody] LicenseAgreement updated)
+    {
+        if (id != updated.Id) return BadRequest("Route-id and body-id must match.");
+        if (!await _licenseService.ExistsAsync(id))
+            return NotFound($"LicenseAgreement '{id}' not found.");
+
+        await _licenseService.UpdateAsync(updated);
+        return NoContent();
+    }
+
+    [HttpDelete("~/api/v1/avaclient/license/byid/{id}")]
+    public async Task<IActionResult> DeleteLicenseAgreement(string id)
+    {
+        if (!await _licenseService.ExistsAsync(id))
+            return NotFound($"LicenseAgreement '{id}' not found.");
+
+        await _licenseService.DeleteAsync(id);
+        return NoContent();
+    }
+
+    // --- LateFeeConfig endpoints (nested under LicenseAgreement) ---
+    [HttpGet("~/api/v1/avaclient/license/byid/{licenseAgreementId}/latefeeconfigs")]
+    public async Task<ActionResult<IEnumerable<LateFeeConfig>>> GetLateFeeConfigsForAgreement(string licenseAgreementId)
+    {
+        if (!await _licenseService.ExistsAsync(licenseAgreementId))
+            return NotFound($"LicenseAgreement '{licenseAgreementId}' not found.");
+
+        var list = await _lateFeeService.GetByAgreementIdAsync(licenseAgreementId);
+        return Ok(list);
+    }
+
+    [HttpGet("~/api/v1/avaclient/latefeeconfigs/byid/{id}")]
+    public async Task<ActionResult<LateFeeConfig>> GetLateFeeConfigById(string id)
+    {
+        var cfg = await _lateFeeService.GetByIdAsync(id);
+        if (cfg is null) return NotFound($"LateFeeConfig '{id}' not found.");
+        return Ok(cfg);
+    }
+
+    /// <summary>
+    /// Generates a LateFeeConfig AFTER the license has been successfully created
+    /// </summary>
+    /// <param name="licenseAgreementId">The License Agreement Id to which should be updated with the LateFeeConfig</param>
+    /// <param name="template">A template to use for the LateFeeConfig</param>
+    /// <returns></returns>
+    [HttpPost("~/api/v1/avaclient/license/byid/{licenseAgreementId}/latefeeconfigs")]
+    public async Task<ActionResult<LateFeeConfig>> CreateLateFeeConfig(
+        string licenseAgreementId,
+        [FromBody] LateFeeConfig template)
+    {
+        // template.LicenseAgreementId is ignored; we enforce route-id
+        var created = await _lateFeeService.CreateForAgreementAsync(licenseAgreementId, template);
+        return CreatedAtAction(
+            nameof(GetLateFeeConfigById),
+            new { id = created.Id },
+            created
+        );
+    }
+
+    [HttpPost("~/api/v1/avaclient/license/byid/{licenseAgreementId}/quickgen/latefeeconfig")]
+    public async Task<IActionResult> QuickGenLateFeeConfigAsync(string licenseAgreementId)
+        => Ok(new { lateFeeConfigId = await _lateFeeService
+                                                .QuickGenLateFeeConfigAsync(licenseAgreementId) });
+
+
+    [HttpPut("~/api/v1/avaclient/latefeeconfigs/byid/{id}")]
+    public async Task<IActionResult> UpdateLateFeeConfig(string id, [FromBody] LateFeeConfig updated)
+    {
+        if (id != updated.Id) return BadRequest("Route-id and body-id must match.");
+        if (!await _lateFeeService.ExistsAsync(id))
+            return NotFound($"LateFeeConfig '{id}' not found.");
+
+        await _lateFeeService.UpdateAsync(updated);
+        return NoContent();
+    }
+
+    [HttpDelete("~/api/v1/avaclient/latefeeconfigs/byid/{id}")]
+    public async Task<IActionResult> DeleteLateFeeConfig(string id)
+    {
+        if (!await _lateFeeService.ExistsAsync(id))
+            return NotFound($"LateFeeConfig '{id}' not found.");
+
+        await _lateFeeService.DeleteAsync(id);
+        return NoContent();
+    }
+    
     private async Task<(bool IsValid, IActionResult? ErrorResult)> ValidateBearerTokenAsync()
     {
         await _loggerService.LogTraceAsync("Entering ValidateBearerTokenAsync");

@@ -3,34 +3,40 @@ namespace Ava.Shared.Models.Kernel.Billing;
 public class LicenseAgreement
 {
     [Key]
-    [MaxLength(12)]
-    public string Id { get; set; } = Nanoid.Generate(size: 12);
+    [MaxLength(14)]
+    public string Id { get; set; } = Nanoid.Generate(alphabet: Nanoid.Alphabets.HexadecimalUppercase, size: 14);
 
     [Required]
     [MaxLength(10)]
     public required string AvaClientId { get; set; }
-
-    public BillingTerms PaymentTerms { get; set; } = BillingTerms.Net0;
+    public PaymentTerms PaymentTerms { get; set; } = PaymentTerms.Net0;
     public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.Stripe;
     public BillingType BillingType { get; set; } = BillingType.Prepaid;
     public BillingFrequency BillingFrequency { get; set; } = BillingFrequency.Monthly;
+    public string RemittanceEmail { get; set; } = string.Empty;
     public bool AutoRenew { get; set; }
     public int GracePeriodDays { get; set; }
-    
+
+    [MoneyPrecision]
+    public decimal AccessFee { get; set; } = 0m;
+
     [MoneyPrecision]
     public decimal PrepaidBalance { get; set; } = 0m;
     public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
-    
-    public required LateFeeConfig LateFeeConfig { get; set; }
 
-    [Required]
-    [CurrencyTypeValidation]
-    public required string CurrencyCode { get; set; } = "AUD";
+    [MaxLength(12)]
+    public string LateFeeConfigId { get; set; } = string.Empty;
+
+    [MoneyPrecision]
+    public decimal AccountThreshold { get; set; } = 0m;
 
     [TaxPrecision]
     public decimal TaxRate { get; set; } = 0m;
     public DateTime? TrialEndsOn { get; set; }
-    public Discount? Discount { get; set; }
+
+    [MarkupPrecision]
+    public decimal Discount { get; set; } = 0m;
+    public DateTime? DiscountExpires { get; set; }
 
     // --- PNR Fees ---
     /// <summary>
@@ -51,7 +57,6 @@ public class LicenseAgreement
 
     [MoneyPrecision]
     public decimal FlightPerItemFee { get; set; } = 0m;
-
     public ServiceFeeType FlightFeeType { get; set; } = ServiceFeeType.None;
 
     // --- Hotel Fees ---
@@ -60,7 +65,6 @@ public class LicenseAgreement
 
     [MoneyPrecision]
     public decimal HotelPerItemFee { get; set; } = 0m;
-
     public ServiceFeeType HotelFeeType { get; set; } = ServiceFeeType.None;
 
     // --- Car Fees ---
@@ -69,7 +73,6 @@ public class LicenseAgreement
 
     [MoneyPrecision]
     public decimal CarPerItemFee { get; set; } = 0m;
-
     public ServiceFeeType CarFeeType { get; set; } = ServiceFeeType.None;
 
     // --- Rail Fees ---
@@ -78,7 +81,6 @@ public class LicenseAgreement
 
     [MoneyPrecision]
     public decimal RailPerItemFee { get; set; } = 0m;
-
     public ServiceFeeType RailFeeType { get; set; } = ServiceFeeType.None;
 
     // --- Transfer Fees ---
@@ -87,7 +89,6 @@ public class LicenseAgreement
 
     [MoneyPrecision]
     public decimal TransferPerItemFee { get; set; } = 0m;
-
     public ServiceFeeType TransferFeeType { get; set; } = ServiceFeeType.None;
 
     // --- Activity Fees ---
@@ -96,7 +97,6 @@ public class LicenseAgreement
 
     [MoneyPrecision]
     public decimal ActivityPerItemFee { get; set; } = 0m;
-
     public ServiceFeeType ActivityFeeType { get; set; } = ServiceFeeType.None;
 
     // --- Travel (Catch-All) Fees ---
@@ -105,6 +105,7 @@ public class LicenseAgreement
 
     [MoneyPrecision]
     public decimal TravelPerItemFee { get; set; } = 0m;
-
     public ServiceFeeType TravelFeeType { get; set; } = ServiceFeeType.None;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime LastUpdatedAt { get; set;} = DateTime.UtcNow;
 }

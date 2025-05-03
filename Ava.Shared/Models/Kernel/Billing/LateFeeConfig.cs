@@ -2,10 +2,23 @@ namespace Ava.Shared.Models.Kernel.Billing;
 
 public class LateFeeConfig
 {
-    public int GracePeriodDays { get; set; }
-    public bool UseFixedAmount { get; set; }
-    public decimal FixedAmount { get; set; }
-    public decimal PercentOfInvoice { get; set; }
+    [Key]
+    [MaxLength(12)]
+    public string Id { get; set; } = Nanoid.Generate(Nanoid.Alphabets.UppercaseLettersAndDigits, 12);
+
+    [MaxLength(14)]
+    [Required]
+    public required string LicenseAgreementId { get; set;}
+    public int GracePeriodDays { get; set; } = 0;
+    public bool UseFixedAmount { get; set; } = false;
+
+    [MoneyPrecision]
+    public decimal FixedAmount { get; set; } = 0m;
+
+    [TaxPrecision]
+    public decimal PercentOfInvoice { get; set; } = 0m;
     public RecurringLateFeeOption RecurringOption { get; set; } = RecurringLateFeeOption.None;
-    public decimal? MaxLateFeeCap { get; set; }
+
+    [MoneyPrecision]
+    public decimal MaxLateFeeCap { get; set; } = 0m;
 }

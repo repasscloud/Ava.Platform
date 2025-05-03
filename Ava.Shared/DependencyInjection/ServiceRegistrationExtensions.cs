@@ -17,6 +17,9 @@ public static class ServiceRegistrationExtensions
         services.AddScoped<IAvaApiService, AvaApiService>();  // Ava API Service
         services.AddScoped<IJwtTokenService, JwtTokenService>();  // JWT Token Service
 
+        services.AddScoped<ILicenseAgreementService, LicenseAgreementService>();
+        services.AddScoped<ILateFeeConfigService, LateFeeConfigService>();
+
         // ✅ Only add this when includeWebOnly is true
         if (includeWebOnly)
         {
