@@ -3,6 +3,7 @@ namespace Ava.Shared.Models.Policies;
 public class TravelPolicy
 {
     [Key]
+    [MaxLength(14)]
     public required string Id { get; set; }
     public required string PolicyName { get; set; }
     public int AvaClientId { get; set; }

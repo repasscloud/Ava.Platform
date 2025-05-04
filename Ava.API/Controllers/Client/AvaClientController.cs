@@ -106,7 +106,7 @@ public class AvaClientController : ControllerBase
 
                 var defaultPolicy = new TravelPolicy
                 {
-                    Id = Nanoid.Generate(Nanoid.Alphabets.HexadecimalUppercase, 10),
+                    Id = Nanoid.Generate(Nanoid.Alphabets.HexadecimalUppercase, 14),
                     PolicyName = "Default Policy",
                     AvaClientId = client.Id,
                     DefaultCurrencyCode = dto.DefaultBillingCurrency ?? "AUD",

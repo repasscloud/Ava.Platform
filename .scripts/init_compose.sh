@@ -77,6 +77,7 @@ echo -e "${YELLOW}Inserting triggers in PostgreSQL database 'avaprod'...${NC}"
 export PGPASSWORD="avaaiPassword1"
 psql -h 170.64.135.239 -p 5432 -d avaprod -U avaai -f "$DEPLOY_BASE_PATH/Resources/SQL/Triggers/trg_after_insert_aspnetusers.sql"
 psql -h 170.64.135.239 -p 5432 -d avaprod -U avaai -f "$DEPLOY_BASE_PATH/Resources/SQL/Triggers/chk_after_insert_aspnetusers.sql"
+psql -h 170.64.135.239 -p 5432 -d avaprod -U avaai -f "$DEPLOY_BASE_PATH/Resources/SQL/Triggers/trg_after_insert_licenseagreements_sync_avaclients"
 echo -e "${GREEN}Database 'avaprod' reset successfully.${NC}"
 
 # -----------------------------------------------------------------------------
