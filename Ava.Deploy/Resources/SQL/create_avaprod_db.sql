@@ -4,7 +4,7 @@
 DROP USER IF EXISTS avaai;
 
 -- Create the new user "avaai" with a password
-CREATE USER avaai WITH PASSWORD 'avaaiPassword1';
+CREATE USER avaai WITH PASSWORD '7CH4J8ZfuPLeNCTggenHY^HRJvdF.?p:';
 
 -- Drop the database if it already exists
 DROP DATABASE IF EXISTS avaprod;

@@ -83,7 +83,7 @@ public class Program
         //     options.UseNpgsql(connectionString));
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        builder.Services.AddOpenApi();
+        //builder.Services.AddOpenApi();
 
         // Add Swagger services manually
         builder.Services.AddEndpointsApiExplorer();
@@ -95,19 +95,20 @@ public class Program
                 Version = "v1",
                 Description = "API documentation for Ava.API",
             });
+
+            // Optional but useful
+            c.EnableAnnotations(); // If you're using [SwaggerOperation], etc.
         });
+
 
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
-            app.MapOpenApi();
-
             app.UseDeveloperExceptionPage();
 
-            // Enable Swagger UI
-            app.UseSwagger();
+            app.UseSwagger(); // generates /swagger/v1/swagger.json
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ava API v1");
