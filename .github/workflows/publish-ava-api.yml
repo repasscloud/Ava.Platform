@@ -1,4 +1,4 @@
-name: Manual Docker Publish Ava.API
+name: 🐳 Manual Docker Publish Ava.API
 
 on:
   workflow_dispatch:
