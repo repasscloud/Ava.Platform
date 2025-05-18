@@ -2,7 +2,7 @@ name: 'Close stale and lock closed issues and PRs'
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 1 * * *'
+    - cron: '30 1 * * 2'
 permissions:
   contents: read
 jobs:
