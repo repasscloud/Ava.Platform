@@ -1,9 +1,9 @@
 services:
   ava-api:
-    build:
-      context: .
-      dockerfile: Dockerfile.API
-    image: ava-api:20250518
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.API
+    image: repasscloud/ava-api:20250518
     ports:
       - "5165:5165"
     networks:
