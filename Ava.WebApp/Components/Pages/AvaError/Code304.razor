@@ -1,0 +1,57 @@
+@page "/AvaError/code-304/{source?}"
+
+@inject NavigationManager Navigation
+
+<PageTitle>Inactive Account</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+  <MudCard>
+    <MudCardHeader>
+      <MudText Typo="Typo.h4" Color="Color.Error">⚠️ Account Inactive</MudText>
+    </MudCardHeader>
+    <MudCardContent>
+      <MudAlert Severity="Severity.Error">
+        Your account is currently inactive.
+        <br />
+        <ul>
+          <li><strong>Status:</strong> Inactive account</li>
+          @if (!string.IsNullOrWhiteSpace(UserSource))
+          {
+            <li><strong>Source:</strong> @UserSource</li>
+          }
+          <li><strong>Ref:</strong> @RefCode</li>
+        </ul>
+        <p>Please activate your account using the confirmation email or contact support.</p>
+      </MudAlert>
+    </MudCardContent>
+    <MudCardActions>
+      <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@NavigateToActivate" Class="me-2">
+        Activate Account
+      </MudButton>
+      <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@NavigateToHome" Class="me-2">
+        Return Home
+      </MudButton>
+    </MudCardActions>
+  </MudCard>
+</MudContainer>
+
+@code {
+  [Parameter]
+  [SupplyParameterFromQuery]
+  public string? Source { get; set; }
+  
+  private string UserSource = "";
+  private string RefCode = NanoidDotNet.Nanoid.Generate();
+
+  protected override void OnInitialized() {
+    UserSource = Source ?? "Unknown";
+  }
+
+  private void NavigateToActivate() {
+    Navigation.NavigateTo("/Account/Activate");
+  }
+  
+  private void NavigateToHome() {
+    Navigation.NavigateTo("/");
+  }
+}

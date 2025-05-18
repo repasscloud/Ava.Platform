@@ -1,0 +1,142 @@
+@page "/flight2"
+
+@inject NavigationManager Navigation
+
+<MudCard class="mb-3">
+    <MudCardContent>
+        <MudGrid align-left>
+            <!-- #region Visible on medium and larger screens -->
+            <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                <!-- Airline Logo -->
+                <MudItem sm="1">
+                    <MudImage Src="https://images.trvl-media.com/media/content/expus/graphics/static_content/fusion/v0.1b/images/airlines/vector/s/QF_sq.svg" 
+                            Width="90" 
+                            Height="90" 
+                            Style="border-radius: 4px; max-width: 100%;" />
+                </MudItem>
+
+                <!-- Flight Times & Route -->
+                <MudItem sm="6">
+                    <MudText Typo="Typo.body1"><b>12:12pm → 4:10pm</b></MudText>
+                    <MudText Typo="Typo.body2">Brisbane (BNE) → Perth (PER)</MudText>
+                    <MudText Typo="Typo.body2">Additional text goes here</MudText>
+                    <div style="position: relative; display: inline-block;">
+                        <!-- Base Icon (Meal Service) -->
+                        <MudIcon Icon="@Icons.Material.Filled.Restaurant" Size="Size.Small"/>
+
+                        <!-- Overlay Icon (Dollar Sign) in Bottom Right -->
+                        <MudIcon Icon="@Icons.Material.Filled.AttachMoney" Size="Size.Small" Color="Color.Error"
+                                Style="position: absolute; bottom: 1px; right: -4px; background-color: white; border-radius: 50%; padding: 0.5px; font-size: 0.8em;" />
+                    </div>
+                    <div style="position: relative; display: inline-block;">
+                        <!-- Base Icon (Meal Service) -->
+                        <MudIcon Icon="@Icons.Material.Filled.Fastfood" Size="Size.Small"/>
+                    </div>
+                </MudItem>
+                
+
+                <!-- Total Travel Time & Layovers -->
+                <MudItem sm="3" Style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                    <!-- Flex container to align the time and chip horizontally -->
+                    <div Style="display: flex; align-items: center; gap: 8px;">
+                        <MudText Typo="Typo.body1" Style="margin: 0;"><b>5h 45m</b></MudText>
+
+                        @if (_layoverCount == 0)
+                        {
+                            <MudChip T="string" Color="Color.Success" Style="margin: 0; padding: 2px 8px;">Direct Flight</MudChip>
+                        }
+                        else if (_layoverCount == 1)
+                        {
+                            <MudChip T="string" Color="Color.Warning" Style="margin: 0; padding: 2px 8px;">@(_layoverCount) @(_stop)</MudChip>
+                        }
+                        else
+                        {
+                            <MudChip T="string" Color="Color.Error" Style="margin: 0; padding: 2px 8px;">@(_layoverCount) @(_stops)</MudChip>
+                        }
+                    </div>
+
+                    <!-- Additional text under the time + chip -->
+                    <MudText Typo="Typo.caption" Class="text-muted">Layover details go here</MudText>
+                </MudItem>
+
+                <!-- Price -->
+                <MudItem sm="2" Style="text-align: right;">
+                    <MudText Typo="Typo.h6" fontweight="FontWeight.Bold">AU$394</MudText>
+                    @* <MudText Typo="Typo.h6" fontweight="FontWeight.Bold">AU$394</MudText> *@
+                </MudItem>
+            </MudHidden>
+            <!-- #endregion -->
+
+            <!-- #region  Visible on small screens only -->
+            <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                <MudItem xs="2">
+                    <MudImage Src="https://images.trvl-media.com/media/content/expus/graphics/static_content/fusion/v0.1b/images/airlines/vector/s/JQ_sq.svg" 
+                            Width="50" 
+                            Height="50"
+                            Style="border-radius: 4px; max-width: 100%;" />
+                </MudItem>
+
+                <!-- Flight Time & Route -->
+                <MudItem xs="7">
+                    <MudText Typo="Typo.body1"><b>12:12pm → 4:10pm</b></MudText>
+                    <MudText Typo="Typo.body2">Brisbane (BNE) → Perth (PER)</MudText>
+                </MudItem>
+
+                <!-- Price -->
+                <MudItem xs="3" Style="text-align: right;">
+                    <MudText Typo="Typo.h6" fontweight="FontWeight.Bold">AU$394</MudText>
+                </MudItem>
+            </MudHidden>
+            <!-- #endregion -->
+        </MudGrid>
+        
+        <MudCardActions>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="HandleBookClick" Class="me-2">
+                Book Now
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="HandleBookClick" Class="me-2">
+                Request
+            </MudButton>
+        </MudCardActions>
+    </MudCardContent>
+</MudCard>
+
+
+
+
+<MudIcon Icon="@Icons.Material.Filled.Restaurant" Color="Color.Primary" /> <!-- Food (Meal Service) -->
+<MudIcon Icon="@Icons.Material.Filled.Fastfood" Color="Color.Primary" /> <!-- Snack Service -->
+<MudIcon Icon="@Icons.Material.Filled.LocalCafe" Color="Color.Secondary" /> <!-- Drinks (Non-Alcoholic) -->
+<MudIcon Icon="@Icons.Material.Filled.LocalBar" Color="Color.Secondary" /> <!-- Alcoholic Beverages -->
+<MudIcon Icon="@Icons.Material.Filled.Wifi" Color="Color.Success" /> <!-- WiFi -->
+<MudIcon Icon="@Icons.Material.Filled.Power" Color="Color.Warning" /> <!-- Power Outlet -->
+<MudIcon Icon="@Icons.Material.Filled.Usb" Color="Color.Error" /> <!-- USB Charging -->
+<MudIcon Icon="@Icons.Material.Filled.Movie" Color="Color.Error" /> <!-- Inflight Entertainment -->
+<MudIcon Icon="@Icons.Material.Filled.EventSeat" Color="Color.Error" /> <!-- Extra Legroom -->
+<MudIcon Icon="@Icons.Material.Filled.AirlineSeatReclineExtra" Color="Color.Error" /> <!-- Reclining Seats -->
+<MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Error" /> <!-- First Class Service -->
+<MudIcon Icon="@Icons.Material.Filled.AirlineSeatIndividualSuite" Color="Color.Error" /> <!-- Blankets & Comfort -->
+
+
+@code {
+    private int _layoverCount = 0;
+    //private string _direct = "Direct";
+    private string _stop = "stop";
+    private string _stops = "stops";
+    //private string _multipleAirlines = "https://images.trvl-media.com/media/content/expus/graphics/static_content/fusion/v0.1b/images/airlines/vector/s/multiple_airlines_logo_sq.svg";
+
+    private void HandleBookClick()
+    {
+        Console.WriteLine("Book button clicked!");
+    }
+}
+
+@*
+@Icons.Material.Filled.Wifi
+@Icons.Material.Filled.Power
+@Icons.Material.Filled.EmojiFoodBeverage  //drinks
+@Icons.Material.Filled.Fastfood // meals
+
+*@
+
+

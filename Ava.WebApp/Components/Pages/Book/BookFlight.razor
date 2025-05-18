@@ -1,0 +1,585 @@
+@page "/Book/Flight"
+
+@inject IAuthenticationInfoService AuthService
+@inject NavigationManager Navigation
+@inject IAvaApiService AvaApiService
+@inject IAvaUserSysPrefService AvaUserSysPrefService
+@* @inject IStorageService StorageService *@
+
+<PageTitle>Book Flight</PageTitle>
+
+<MudContainer>
+    <MudOverlay Visible="isLoading" class="fade-overlay">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+            <MudProgressCircular Color="Color.Primary" Style="height: 70px; width: 70px;" Indeterminate="true" />
+            <MudText Class="mt-2">Getting Flight options... <MudIcon Icon="@Icons.Material.Filled.Search" Color="Color.Primary" /></MudText>
+        </div>
+    </MudOverlay>
+
+    @if (isLoading == false)
+    {
+        <MudPaper Class="pa-4" Elevation="4">
+            <MudStack Spacing="3">
+                <MudText Typo="Typo.h5">
+                    Book a Corporate Flight <MudIcon Icon="@Icons.Material.Filled.Flight" />
+                </MudText>
+
+                @if (!string.IsNullOrWhiteSpace(_travelPolicyId))
+                {
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.body2">
+                            <strong>Travel Policy:</strong> @_travelPolicy?.PolicyName
+                        </MudText>
+                        <MudText Typo="Typo.body2">
+                            <strong>Travel Policy ID:</strong> <a href="/TravelPolicy/@_travelPolicy?.Id">@_travelPolicy?.Id</a>
+                        </MudText>
+                    </MudStack>
+                }
+
+                <!-- Number of People -->
+                <MudSelect @bind-Value="@_numberOfPeople" Label="Number of Adults" 
+                HelperText="Select number of adult passengers" Placeholder="Please Select"
+                AdornmentIcon="@Icons.Material.Filled.PersonAddAlt" AdornmentColor="Color.Primary">
+                    <MudSelectItem Value="@("1")">1</MudSelectItem>
+                    <MudSelectItem Value="@("2")">2</MudSelectItem>
+                    <MudSelectItem Value="@("3")">3</MudSelectItem>
+                    <MudSelectItem Value="@("4")">4</MudSelectItem>
+                    <MudSelectItem Value="@("5")">5</MudSelectItem>
+                    <MudSelectItem Value="@("6")">6</MudSelectItem>
+                    <MudSelectItem Value="@("7")">7</MudSelectItem>
+                    <MudSelectItem Value="@("8")">8</MudSelectItem>
+                    <MudSelectItem Value="@("9")">9</MudSelectItem>
+                    <MudSelectItem Value="@("10")">10 or more</MudSelectItem>
+                </MudSelect>
+
+                <!-- Trip Type -->
+                <MudSelect @bind-Value="@_isOneWay" Label="Trip Type" 
+                HelperText="Select trip type" Placeholder="Please Select"
+                AdornmentIcon="@Icons.Material.Filled.Flight" AdornmentColor="Color.Primary">
+                    <MudSelectItem Value="@(true)">One-Way</MudSelectItem>
+                    <MudSelectItem Value="@(false)">Return Trip</MudSelectItem>
+                </MudSelect>
+
+                <!-- Cabin Class -->
+                @if (!string.IsNullOrEmpty(_maxFlightSeating))
+                {
+                    @RenderCabinClassSelectionDropDown(_maxFlightSeating);
+                }
+                else
+                {
+                    <MudSelect @bind-Value="@_cabinClass"
+                        Label="Cabin Class" 
+                        HelperText="Select cabin class" Placeholder="Please Select"
+                        AdornmentIcon="@Icons.Material.Filled.AirlineSeatReclineExtra"
+                        AdornmentColor="Color.Primary">
+                        @foreach (var kvp in FareTypes.AirfaresBookingClassOptions)
+                        {
+                            <MudSelectItem Value="@(kvp.Value)">@kvp.Key</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
+
+                <!-- Date Picker -->
+                <div @key="_isOneWay">
+                    @RenderDatePicker(_isOneWay, _filterMode)
+                </div>
+
+                <!-- From City -->
+                <MudAutocomplete @bind-Value="@_departCity"
+                    Label="From City"
+                    Variant="Variant.Outlined" 
+                    Required="true"
+                    ResetValueOnEmptyText="true"
+                    SearchFunc="SearchCity" />
+
+                <!-- Destination City -->
+                <MudAutocomplete @bind-Value="@_destinationCity"
+                    Label="Destination City" 
+                    Variant="Variant.Outlined"
+                    Required="true"
+                    SearchFunc="SearchCity" />
+
+                <!-- Submit Button -->
+                <div style="display: inline-block;">
+                    <MudButton Variant="Variant.Filled"
+                                Color="Color.Primary"
+                                OnClick="HandleBookingAsync">
+                        Search Flights
+                    </MudButton>
+                </div>
+            </MudStack>
+        </MudPaper>
+
+        <MudMessageBox @ref="_mudMessageBox" Title="Warning" CancelText="Cancel">
+            <MessageContent>
+                Deleting can <b><i>not</i></b> be undone!
+                <MudTextField @bind-Value="TextValue" Label="Outlined" Variant="Variant.Outlined"></MudTextField>
+            </MessageContent>
+            <YesButton>
+                <MudButton Variant="Variant.Filled" Style="background-color: #009688; color: white;" StartIcon="@Icons.Material.Filled.Done">
+                    Accept
+                </MudButton>
+            </YesButton>
+        </MudMessageBox>
+    }
+
+</MudContainer>
+
+@code {
+    // page settings
+    private bool isLoading = false;
+
+    // user settings
+    private string? _aspNetUserId;
+    private string? _userEmailAddress;
+
+    // travel policy settings
+    private string? _travelPolicyId;
+    private TravelPolicy? _travelPolicy;
+
+
+    // values for flight search criteria
+    private string? _numberOfPeople;
+    private bool _isOneWay = false;
+    private string _departCity = string.Empty;
+    private string _destinationCity = string.Empty;
+    private DateTime? _date;  // departing date
+    private DateRange? _dateRange;
+    
+    private DateTime _minDate = DateTime.Today;
+    private DateTime _maxDate = DateTime.Today.AddMonths(3);
+    private WeekendFilter _filterMode = WeekendFilter.AllDays;
+
+    // dialog box
+    [Inject]
+    public required IDialogService DialogService { get; set; }
+    private MudMessageBox? _mudMessageBox;
+    private readonly DialogOptions _backdropClick = new() { BackdropClick = false };
+    private string _state = string.Empty;
+    private string TextValue = "this is text value";
+
+    // values from TravelPolicy and/or AvaUserSysPreference
+    private string? _maxFlightSeating;
+    private string? _cabinClass;
+    private string? _clientId;
+
+    // when records stored in DB from search results
+    private bool resultsStored = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // check if the user is authenticated first
+        if (await AuthService.IsAuthenticatedAsync())
+        {
+            // get user authentication Id (the guid object)
+            _aspNetUserId = await AuthService.GetUserIdAsync();
+
+            if (_aspNetUserId is not null)
+            {
+                // load the user preferences
+                AvaUserSysPreference userSysPrefs = await AvaUserSysPrefService.GetUserPrefRecordAsync(_aspNetUserId);
+
+                _userEmailAddress = userSysPrefs.Email;
+
+                // before proceeding, check if email is valid, or go to error 302 page
+                if (string.IsNullOrEmpty(_userEmailAddress))
+                {
+                    Navigation.NavigateTo("/AvaError/code-302?source=BookFlightPage-NoEmailAddress", forceLoad: true);
+                    return; // stop execution
+                }
+
+                // load user preferences first
+                _departCity = userSysPrefs.OriginLocationCode ?? string.Empty;
+                _cabinClass = userSysPrefs.DefaultFlightSeating switch
+                {
+                    "ECONOMY" => "ECONOMY",
+                    "PREMIUM_ECONOMY" => "PREMIUM_ECONOMY",
+                    "BUSINESS" => "BUSINESS",
+                    "FIRST" => "FIRST",
+                    _ => "ECONOMY"
+                };
+                _maxFlightSeating = userSysPrefs.MaxFlightSeating switch
+                {
+                    "ECONOMY" => "ECONOMY",
+                    "PREMIUM_ECONOMY" => "PREMIUM_ECONOMY",
+                    "BUSINESS" => "BUSINESS",
+                    "FIRST" => "FIRST",
+                    _ => "ECONOMY"
+                };
+
+                // load the travel policy if the value has has value and override the user preferences here
+                _travelPolicyId = userSysPrefs.TravelPolicyId;
+                @if (!string.IsNullOrEmpty(_travelPolicyId))
+                {
+                    _travelPolicy = await AvaApiService.GetTravelPolicyByIdAsync(_travelPolicyId, "");
+
+                    // set clientId
+                    _clientId = _travelPolicy.AvaClientId.ToString();
+
+                    // set default cabin class
+                    _cabinClass = _travelPolicy.DefaultFlightSeating switch
+                    {
+                        "ECONOMY" => "ECONOMY",
+                        "PREMIUM_ECONOMY" => "PREMIUM_ECONOMY",
+                        "BUSINESS" => "BUSINESS",
+                        "FIRST" => "FIRST",
+                        _ => "ECONOMY"
+                    };
+
+                    _maxFlightSeating = _travelPolicy.MaxFlightSeating switch
+                    {
+                        "ECONOMY" => "ECONOMY",
+                        "PREMIUM_ECONOMY" => "PREMIUM_ECONOMY",
+                        "BUSINESS" => "BUSINESS",
+                        "FIRST" => "FIRST",
+                        _ => "ECONOMY"
+                    };
+
+                    // calendar search settings
+                    if (_travelPolicy.DefaultCalendarDaysInAdvanceForFlightBooking.HasValue)
+                    {
+                        _minDate = DateTime.Today.AddDays(_travelPolicy.DefaultCalendarDaysInAdvanceForFlightBooking.Value);
+                    }
+
+                    // enable weekends (or not) in the calendar
+                    if (_travelPolicy.EnableSundayFlightBookings && _travelPolicy.EnableSaturdayFlightBookings)
+                    {
+                        _filterMode = WeekendFilter.AllDays;
+                    }
+                    else if (_travelPolicy.EnableSundayFlightBookings && !_travelPolicy.EnableSaturdayFlightBookings)
+                    {
+                        _filterMode = WeekendFilter.NoSaturdays;
+                    }
+                    else if (!_travelPolicy.EnableSundayFlightBookings && _travelPolicy.EnableSaturdayFlightBookings)
+                    {
+                        _filterMode = WeekendFilter.NoSundays;
+                    }
+                    else if (!_travelPolicy.EnableSundayFlightBookings && !_travelPolicy.EnableSaturdayFlightBookings)
+                    {
+                        _filterMode = WeekendFilter.NoWeekends;
+                    }
+                }
+            }
+            else
+            {
+                Navigation.NavigateTo("/AvaError/code-301?source=BookFlightPage-NoUserId", forceLoad: true);
+                return; // stop execution
+            }
+        }
+        else
+        {
+            // redirect to login page
+            Navigation.NavigateTo("/Account/Login", forceLoad: true);
+            return;
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task HandleBookingAsync()
+    {
+        bool result = true;
+
+        // number of travellers
+        if (string.IsNullOrWhiteSpace(_numberOfPeople))
+        {
+            result = false;
+            await DialogService.ShowMessageBox(
+                "Invalid Input",
+                "The number of travelers must be selected before proceeding with your booking.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+
+        // 10 or more people, 1-9 people, or something weird
+        else if (int.TryParse(_numberOfPeople, out int numberOfPeople))
+        {
+            if (numberOfPeople == 10)
+            {
+                result = false;
+                await DialogService.ShowMessageBox(
+                    "Group Booking Required",
+                    (MarkupString)"For bookings of 10 people, please contact our support team via <a href=\"https://yourwebsite.com/live-chat\" target=\"_blank\">Live Chat</a>.",
+                    yesText: "OK", options: _backdropClick
+                );
+            }
+            else if (numberOfPeople >= 1 && numberOfPeople <= 9)
+            {
+                // valid group size
+                //Console.WriteLine("Proceed with booking for a group of 1-9 people, QANTAS rules.");
+            }
+            else
+            {
+                result = false;
+                // handle cases like 0 or negative numbers (as required)
+                await DialogService.ShowMessageBox(
+                    "Invalid Number of Passengers",
+                    "The number of people must be between 1 and 10.",
+                    yesText: "OK", options: _backdropClick
+                );
+            }
+        }
+
+        // handle non-numerical values (last resort)
+        else
+        {
+            result = false;
+            await DialogService.ShowMessageBox(
+                "Invalid Input",
+                "Please enter a valid numeric value for the number of people.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+
+        // departing flight date not selected
+        if (_isOneWay && string.IsNullOrWhiteSpace(_date?.ToString()))
+        {
+            result = false;
+            await DialogService.ShowMessageBox(
+                "Departing Date Missing",
+                "Please select a departure date for your flight to continue with the booking process.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+        else if (!_isOneWay && string.IsNullOrWhiteSpace(_dateRange?.ToString()))
+        {
+            result = false;
+            await DialogService.ShowMessageBox(
+                "Return Date Missing",
+                "Please select a return date for your flight if applicable, or confirm that this is a one-way trip.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+
+        // departing city and destination city not provided
+        if (string.IsNullOrWhiteSpace(_departCity) && string.IsNullOrWhiteSpace(_destinationCity))
+        {
+            result = false;
+            await DialogService.ShowMessageBox(
+                "Cities Missing",
+                "Please select both a departing city and a destination city to proceed with your booking.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+
+        // departing city not provided
+        if (string.IsNullOrWhiteSpace(_departCity))
+        {
+            result = false;
+            await DialogService.ShowMessageBox(
+                "Departing City Missing",
+                "Please select a departing city to proceed with your booking.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+
+        // destination city not provided
+        if (string.IsNullOrWhiteSpace(_destinationCity))
+        {
+            result = false;
+            await DialogService.ShowMessageBox(
+                "Destination City Missing",
+                "Please select a destination city to proceed with your booking.",
+                yesText: "OK", options: _backdropClick
+            );
+        }
+
+        if (result)
+        {
+            // create the search object to hand to the API via Service
+            FlightOfferSearchRequestDTO _flightOfferSearchRequest = new FlightOfferSearchRequestDTO()
+            {
+                Id = await Nanoid.GenerateAsync(),
+                CreatedAt = DateTime.UtcNow,
+                ClientId = _clientId ?? string.Empty,
+                CustomerId = _aspNetUserId ?? string.Empty,
+                TravelPolicyId = _travelPolicyId ?? null,
+                OriginLocationCode = new string(_departCity[^5..].Where(c => char.IsLetterOrDigit(c)).ToArray()),
+                DestinationLocationCode = new string(_destinationCity[^5..].Where(c => char.IsLetterOrDigit(c)).ToArray()),
+                IsOneWay = _isOneWay,
+                DepartureDate = (_date ?? DateTime.UtcNow).ToString("yyyy-MM-dd"),
+                Adults = int.TryParse(_numberOfPeople, out int adults) ? adults : 0,
+                CabinClass = _cabinClass ?? "ECONOMY",
+            };
+
+            // if oneway trip, add departing only date
+            if (_date is not null && _isOneWay)
+            {
+                _flightOfferSearchRequest.DepartureDate = (_date ?? DateTime.UtcNow).ToString("yyyy-MM-dd");
+            }
+
+            // if return trip, add both dates
+            if (_dateRange?.Start is not null && _dateRange?.End is not null && !_isOneWay)
+            {
+                _flightOfferSearchRequest.DepartureDate = _dateRange.Start.Value.ToString("yyyy-MM-dd");
+                _flightOfferSearchRequest.DepartureDateReturn = _dateRange.End.Value.ToString("yyyy-MM-dd");
+            }
+
+            isLoading = true;
+            StateHasChanged(); // triggers re-render
+            await Task.Delay(1); // gives Blazor time to update the UI
+
+            // make the call to the API now
+            try
+            {
+                TravelSearchRecordWrapper travelSearchRecordWrapper = await AvaApiService.PostFlightSearchQueryAsync(_flightOfferSearchRequest, "");
+
+                // this can be used as a cache key
+                //resultsStored = await StorageService.StoreAmadeusFlightOfferSearchResultAsync(searchResults, _flightOfferSearchRequest.Id);
+                resultsStored = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex}");
+            }
+            finally
+            {
+                if (resultsStored)
+                {
+                    Navigation.NavigateTo($"/Results/Flight/{_flightOfferSearchRequest.Id}", forceLoad: true);
+                }
+                else
+                {
+                    isLoading = false;
+                }                
+            }
+        }
+    }
+
+    private Task<IEnumerable<string>> SearchCity(string value, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Task.FromResult(Enumerable.Empty<string>());
+        }
+
+        var results = AustralianCities.AusCities
+            .Where(c => c.Key.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0)
+            .Select(c => $"{c.Key} ({c.Value})");
+
+        return Task.FromResult(results);
+    }
+
+    public class SupportedEmailResponse
+    {
+        public string SupportedEmailDomain { get; set; } = string.Empty;
+    }
+
+    private RenderFragment RenderDatePicker(bool isOneWay, WeekendFilter weekendFilter) => (isOneWay, weekendFilter) switch
+    {
+        (true, WeekendFilter.AllDays) => @<MudDatePicker @bind-Date="_date"
+                                                     Label="Select Date"
+                                                     MinDate="_minDate"
+                                                     MaxDate="_maxDate">
+                                        <!-- One-way, all days -->
+                                     </MudDatePicker>,
+
+        (true, WeekendFilter.NoSaturdays) => @<MudDatePicker @bind-Date="_date"
+                                                            Label="Select Date"
+                                                            MinDate="_minDate"
+                                                            MaxDate="_maxDate"
+                                                            IsDateDisabledFunc="@((DateTime dt) => dt.DayOfWeek == DayOfWeek.Saturday)">
+                                                <!-- One-way, no Saturdays -->
+                                            </MudDatePicker>,
+
+        (true, WeekendFilter.NoSundays) => @<MudDatePicker @bind-Date="_date"
+                                                        Label="Select Date"
+                                                        MinDate="_minDate"
+                                                        MaxDate="_maxDate"
+                                                        IsDateDisabledFunc="@((DateTime dt) => dt.DayOfWeek == DayOfWeek.Sunday)">
+                                            <!-- One-way, no Sundays -->
+                                        </MudDatePicker>,
+
+        (true, WeekendFilter.NoWeekends) => @<MudDatePicker @bind-Date="_date"
+                                                            Label="Select Date"
+                                                            MinDate="_minDate"
+                                                            MaxDate="_maxDate"
+                                                            IsDateDisabledFunc="@((DateTime dt) => dt.DayOfWeek == DayOfWeek.Saturday || dt.DayOfWeek == DayOfWeek.Sunday)">
+                                            <!-- One-way, weekdays only -->
+                                            </MudDatePicker>,
+
+        (false, WeekendFilter.AllDays) => @<MudDateRangePicker @bind-DateRange="_dateRange"
+                                                Label="Select Dates"
+                                                MinDate="_minDate"
+                                                MaxDate="_maxDate">
+                                                <!-- Return trip, all days -->
+                                            </MudDateRangePicker>,
+
+        (false, WeekendFilter.NoSaturdays) => @<MudDateRangePicker @bind-DateRange="_dateRange"
+                                                Label="Select Dates"
+                                                MinDate="_minDate"
+                                                MaxDate="_maxDate"
+                                                IsDateDisabledFunc="@((DateTime dt) => dt.DayOfWeek == DayOfWeek.Saturday)">
+                                                <!-- Return trip, no Saturdays -->
+                                              </MudDateRangePicker>,
+
+        (false, WeekendFilter.NoSundays) => @<MudDateRangePicker @bind-DateRange="_dateRange"
+                                                Label="Select Dates"
+                                                MinDate="_minDate"
+                                                MaxDate="_maxDate"
+                                                IsDateDisabledFunc="@((DateTime dt) => dt.DayOfWeek != DayOfWeek.Sunday)">
+                                                <!-- Return trip, no Sundays -->
+                                            </MudDateRangePicker>,
+
+        (false, WeekendFilter.NoWeekends) => @<MudDateRangePicker @bind-DateRange="_dateRange"
+                                                Label="Select Dates"
+                                                MinDate="_minDate"
+                                                MaxDate="_maxDate"
+                                                IsDateDisabledFunc="@((DateTime dt) => dt.DayOfWeek == DayOfWeek.Saturday || dt.DayOfWeek == DayOfWeek.Sunday)">
+                                                <!-- Return trip, weekdays only -->
+                                            </MudDateRangePicker>,
+
+        _ => @<div>
+            <!-- Fallback or error message -->
+            <MudText Color="Color.Error">Invalid combination</MudText>
+        </div>
+    };
+    
+    RenderFragment RenderCabinClassSelectionDropDown(string maxCabinClass) => (maxCabinClass) switch
+    {
+        ("ECONOMY") => @<MudSelect @bind-Value="@_cabinClass" Label="Cabin Class" 
+                        HelperText="Select cabin class" Placeholder="Please Select"
+                        AdornmentIcon="@Icons.Material.Filled.AirlineSeatReclineExtra" AdornmentColor="Color.Primary">
+                            @foreach (var kvp in FareTypes.AirfaresBookingClassOptionsMaxEconomy)
+                            {
+                                <MudSelectItem Value="@(kvp.Value)">@kvp.Key</MudSelectItem>
+                            }
+                        </MudSelect>,
+
+        ("PREMIUM_ECONOMY") => @<MudSelect @bind-Value="@_cabinClass" Label="Cabin Class" 
+                                HelperText="Select cabin class" Placeholder="Please Select"
+                                AdornmentIcon="@Icons.Material.Filled.AirlineSeatReclineExtra" AdornmentColor="Color.Primary">
+                                    @foreach (var kvp in FareTypes.AirfaresBookingClassOptionsMaxPremiumEconomy)
+                                    {
+                                        <MudSelectItem Value="@(kvp.Value)">@kvp.Key</MudSelectItem>
+                                    }
+                                </MudSelect>,
+
+        ("BUSINESS") => @<MudSelect @bind-Value="@_cabinClass" Label="Cabin Class" 
+                        HelperText="Select cabin class" Placeholder="Please Select"
+                        AdornmentIcon="@Icons.Material.Filled.AirlineSeatReclineExtra" AdornmentColor="Color.Primary">
+                            @foreach (var kvp in FareTypes.AirfaresBookingClassOptionsMaxBusiness)
+                            {
+                                <MudSelectItem Value="@(kvp.Value)">@kvp.Key</MudSelectItem>
+                            }
+                        </MudSelect>,
+
+        ("FIRST") => @<MudSelect @bind-Value="@_cabinClass" Label="Cabin Class" 
+                        HelperText="Select cabin class" Placeholder="Please Select"
+                        AdornmentIcon="@Icons.Material.Filled.AirlineSeatReclineExtra" AdornmentColor="Color.Primary">
+                            @foreach (var kvp in FareTypes.AirfaresBookingClassOptionsMaxFirst)
+                            {
+                                <MudSelectItem Value="@(kvp.Value)">@kvp.Key</MudSelectItem>
+                            }
+                        </MudSelect>,
+
+        _ => @<MudSelect @bind-Value="@_cabinClass" Label="Cabin Class" 
+                HelperText="Select cabin class" Placeholder="Please Select"
+                AdornmentIcon="@Icons.Material.Filled.AirlineSeatReclineExtra" AdornmentColor="Color.Primary">
+                    @foreach (var kvp in FareTypes.AirfaresBookingClassOptionsMaxFirst)
+                    {
+                        <MudSelectItem Value="@(kvp.Value)">@kvp.Key</MudSelectItem>
+                    }
+                </MudSelect>,
+    };
+}

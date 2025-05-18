@@ -1,0 +1,312 @@
+@page "/Dev2/Results/Flight/{cacheKey?}"
+
+@inject IStorageService StorageService
+@inject IGithubCDNService GithubCDNService
+
+@if (_isCacheKeyLoaded)
+{
+    <MudGrid Class="pa-2">
+        <MudHidden Breakpoint="Breakpoint.SmAndDown">
+
+            <MudItem xs="4">
+                
+            </MudItem>
+
+            @if (_flightResultsV1 is not null && _flightResultsV1.Count > 0)
+            {
+                @* Loop for each "ultimate row" - could be one per itinerary or flight result *@
+                for (int i = 0; i < _flightResultsV1.Count; i++)
+                {
+                    var flightOffer = _flightResultsV1[i];
+                    int itin0 = 0; // only the first itinerary for each result
+
+                    var itineraryDuration = flightOffer.ItineraryGroup[itin0].TravelTime;  // store the duration of an itinerary
+
+                    <MudItem xs="8">
+                        <div style="border: 1px solid rgba(0,0,0,0.12); border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+                            <MudGrid>
+
+                                <!-- Column A (Segments list) -->
+                                <MudItem sm="6">
+                                    @for (int j = 0; j < flightOffer.ItineraryGroup[itin0].SegmentGroup.Count; j++)
+                                    {
+                                        var segment = flightOffer.ItineraryGroup[itin0].SegmentGroup[j];  // obtain the segment info here
+
+                                        <MudGrid Class="mb-2">
+                                            <!-- Image -->
+                                            <MudItem xs="2" Class="d-flex align-center justify-center">
+                                                <MudImage Src="@segment.OperatingCarrierCode.ToAirlineImageUrl()"
+                                                        Width="90" Height="90"
+                                                        Style="border-radius: 4px;" />
+                                            </MudItem>
+
+                                            <!-- Segment details stacked in rows -->
+                                            <MudItem xs="10">
+                                                <MudGrid Spacing="0">
+
+                                                    <!-- Row 1: Departure and Arrival Code -->
+                                                    <MudItem xs="12">
+                                                        <MudText Typo="Typo.body1" Align="Align.Left">@FlightRouteRenderer.BuildRouteLine(segment.Departure.IataCode, new string[] { }, segment.Arrival.IataCode)</MudText>
+                                                    </MudItem>
+
+                                                    <!-- Row 2: Time -->
+                                                    <MudItem xs="12">
+                                                        <MudText Typo="Typo.body2" Align="Align.Left">
+                                                            @($"{segment.Departure.At:h:mm tt}".ToLower()) → @($"{segment.Arrival.At:h:mm tt}".ToLower())
+                                                        </MudText>
+                                                    </MudItem>
+
+                                                    <!-- Row 3: Carrier + Flight Number -->
+                                                    <MudItem xs="12">
+                                                        <MudText Typo="Typo.body2" Align="Align.Left">
+                                                            @segment.OperatingCarrierCode @segment.Number
+                                                        </MudText>
+                                                    </MudItem>
+
+                                                    <!-- Row 4: Aircraft -->
+                                                    <MudItem xs="12">
+                                                        <MudText Typo="Typo.caption" Align="Align.Left">@segment.Aircraft</MudText>
+                                                    </MudItem>
+
+                                                </MudGrid>
+                                            </MudItem>
+                                        </MudGrid>
+                                    }
+                                </MudItem>
+
+                                <!-- Column B -->
+                                <MudItem sm="4">
+                                    <MudGrid>
+
+                                        <!-- Row 1: Travel time and stops -->
+                                        <MudItem xs="6">
+                                            <MudText Typo="Typo.body1" Align="Align.Left">
+                                                <b>@($"{flightOffer.TotalTravelTime.Hours}h {flightOffer.TotalTravelTime.Minutes}m")</b>
+                                            </MudText>
+                                        </MudItem>
+                                        <MudItem xs="6">
+                                            @if (flightOffer.TotalNumberOfSegments == 1)
+                                            {
+                                                <MudChip T="string" Color="Color.Success" Style="padding: 2px 8px;">Direct</MudChip>
+                                            }
+                                            else if (flightOffer.TotalNumberOfSegments == 2)
+                                            {
+                                                <MudChip T="string" Color="Color.Warning" Style="padding: 2px 8px;">1 stop</MudChip>
+                                            }
+                                            else
+                                            {
+                                                <MudChip T="string" Color="Color.Error" Style="padding: 2px 8px;">@flightOffer.TotalNumberOfSegments stops</MudChip>
+                                            }
+                                        </MudItem>
+
+                                        <!-- Row 2: Layover info (stub for now) -->
+                                        <MudItem xs="12">
+                                            <MudText Typo="Typo.caption" Class="text-muted">Layover details go here</MudText>
+                                        </MudItem>
+
+                                    </MudGrid>
+                                </MudItem>
+
+                                <!-- Column C -->
+                                <MudItem sm="2">
+                                    <MudGrid>
+                                        <MudItem xs="12">
+                                            <MudText Typo="Typo.h6" Align="Align.Right" Class="me-2">
+                                                <b>@($"{flightOffer.CurrencyCode.ToCurrencySymbol()}{flightOffer.GrandTotal:N2}")</b>
+                                            </MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" Class="d-flex justify-end">
+                                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" Class="me-2">
+                                                Book
+                                            </MudButton>
+                                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" Class="me-2">
+                                                Request
+                                            </MudButton>
+                                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" Class="me-2">
+                                                Info
+                                            </MudButton>
+                                        </MudItem>
+                                    </MudGrid>
+                                </MudItem>
+
+                            </MudGrid>
+                        </div>
+                    </MudItem>
+                }
+            }
+            else
+            {
+                <b>No Flights found</b>
+            }
+            
+        </MudHidden>
+    </MudGrid>
+
+}
+
+@code {
+    [Parameter] public string? cacheKey { get; set; }
+
+    private bool _isCacheKeyLoaded = false;
+    private AmadeusFlightOfferSearchResult? _storedResults;
+    private List<FlightOffer>? _flightOffers;
+
+    private List<FlightResultV1>? _flightResultsV1;  // this is used to hold all the data for the for (int i=0) iteration to display results
+
+
+    // json debug indenting
+    private JsonSerializerOptions options = new JsonSerializerOptions
+    {
+        WriteIndented = true // optional, for nicely formatted JSON
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(cacheKey))
+        {
+            _storedResults = await StorageService.GetAmadeusFlightOfferSearchResultAsync(cacheKey);
+            await Task.Delay(1000);
+            if (_storedResults is not null)
+            {
+                _isCacheKeyLoaded = true;
+                _flightOffers = _storedResults.Data;
+
+                // update the _flightResultsV1 list
+                _flightResultsV1 ??= new List<FlightResultV1>();
+                var data = _flightOffers!.ToList();
+                for (int i = 0; i < data.Count; i++)
+                {
+                    var flightOffer = data[i];
+
+                    FlightResultV1 flightResultV1 = flightOffer.ToFlightResultV1();
+
+                    _flightResultsV1.Add(flightResultV1);
+                }
+            }
+        }
+    }
+
+
+    private string GetAmenityIcon(string description)
+    {
+        return description.ToUpperInvariant() switch
+        {
+            "175 PCT  QMILES ACCUMULATION" => Icons.Material.Filled.TrendingUp,
+            "1PC MAX 15LB 7KG 115LCM" => Icons.Material.Filled.WorkOutline,
+            "1PC MAX 23KG 158LCM EACH" => Icons.Material.Filled.WorkOutline,
+            "200 PCT  QMILES ACCUMULATION" => Icons.Material.Filled.TrendingUp,
+            "3000 EXTRA MILES" => Icons.Material.Filled.Add,
+            "50 PCT QMILES ACCUMULATION" => Icons.Material.Filled.TrendingFlat,
+            "50KG BAGGAGE ALLOWANCE" => Icons.Material.Filled.Luggage,
+            "70 PERCENT MILES EARNED" => Icons.Material.Filled.TrendingFlat,
+            "75 PCT  QMILES ACCUMULATION" => Icons.Material.Filled.TrendingUp,
+            "ALCOHOLIC DRINK" => Icons.Material.Filled.WineBar,
+            "BAG INCLUDED" => Icons.Material.Filled.Work,
+            "BEVERAGE" => Icons.Material.Filled.LocalCafe,
+            "BID TO UPGRADE" => Icons.Material.Filled.Upgrade,
+            "CABIN BAG 1 PIECE 7 KG" => Icons.Material.Filled.Cabin,
+            "CARRY ON BAGGAGE" => Icons.Material.Filled.Cases,
+            "CHANGE AFTER DEPARTURE" => Icons.Material.Filled.EditCalendar,
+            "CHANGE BEFORE DEPARTURE" => Icons.Material.Filled.EditCalendar,
+            "CHANGEABLE TICKET" => Icons.Material.Filled.ChangeCircle,
+            "CHECKED BAG 1 PC 23 KG EACH" => Icons.Material.Filled.Work,
+            "CHECKED BAG 2 PCS 23 KG EACH" => Icons.Material.Filled.Work,
+            "CHECKED BAG 2 PCS 32 KG EACH" => Icons.Material.Filled.Work,
+            "CHECKED BAG FIRST" => Icons.Material.Filled.Luggage,
+            "CHECKED BAG SECOND" => Icons.Material.Filled.Luggage,
+            "COMPLIMENTARY BEVERAGES" => Icons.Material.Filled.LocalCafe,
+            "DEDICATED CHECK IN" => Icons.Material.Filled.AssignmentInd,
+            "EXCESS BAGGAGE" => Icons.Material.Filled.WorkOff,
+            "EXCESS WEIGHT SPECIAL CHARGE" => Icons.Material.Filled.Scale,
+            "FAST TRACK" => Icons.Material.Filled.Speed,
+            "FAST TRACK IF AVAILABLE" => Icons.Material.Filled.Speed,
+            "FOOD AND BEVERAGE" => Icons.Material.Filled.Restaurant,
+            "FREE CHECKED BAGGAGE ALLOWANCE" => Icons.Material.Filled.CheckCircle,
+            "FRONT SEAT SELECTION" => Icons.Material.Filled.EventSeat,
+            "MEAL" => Icons.Material.Filled.Restaurant,
+            "MEAL AND BEVERAGE" => Icons.Material.Filled.LocalDining,
+            "MEAL BEVERAGE" => Icons.Material.Filled.LocalDining,
+            "MEAL OR SNACK" => Icons.Material.Filled.RestaurantMenu,
+            "MEAL SERVICE" => Icons.Material.Filled.RoomService,
+            "MEAL SERVICES" => Icons.Material.Filled.RoomService,
+            "MEAL VOUCHER" => Icons.Material.Filled.ReceiptLong,
+            "MILEAGE ACCRUAL" => Icons.Material.Filled.Loyalty,
+            "NO SHOW FEE" => Icons.Material.Filled.Block,
+            "NON ALCOHOLIC DRINK" => Icons.Material.Filled.LocalDrink,
+            "ONLINE MESSAGE RIGHT" => Icons.Material.Filled.MarkChatRead,
+            "PRE PAID BAGGAGE" => Icons.Material.Filled.AttachMoney,
+            "PRE RESERVED SEAT ASSIGNMENT" => Icons.Material.Filled.EventSeat,
+            "PRE SEAT ASSIGNMENT" => Icons.Material.Filled.EventSeat,
+            "PREMIUM CHECK IN" => Icons.Material.Filled.Star,
+            "PREMIUM SEAT" => Icons.Material.Filled.AirlineSeatReclineExtra,
+            "PRIORITY ACCESS" => Icons.Material.Filled.FlightTakeoff,
+            "PRIORITY BAGGAGE" => Icons.Material.Filled.LocalShipping,
+            "PRIORITY BOARDING" => Icons.Material.Filled.DirectionsWalk,
+            "PRIORITY CHECK IN" => Icons.Material.Filled.Login,
+            "PRIORITY CHKIN AT CERTAIN PORT" => Icons.Material.Filled.Login,
+            "PRIORITY SECURITY" => Icons.Material.Filled.VerifiedUser,
+            "QR LOUNGE ACCESS OS" => Icons.Material.Filled.MeetingRoom,
+            "REFUND AFTER DEPARTURE" => Icons.Material.Filled.MoneyOff,
+            "REFUND BEFORE DEPARTURE" => Icons.Material.Filled.MoneyOffCsred,
+            "REFUNDABLE TICKET" => Icons.Material.Filled.Receipt,
+            "SEAT ASSIGNMENT" => Icons.Material.Filled.EventSeat,
+            "SEAT SELECTION" => Icons.Material.Filled.EventSeat,
+            "SNACK" => Icons.Material.Filled.Fastfood,
+            "STANDARD SEAT" => Icons.Material.Filled.EventSeat,
+            "STANDARD SEAT SELECTION" => Icons.Material.Filled.EventSeat,
+            "UPGRADE" => Icons.Material.Filled.Upgrade,
+            "UPGRADE ELIGIBILITY" => Icons.Material.Filled.CheckCircleOutline,
+            _ => Icons.Material.Filled.Info
+        };
+    }
+
+
+
+
+
+
+    // junk below here
+
+    private void HandleBookClick()
+    {
+        Console.WriteLine("Book button clicked!");
+    }
+}
+
+
+@*
+See in the segments, there is an Id per segment? (this has been truncated for reference):
+
+"segments": [
+    {
+        "id": "17",
+
+
+That "id" is used further down here:
+"travelerPricings": [
+    {
+        "travelerId": "1",
+        "fareOption": "STANDARD",
+        "travelerType": "ADULT",
+        "price": {
+            "currency": "AUD",
+            "total": "313.98",
+            "base": "257.95"
+        },
+        "fareDetailsBySegment": [
+            {
+                "segmentId": "17",
+                "cabin": "ECONOMY",
+                "fareBasis": "UZCH0",
+                "brandedFare": "CH",
+                "brandedFareLabel": "CHOICE",
+                "class": "U",
+                "includedCheckedBags": {
+                    "quantity": 1
+                },
+                "amenities": [
+
+The "amenities" list is found down in travelerPricings.fareDetailsBySegment, then you need to find the record with the segmentId that matches the segments.Id from earlier, then check if it has the section .amenities (it should have, but it might not? That's why 'public List<AmenityV1>? AmenityGroup { get; set; }' is optiona!)
+
+And if it exists, that is how the amentitiesGroup must be populated!
+*@

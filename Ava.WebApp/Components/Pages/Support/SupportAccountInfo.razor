@@ -1,0 +1,61 @@
+@page "/Support/Account/Authentication-Info"
+
+@inject IAuthenticationInfoService AuthService
+
+<PageTitle>Account authentication Info</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <MudContainer MaxWidth="MaxWidth.Small">
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h5">Authentication Debug Info</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <MudText><strong>Authentication Method:</strong> @AuthenticationMethod</MudText>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudText><strong>User ID:</strong> @UserId</MudText>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudText><strong>User Name:</strong> @UserName</MudText>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudText><strong>Email Address:</strong> @Email</MudText>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudText><strong>Roles:</strong> @UserRoles</MudText>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        </MudContainer>
+    </Authorized>
+    <NotAuthorized>
+        <MudText Typo="Typo.h5" Color="Color.Error">You are not authorized to view this page.</MudText>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private string? AuthenticationMethod;
+    private string? UserId;
+    private string? UserName;
+    private string? Email;
+    private string? UserRoles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await AuthService.IsAuthenticatedAsync())
+        {
+            AuthenticationMethod = await AuthService.GetAuthenticationMethodAsync();
+            UserId = await AuthService.GetUserIdAsync();
+            UserName = await AuthService.GetUserNameAsync();
+            Email = await AuthService.GetEmailAsync();
+            UserRoles = await AuthService.GetUserRolesAsync();
+        }
+
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,24 @@
+@page "/Book/FlightTest"
+
+@inject IAuthenticationInfoService AuthService
+
+<PageTitle>Book Test Page @Icons.Material.Filled.Flight</PageTitle>
+
+<p>@UserId</p>
+
+@code {
+    private string? UserId;
+    protected override async Task OnInitializedAsync()
+    {
+        if (await AuthService.IsAuthenticatedAsync())
+        {
+            UserId = await AuthService.GetUserIdAsync(); // this returns the user GUID
+        }
+        else
+        {
+            UserId = "no value found";
+        }
+
+        StateHasChanged();
+    }
+}

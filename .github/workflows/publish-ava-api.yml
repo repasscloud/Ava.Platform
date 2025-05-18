@@ -1,0 +1,76 @@
+name: 🐳 Manual Docker Publish Ava.API (Split Arch Build)
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_id:
+        description: "Docker tag (e.g. 20250518, v1.0.0)"
+        required: true
+        type: string
+
+jobs:
+  build-amd64:
+    name: 🛠️ Build & Push amd64
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔐 Docker Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: 🐳 Build & Push amd64 image
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --push \
+            --tag repasscloud/ava-api:${{ inputs.release_id }}-amd64 \
+            -f Dockerfile.API .
+
+  build-arm64:
+    name: 🛠️ Build & Push arm64
+    runs-on: ARM64
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔐 Docker Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: 🐳 Build & Push arm64 image
+        run: |
+          docker buildx build \
+            --platform linux/arm64 \
+            --push \
+            --tag repasscloud/ava-api:${{ inputs.release_id }}-arm64 \
+            -f Dockerfile.API .
+
+  merge-manifest:
+    name: 🧬 Create Multi-Arch Manifest
+    runs-on: ubuntu-latest
+    needs: [build-amd64, build-arm64]
+    steps:
+      - name: 🔐 Docker Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: 🧪 Create and Push Manifest
+        run: |
+          docker buildx imagetools create \
+            --tag repasscloud/ava-api:${{ inputs.release_id }} \
+            repasscloud/ava-api:${{ inputs.release_id }}-amd64 \
+            repasscloud/ava-api:${{ inputs.release_id }}-arm64

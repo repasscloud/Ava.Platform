@@ -1,0 +1,192 @@
+@page "/TravelPolicy/{TravelPolicyId}"
+
+@inject NavigationManager Navigation
+@inject IAvaApiService AvaApiService
+
+<PageTitle>Travel Policy Details</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6">
+    @if (travelPolicy is null)
+    {
+        <MudText Typo="Typo.h6">Loading travel policy...</MudText>
+    }
+    else
+    {
+        <MudCard>
+            <MudCardHeader>
+                <MudText Typo="Typo.h4">Travel Policy: @travelPolicy.PolicyName</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <table class="mud-table" style="width: 100%;">
+                    <tr>
+                        <td><strong>Travel Policy ID:</strong></td>
+                        <td>@travelPolicy.Id</td>
+                    </tr>
+                    @* <tr>
+                        <td><strong>Ava Client ID:</strong></td>
+                        <td>@travelPolicy.AvaClientId</td>
+                    </tr> *@
+                    <tr>
+                        <td><strong>Currency:</strong></td>
+                        @RenderCurrencyCell(travelPolicy.DefaultCurrencyCode)
+                    </tr>
+                    <tr>
+                        <td><strong>Maximum Flight Price:</strong></td>
+                        @* <td>@travelPolicy.MaxFlightPrice</td> *@
+                        @RenderAmountWithCurrencySymbol(travelPolicy.DefaultCurrencyCode, travelPolicy.MaxFlightPrice)
+
+                    </tr>
+                    <tr>
+                        <td><strong>Default Cabin Class:</strong></td>
+                        <td>@travelPolicy.DefaultFlightSeating</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Maximum Allowed Cabin Class:</strong></td>
+                        <td>@travelPolicy.MaxFlightSeating</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cabin Class Coverage:</strong></td>
+                        <td>@travelPolicy.CabinClassCoverage</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Non-Stop Flight:</strong></td>
+                        <td>@(travelPolicy.NonStopFlight ? "Yes" : "No")</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Saturday Bookings Allowed:</strong></td>
+                        <td>@(travelPolicy.EnableSaturdayFlightBookings ? "Yes" : "No")</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sunday Bookings Allowed:</strong></td>
+                        <td>@(travelPolicy.EnableSundayFlightBookings ? "Yes" : "No")</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Allowed Airlines:</strong></td>
+                        @if (string.IsNullOrEmpty(travelPolicy.IncludedAirlineCodes))
+                        {
+                            <td><em>No specific airline restrictions</em></td>
+                        }
+                    </tr>
+                    <tr>
+                        <td><strong>Disallowed Airlines:</strong></td>
+                        @if (string.IsNullOrEmpty(travelPolicy.ExcludedAirlineCodes))
+                        {
+                            <td><em>No specific airline restrictions</em></td>
+                        }
+                    </tr>
+                    <tr>
+                        <td><strong>Allowed Regions:</strong></td>
+                        <td>
+                            @if (travelPolicy.Regions?.Any() == true)
+                            {
+                                @string.Join(", ", travelPolicy.Regions.Select(r => r.Name))
+                            }
+                            else
+                            {
+                                <em>No specific region restrictions</em>
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Allowed Continents:</strong></td>
+                        <td>
+                            @if (travelPolicy.Continents?.Any() == true)
+                            {
+                                @string.Join(", ", travelPolicy.Continents.Select(c => c.Name))
+                            }
+                            else
+                            {
+                                <em>No specific continent restrictions</em>
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Allowed Countries:</strong></td>
+                        <td>
+                            @if (travelPolicy.Countries?.Any() == true)
+                            {
+                                @string.Join(", ", travelPolicy.Countries.Select(c => c.Name))
+                            }
+                            else
+                            {
+                                <em>No specific country restrictions</em>
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Disallowed Countries:</strong></td>
+                        <td>
+                            @if (travelPolicy.DisabledCountries?.Any() == true)
+                            {
+                                @string.Join(", ", travelPolicy.DisabledCountries.Select(dc => dc.Country?.Name))
+                            }
+                            else
+                            {
+                                <em>None specified</em>
+                            }
+                        </td>
+                    </tr>
+                </table>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@NavigateBack">
+                    Back
+                </MudButton>
+            </MudCardActions>
+        </MudCard>
+    }
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string TravelPolicyId { get; set; } = string.Empty;
+
+    private TravelPolicy? travelPolicy;
+
+    RenderFragment RenderCurrencyCell(string currencyCode) => currencyCode switch
+    {
+        "AUD" => @<td>🇦🇺 Australian Dollar (AUD)</td>,
+        "USD" => @<td>🇺🇸 US Dollar (USD)</td>,
+        "EUR" => @<td>🇪🇺 Euro (EUR)</td>,
+        "GBP" => @<td>🇬🇧 Pound Sterling (GBP)</td>,
+        "JPY" => @<td>🇯🇵 Japanese Yen (JPY)</td>,
+        "CAD" => @<td>🇨🇦 Canadian Dollar (CAD)</td>,
+        "NZD" => @<td>🇳🇿 New Zealand Dollar (NZD)</td>,
+        "SGD" => @<td>🇸🇬 Singapore Dollar (SGD)</td>,
+        "CNH" => @<td>🇨🇳 Chinese Renminbi (CNY)</td>,
+        "HKD" => @<td>🇭🇰 Hong Kong Dollar (HKD)</td>,
+        "CHF" => @<td>🇨🇭 Swiss Franc (CHF)</td>,
+        _ => @<td>Unknown Currency</td>
+    };
+
+    RenderFragment RenderAmountWithCurrencySymbol(string currencyCode, int maxFlightPrice) => currencyCode switch
+    {
+        "AUD" => @<td>A$ @maxFlightPrice</td>,
+        "USD" => @<td>$ @maxFlightPrice</td>,
+        "EUR" => @<td>€ @maxFlightPrice</td>,
+        "GBP" => @<td>£ @maxFlightPrice</td>,
+        "JPY" => @<td>¥ @maxFlightPrice</td>,
+        "CAD" => @<td>C$ @maxFlightPrice</td>,
+        "NZD" => @<td>NZ$ @maxFlightPrice</td>,
+        "SGD" => @<td>S$ @maxFlightPrice</td>,
+        "CNH" => @<td>¥ @maxFlightPrice</td>,
+        "HKD" => @<td>HK$ @maxFlightPrice</td>,
+        "CHF" => @<td>CHF @maxFlightPrice</td>,
+        _ => @<td>@maxFlightPrice</td>
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        // if the value for TravelPolicyId is not provided, redirect to error page
+        if (string.IsNullOrEmpty(TravelPolicyId))
+        {
+            Navigation.NavigateTo("/AvaError/code-504?source=TravelPolicyDetail", forceLoad: true);
+        }
+        travelPolicy = await AvaApiService.GetTravelPolicyByIdAsync(TravelPolicyId, "");
+    }
+
+    private void NavigateBack()
+    {
+        Navigation.NavigateTo("/Book/Flight", forceLoad: true);
+    }
+}

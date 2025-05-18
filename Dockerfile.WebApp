@@ -1,0 +1,35 @@
+# Step 1: Use unofficial .NET SDK to build the app
+FROM repasscloud/dotnet-sdk-preloaded:9.0.200-alpine AS build
+
+# Copy only the project file(s) first for caching purposes.
+COPY Ava.WebApp/*.csproj /app/Ava.WebApp/
+COPY Ava.Shared/*.csproj /app/Ava.Shared/
+
+WORKDIR /app/Ava.WebApp
+
+# Use BuildKit cache mount to cache NuGet packages.
+RUN --mount=type=cache,target=/root/.nuget/packages dotnet restore
+
+# Now copy the rest of the source code.
+COPY Ava.WebApp /app/Ava.WebApp/
+COPY Ava.Shared /app/Ava.Shared/
+
+# Build and publish the app.
+RUN dotnet publish -c Release -o /out
+
+# Step 2: Use the official ASP.NET Core runtime image to run the app
+FROM mcr.microsoft.com/dotnet/aspnet:9.0.2-alpine3.21-arm64v8
+RUN apk add icu-libs && rm -rf /var/cache/apk/*
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+ENV DOTNET_SYSTEM_GLOBALIZATION_USENLS=false
+WORKDIR /app
+COPY --from=build /out .
+
+# Set environment to Development so Swagger is enabled if coded that way.
+ENV ASPNETCORE_ENVIRONMENT=Development
+
+# Expose the port that the WebApp will run on
+EXPOSE 5090
+
+# Start the WebApp
+ENTRYPOINT ["dotnet", "Ava.WebApp.dll", "--urls", "http://0.0.0.0:5090"]
