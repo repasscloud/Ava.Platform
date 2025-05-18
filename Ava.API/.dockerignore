@@ -14,3 +14,4 @@ airports.csv
 city_lookup.md
 README.md
 start-dev.sh
+**/appsettings.Development.json

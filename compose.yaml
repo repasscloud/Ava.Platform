@@ -3,17 +3,38 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.API
+    image: ava-api:20250518
     ports:
       - "5165:5165"
     networks:
       - common_net
     restart: unless-stopped
+    environment:
+      - ConnectionStrings__PostgresConnection
+      - Amadeus__ClientId
+      - Amadeus__ClientSecret
+      - Amadeus__Url__FlightOffer
+      - AvaLicense__SecretKey
+      - AvaSettings__GlobalSalt
+      - AvaSettings__ResendKey
+      - JwtSettings__SecretKey
+      - JwtSettings__Audience
+      - GitHub__Repos__0__Name
+      - GitHub__Repos__0__Owner
+      - GitHub__Repos__0__Repo
+      - GitHub__Repos__0__ApiKey
+      - Kestrel__Endpoints__Http__Url
+      - Logging__LogLevel__Default
+      - Logging__LogLevel__Microsoft.AspNetCore
+      - Logging__LogLevel__Microsoft.EntityFrameworkCore.Database.Command
+      - AllowedHosts
     healthcheck:
       test: ["CMD", "wget", "--spider", "--quiet", "http://0.0.0.0:5165/health"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
+
 
   ava-webapp:
     build:
