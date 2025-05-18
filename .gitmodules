@@ -1,0 +1,3 @@
+[submodule "ava.api.docker"]
+	path = ava.api.docker
+	url = git@github.com:repasscloud/ava.api.docker.git
