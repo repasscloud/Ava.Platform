@@ -1,16 +1,16 @@
-name: 🐳 Manual Docker Publish Ava.API (Per Arch)
+name: 🐳 Manual Docker Publish Ava.API (Multi-Arch)
 
 on:
   workflow_dispatch:
     inputs:
-      param:
-        description: "Base Docker tag (e.g. 20250518, v1.0.0)"
+      release_id:
+        description: "Docker tag (e.g. 20250518, v1.0.0)"
         required: true
         type: string
 
 jobs:
   build-and-push:
-    name: 🚀 Build & Push Arch-Specific Images
+    name: 🚀 Build & Push Multi-Arch Image
     runs-on: ubuntu-latest
 
     steps:
@@ -26,20 +26,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: 🐳 Build & Push amd64
+      - name: 🐳 Build & Push for amd64, arm64
         uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile.API
-          platforms: linux/amd64
           push: true
-          tags: repasscloud/ava-api:${{ inputs.param }}-amd64
-
-      - name: 🐳 Build & Push arm64
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: Dockerfile.API
-          platforms: linux/arm64
-          push: true
-          tags: repasscloud/ava-api:${{ inputs.param }}-arm64
+          platforms: |
+            linux/amd64
+            linux/arm64
+          tags: repasscloud/ava-api:${{ inputs.release_id }}
