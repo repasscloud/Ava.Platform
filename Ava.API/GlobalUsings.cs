@@ -57,3 +57,5 @@ global using Resend;
 global using Ava.Shared.Models.ExternalLib.GitHub;
 global using HtmlAgilityPack;
 global using System.Net;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.IdentityModel.Tokens;
