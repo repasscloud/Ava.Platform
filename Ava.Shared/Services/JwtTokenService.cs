@@ -13,7 +13,13 @@ public class JwtTokenService : IJwtTokenService
         _configuration = configuration;
     }
 
-    public async Task<string> GenerateTokenAsync(string userId, string username, string role, int expiryMinutes = 480)
+    public async Task<string> GenerateTokenAsync(
+        string userId,
+        string username,
+        string role,
+        string audience,
+        string issuer,
+        int expiryMinutes = 480)
     {
         var secretKey = _configuration["JwtSettings:SecretKey"]
             ?? throw new InvalidOperationException("JwtSettings:SecretKey is missing in the configuration");
@@ -37,7 +43,9 @@ public class JwtTokenService : IJwtTokenService
         {
             Subject = new ClaimsIdentity(claims),
             Expires = tokenExpiry,
-            SigningCredentials = credentials
+            SigningCredentials = credentials,
+            Issuer = issuer,
+            Audience = audience
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
