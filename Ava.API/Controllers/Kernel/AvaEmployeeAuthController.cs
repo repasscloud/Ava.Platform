@@ -9,19 +9,22 @@ public class AvaEmployeeAuthController : ControllerBase
     private readonly ApplicationDbContext _context;
     private readonly ICustomPasswordHasher _passwordHasher;
     private readonly ILoggerService _loggerService;
+    private readonly IConfiguration _configuration;
 
     public AvaEmployeeAuthController(
         IJwtTokenService jwtTokenService,
         IAvaEmployeeService avaEmployeeService,
         ApplicationDbContext context,
         ICustomPasswordHasher passwordHasher,
-        ILoggerService loggerService)
+        ILoggerService loggerService,
+        IConfiguration configuration)
     {
         _jwtTokenService = jwtTokenService;
         _avaEmployeeService = avaEmployeeService;
         _context = context;
         _passwordHasher = passwordHasher;
         _loggerService = loggerService;
+        _configuration = configuration;
     }
 
     [HttpPost("login")]
@@ -31,16 +34,26 @@ public class AvaEmployeeAuthController : ControllerBase
 
         if (user is null)
             return Unauthorized("User not found.");
-        
-        if (!string.IsNullOrEmpty(user.PasswordHash) && 
+
+        var jwtIssuer = _configuration["JwtSettings:Issuer"]
+            ?? throw new InvalidOperationException("JwtSettings:Issuer is missing");
+
+        var jwtAudience = _configuration["JwtSettings:Audiences:1"]
+            ?? throw new InvalidOperationException("JwtSettings:Audiences:1 is missing");
+            
+        if (!string.IsNullOrEmpty(user.PasswordHash) &&
             _passwordHasher.VerifyPassword(user.PrivateKey, dto.Password, user.PasswordHash))
         {
-            // crate JWT Token now
+            // expiry minutes
+            int expiryMins = 480;
+            // create JWT Token now
             var token = await _jwtTokenService.GenerateTokenAsync(
-                user.Id,
-                user.Email,
-                user.Role.ToString(),
-                expiryMinutes: 480
+                userId: user.Id,
+                username: user.Email,
+                role: user.Role.ToString(),
+                audience: jwtAudience,
+                issuer: jwtIssuer,
+                expiryMinutes: expiryMins
             );
 
             // create an AvaJwtTokenResponse for quick verification
@@ -48,7 +61,7 @@ public class AvaEmployeeAuthController : ControllerBase
             {
                 Id = 0,
                 JwtToken = token,
-                Expires = DateTime.UtcNow.AddMinutes(480),
+                Expires = DateTime.UtcNow.AddMinutes(expiryMins),
                 IsValid = true,
             };
 
@@ -105,7 +118,8 @@ public class AvaEmployeeAuthController : ControllerBase
             LastName = dto.LastName,
             Email = dto.Email.ToLowerInvariant(),
             EmployeeType = dto.EmployeeType,
-            VerificationToken = Nanoid.Generate(size:18)
+            VerificationToken = Nanoid.Generate(size: 18),
+            Role = dto.Role,
         };
 
         await _context.AvaEmployees.AddAsync(newUser);

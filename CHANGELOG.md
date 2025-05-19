@@ -10,10 +10,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- [#70](https://github.com/repasscloud/Ava.Platform/issues/70)
+  Enable [Authorize] via JWT
+  - Add nuget package Microsoft.AspNetCore.Authentication.JwtBearer [#11](https://github.com/repasscloud/dotnet-sdk-preloaded/issues/11)
+  - Add nuget package Microsoft.IdentityModel.Tokens [#10](https://github.com/repasscloud/dotnet-sdk-preloaded/issues/10)
+
 ### Changed
 
 - [#69](https://github.com/repasscloud/Ava.WebApp/issues/69)
   Remove HTTPS redirection in webapi #69
+- [#71](https://github.com/repasscloud/Ava.WebApp/issues/71)
+  Refactor IJwtTokenService.GenerateTokenAsync
 
 ### Fixed
 

@@ -100,6 +100,53 @@ public class Program
             c.EnableAnnotations(); // If you're using [SwaggerOperation], etc.
         });
 
+        // JWT settings
+        var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+        var secretKey = jwtSettings["SecretKey"] 
+            ?? throw new InvalidOperationException("JwtSettings:SecretKey is missing");
+
+        var issuer = jwtSettings["Issuer"]
+            ?? throw new InvalidOperationException("JwtSettings:Issuer is missing");
+
+        var validAudiences = jwtSettings.GetSection("Audiences").Get<string[]>()
+            ?? new[] { jwtSettings["Audience"] ?? throw new InvalidOperationException("JwtSettings:Audience is missing") };
+
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = issuer,
+
+                    ValidateAudience = true,
+                    ValidAudiences = validAudiences, // accepts string[]
+
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero,
+
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = async context =>
+                    {
+                        var logger = context.HttpContext.RequestServices.GetRequiredService<ILoggerService>();
+                        await logger.LogWarningAsync($"JWT auth failed: {context.Exception.Message}");
+                    },
+                    OnTokenValidated = async context =>
+                    {
+                        var logger = context.HttpContext.RequestServices.GetRequiredService<ILoggerService>();
+                        await logger.LogInfoAsync($"JWT token validated for user: {context.Principal?.Identity?.Name}");
+                    }
+                };
+            });
+
+        builder.Services.AddAuthorization();
+
+        builder.Services.AddAuthorization(); // important
 
         var app = builder.Build();
 
