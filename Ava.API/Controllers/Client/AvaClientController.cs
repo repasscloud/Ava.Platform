@@ -389,21 +389,48 @@ public class AvaClientController : ControllerBase
             // create the default policy
             var defaultPolicy = new TravelPolicy
             {
-                Id                     = Nanoid.Generate(Nanoid.Alphabets.HexadecimalUppercase, 10),
-                PolicyName             = $"{dto?.CompanyName} Default Policy",
-                AvaClientId            = newClient.Id,
-                DefaultCurrencyCode    = dto?.DefaultCurrency ?? "AUD",
+                Id                   = dto?.DefaultTravelPolicyId is { Length: > 0 }
+                                        ? dto?.DefaultTravelPolicyId!
+                                        : Nanoid.Generate(Nanoid.Alphabets.HexadecimalUppercase, 14),
+                PolicyName           = $"{dto?.CompanyName} Default Policy",
+                AvaClientId          = newClient.Id,
+                DefaultCurrencyCode  = dto?.DefaultCurrency ?? "AUD",
             };
 
-            _context.TravelPolicies.Add(defaultPolicy);
+            await _context.TravelPolicies.AddAsync(defaultPolicy);
 
             newClient.DefaultTravelPolicyId = defaultPolicy.Id;
             newClient.DefaultTravelPolicy   = defaultPolicy;
 
             await _context.SaveChangesAsync();
-
             await _loggerService.LogInfoAsync($"Default TravelPolicy created with Id: '{defaultPolicy.Id}' for AvaClientId: '{newClient.Id}'.");
             await _loggerService.LogDebugAsync($"Updated AvaClientId: '{newClient.Id}' with DefaultTravelPolicyId '{defaultPolicy.Id}'.");
+
+            // create the new license agreement (in pending state)
+            var _lateFeeConfigId = Nanoid.Generate(Nanoid.Alphabets.UppercaseLettersAndDigits, 12);
+            var newLicenseAgreement = new LicenseAgreement
+            {
+                Id = dto?.LicenseAgreementId is { Length: > 0 }
+                    ? dto?.LicenseAgreementId!
+                    : Nanoid.Generate(Nanoid.Alphabets.HexadecimalUppercase, 14),
+                AvaClientId = dto?.ClientId!,
+                LateFeeConfigId = _lateFeeConfigId,
+            };
+
+            await _context.LicenseAgreements.AddAsync(newLicenseAgreement);
+            await _context.SaveChangesAsync();
+            await _loggerService.LogInfoAsync($"New LicenseAgreement created wtih Id: '{newLicenseAgreement.Id}' for AvaClientId: '{newClient.Id}'.");
+
+            // create the new late fee config and attach to license
+            var _lateFeeConfig = new LateFeeConfig
+            {
+                Id = _lateFeeConfigId,
+                LicenseAgreementId = newLicenseAgreement.Id
+            };
+
+            await _context.LateFeeConfigs.AddAsync(_lateFeeConfig);
+            await _context.SaveChangesAsync();
+            await _loggerService.LogInfoAsync($"Default LateFeeConfig created with Id: '{_lateFeeConfig.Id}' for LicenseAgreementId: '{newLicenseAgreement.Id}'.");
             
             return Ok();
         }
