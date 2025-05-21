@@ -1,33 +1,37 @@
 services:
   ava-api:
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile.API
+    build:
+      context: .
+      dockerfile: Dockerfile.API
     image: repasscloud/ava-api:20250518
     ports:
       - "5165:5165"
     networks:
       - common_net
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      - ConnectionStrings__PostgresConnection
-      - Amadeus__ClientId
-      - Amadeus__ClientSecret
-      - Amadeus__Url__FlightOffer
-      - AvaLicense__SecretKey
-      - AvaSettings__GlobalSalt
-      - AvaSettings__ResendKey
-      - JwtSettings__SecretKey
-      - JwtSettings__Audience
-      - GitHub__Repos__0__Name
-      - GitHub__Repos__0__Owner
-      - GitHub__Repos__0__Repo
-      - GitHub__Repos__0__ApiKey
-      - Kestrel__Endpoints__Http__Url
-      - Logging__LogLevel__Default
-      - Logging__LogLevel__Microsoft.AspNetCore
-      - Logging__LogLevel__Microsoft.EntityFrameworkCore.Database.Command
-      - AllowedHosts
+      - JwtSettings__Issuer=${JwtSettings__Issuer}
+      - JwtSettings__SecretKey=${JwtSettings__SecretKey}
+      - JwtSettings__Audiences__0=${JwtSettings__Audiences__0}
+      - JwtSettings__Audiences__1=${JwtSettings__Audiences__1}
+      - ConnectionStrings__PostgresConnection=${ConnectionStrings__PostgresConnection}
+      - Amadeus__ClientId=${Amadeus__ClientId}
+      - Amadeus__ClientSecret=${Amadeus__ClientSecret}
+      - Amadeus__Url__FlightOffer=${Amadeus__Url__FlightOffer}
+      - AvaLicense__SecretKey=${AvaLicense__SecretKey}
+      - AvaSettings__GlobalSalt=${AvaSettings__GlobalSalt}
+      - AvaSettings__ResendKey=${AvaSettings__ResendKey}
+      - GitHub__Repos__0__Name=${GitHub__Repos__0__Name}
+      - GitHub__Repos__0__Owner=${GitHub__Repos__0__Owner}
+      - GitHub__Repos__0__Repo=${GitHub__Repos__0__Repo}
+      - GitHub__Repos__0__ApiKey=${GitHub__Repos__0__ApiKey}
+      - Kestrel__Endpoints__Http__Url=${Kestrel__Endpoints__Http__Url}
+      - Logging__LogLevel__Default=${Logging__LogLevel__Default}
+      - Logging__LogLevel__Microsoft.AspNetCore=${Logging__LogLevel__Microsoft_AspNetCore}
+      - Logging__LogLevel__Microsoft.EntityFrameworkCore.Database.Command=${Logging__LogLevel__Microsoft_EntityFrameworkCore_Database_Command}
+      - AllowedHosts=${AllowedHosts}
     healthcheck:
       test: ["CMD", "wget", "--spider", "--quiet", "http://0.0.0.0:5165/health"]
       interval: 30s

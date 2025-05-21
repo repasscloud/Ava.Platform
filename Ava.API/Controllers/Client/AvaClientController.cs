@@ -333,79 +333,124 @@ public class AvaClientController : ControllerBase
         if (existingClient == null)
         {
             await _loggerService.LogInfoAsync($"No existing client—creating new AvaClient with ClientId: {dto.ClientId}");
-            AvaClient newClient = new AvaClient
-            {
-                Id = 0,
-                ClientId = dto.ClientId,
-                CompanyName = dto.CompanyName,
-                TaxIdType = dto.TaxIdType ?? null,
-                TaxId = dto.TaxId ?? null,
-                TaxLastValidated = dto.TaxLastValidated ?? null,
-                LastUpdated = DateTime.UtcNow,
-                ContactPersonFirstName = dto.ContactPersonFirstName ?? "UNKNOWN",
-                ContactPersonLastName = dto.ContactPersonLastName ?? "UNKNOWN",
-                ContactPersonCountryCode = dto.ContactPersonCountryCode ?? string.Empty,
-                ContactPersonPhone = dto.ContactPersonPhone ?? "0000000000",
-                ContactPersonEmail = dto.ContactPersonEmail ?? "nobody@example.com",
-                ContactPersonJobTitle = dto.ContactPersonJobTitle ?? "UNKNOWN",
-                BillingPersonFirstName = dto.BillingPersonFirstName ?? "UNKNOWN",
-                BillingPersonLastName = dto.BillingPersonLastName ?? "UNKNOWN",
-                BillingPersonCountryCode = dto.BillingPersonCountryCode ?? string.Empty,
-                BillingPersonPhone = dto.BillingPersonPhone ?? "0000000000",
-                BillingPersonEmail = dto.BillingPersonEmail ?? "nobody@example.com",
-                BillingPersonJobTitle = dto.BillingPersonJobTitle ?? "UNKNOWN",
-                AdminPersonFirstName = dto.AdminPersonFirstName ?? "UNKNOWN",
-                AdminPersonLastName = dto.AdminPersonLastName ?? "UNKNOWN",
-                AdminPersonCountryCode = dto.AdminPersonCountryCode ?? string.Empty,
-                AdminPersonPhone = dto.AdminPersonPhone ?? "UNKNOWN",
-                AdminPersonEmail = dto.AdminPersonEmail ?? "nobody@example.com",
-                AdminPersonJobTitle = dto.AdminPersonJobTitle ?? "UNKNOWN",
-                AddressLine1 = dto.AddressLine1 ?? string.Empty,
-                AddressLine2 = dto.AddressLine2 ?? string.Empty,
-                AddressLine3 = dto.AddressLine3 ?? string.Empty,
-                City = dto.City ?? string.Empty,
-                State = dto.State ?? string.Empty,
-                PostalCode = dto.PostalCode ?? string.Empty,
-                Country = dto.Country ?? string.Empty,
-                DefaultCurrency = dto.DefaultCurrency ?? "AUD",
-                DefaultTravelPolicyId = dto?.DefaultTravelPolicyId is { Length: > 0 }
-                    ? dto?.DefaultTravelPolicyId
-                    : null,
-                LicenseAgreementId = dto?.LicenseAgreementId is { Length: > 0 }
-                    ? dto?.LicenseAgreementId
-                    : null,
-            };
 
-            if (!string.IsNullOrWhiteSpace(dto?.TaxId) && !string.IsNullOrWhiteSpace(dto?.Country))
+            using var tx = await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                newClient.TaxLastValidated = await _taxValidation.ValidateTaxRegistrationAsync(dto.TaxId, dto.Country);
-                await _loggerService.LogDebugAsync($"Tax validation result for {dto.TaxId}, {dto.Country}: {newClient.TaxLastValidated}");
+                // STEP 1: Create the AvaClient
+                var newClient = new AvaClient
+                {
+                    Id = 0,
+                    ClientId = dto.ClientId,
+                    CompanyName = dto.CompanyName,
+                    TaxIdType = dto.TaxIdType ?? null,
+                    TaxId = dto.TaxId ?? null,
+                    TaxLastValidated = null, // will update below if needed
+                    LastUpdated = DateTime.UtcNow,
+                    ContactPersonFirstName = dto.ContactPersonFirstName ?? "UNKNOWN",
+                    ContactPersonLastName = dto.ContactPersonLastName ?? "UNKNOWN",
+                    ContactPersonCountryCode = dto.ContactPersonCountryCode ?? string.Empty,
+                    ContactPersonPhone = dto.ContactPersonPhone ?? "0000000000",
+                    ContactPersonEmail = dto.ContactPersonEmail ?? "nobody@example.com",
+                    ContactPersonJobTitle = dto.ContactPersonJobTitle ?? "UNKNOWN",
+                    BillingPersonFirstName = dto.BillingPersonFirstName ?? "UNKNOWN",
+                    BillingPersonLastName = dto.BillingPersonLastName ?? "UNKNOWN",
+                    BillingPersonCountryCode = dto.BillingPersonCountryCode ?? string.Empty,
+                    BillingPersonPhone = dto.BillingPersonPhone ?? "0000000000",
+                    BillingPersonEmail = dto.BillingPersonEmail ?? "nobody@example.com",
+                    BillingPersonJobTitle = dto.BillingPersonJobTitle ?? "UNKNOWN",
+                    AdminPersonFirstName = dto.AdminPersonFirstName ?? "UNKNOWN",
+                    AdminPersonLastName = dto.AdminPersonLastName ?? "UNKNOWN",
+                    AdminPersonCountryCode = dto.AdminPersonCountryCode ?? string.Empty,
+                    AdminPersonPhone = dto.AdminPersonPhone ?? "UNKNOWN",
+                    AdminPersonEmail = dto.AdminPersonEmail ?? "nobody@example.com",
+                    AdminPersonJobTitle = dto.AdminPersonJobTitle ?? "UNKNOWN",
+                    AddressLine1 = dto.AddressLine1 ?? string.Empty,
+                    AddressLine2 = dto.AddressLine2 ?? string.Empty,
+                    AddressLine3 = dto.AddressLine3 ?? string.Empty,
+                    City = dto.City ?? string.Empty,
+                    State = dto.State ?? string.Empty,
+                    PostalCode = dto.PostalCode ?? string.Empty,
+                    Country = dto.Country ?? string.Empty,
+                    DefaultCurrency = dto.DefaultCurrency ?? "AUD",
+                    LicenseAgreementId = null, // will update after it's created
+                };
+
+                if (!string.IsNullOrWhiteSpace(dto?.TaxId) && !string.IsNullOrWhiteSpace(dto?.Country))
+                {
+                    newClient.TaxLastValidated = await _taxValidation.ValidateTaxRegistrationAsync(dto.TaxId, dto.Country);
+                    await _loggerService.LogDebugAsync($"Tax validation result for {dto.TaxId}, {dto.Country}: {newClient.TaxLastValidated}");
+                }
+
+                await _context.AvaClients.AddAsync(newClient);
+                await _context.SaveChangesAsync();
+                await _loggerService.LogInfoAsync($"New AvaClient created with Id: {newClient.Id}, ClientId: {newClient.ClientId}");
+
+                // STEP 2: Create default TravelPolicy
+                var defaultPolicyId = dto?.DefaultTravelPolicyId is { Length: > 0 }
+                    ? dto.DefaultTravelPolicyId
+                    : Nanoid.Generate(Nanoid.Alphabets.HexadecimalUppercase, 14);
+
+                var defaultPolicy = new TravelPolicy
+                {
+                    Id = defaultPolicyId,
+                    PolicyName = $"{dto.CompanyName} Default Policy",
+                    AvaClientId = newClient.Id,
+                    DefaultCurrencyCode = dto.DefaultCurrency ?? "AUD"
+                };
+
+                await _context.TravelPolicies.AddAsync(defaultPolicy);
+                await _context.SaveChangesAsync();
+
+                // Update client to link default policy
+                newClient.DefaultTravelPolicyId = defaultPolicyId;
+                newClient.DefaultTravelPolicy = defaultPolicy;
+                await _context.SaveChangesAsync();
+
+                await _loggerService.LogInfoAsync($"Default TravelPolicy created with Id: '{defaultPolicy.Id}' for AvaClientId: '{newClient.Id}'.");
+
+                // STEP 3: Create LicenseAgreement and LateFeeConfig
+                var lateFeeConfigId = Nanoid.Generate(Nanoid.Alphabets.UppercaseLettersAndDigits, 12);
+                var licenseAgreementId = dto?.LicenseAgreementId is { Length: > 0 }
+                    ? dto.LicenseAgreementId!
+                    : Nanoid.Generate(Nanoid.Alphabets.HexadecimalUppercase, 14);
+
+                var newLicenseAgreement = new LicenseAgreement
+                {
+                    Id = licenseAgreementId,
+                    AvaClientId = dto.ClientId,
+                    LateFeeConfigId = lateFeeConfigId
+                };
+
+                await _context.LicenseAgreements.AddAsync(newLicenseAgreement);
+                await _context.SaveChangesAsync();
+
+                newClient.LicenseAgreementId = newLicenseAgreement.Id;
+                await _context.SaveChangesAsync();
+
+                await _loggerService.LogInfoAsync($"New LicenseAgreement created with Id: '{licenseAgreementId}' for AvaClientId: '{newClient.Id}'.");
+
+                var lateFeeConfig = new LateFeeConfig
+                {
+                    Id = lateFeeConfigId,
+                    LicenseAgreementId = licenseAgreementId
+                };
+
+                await _context.LateFeeConfigs.AddAsync(lateFeeConfig);
+                await _context.SaveChangesAsync();
+
+                await _loggerService.LogInfoAsync($"Default LateFeeConfig created with Id: '{lateFeeConfig.Id}' for LicenseAgreementId: '{licenseAgreementId}'.");
+
+                await tx.CommitAsync();
+                return Ok();
             }
-
-            await _context.AvaClients.AddAsync(newClient);
-            await _context.SaveChangesAsync();
-            await _loggerService.LogInfoAsync($"New AvaClient created with Id: {newClient.Id}, ClientId: {newClient.ClientId}");
-
-            // create the default policy
-            var defaultPolicy = new TravelPolicy
+            catch (Exception ex)
             {
-                Id                     = Nanoid.Generate(Nanoid.Alphabets.HexadecimalUppercase, 10),
-                PolicyName             = $"{dto?.CompanyName} Default Policy",
-                AvaClientId            = newClient.Id,
-                DefaultCurrencyCode    = dto?.DefaultCurrency ?? "AUD",
-            };
-
-            _context.TravelPolicies.Add(defaultPolicy);
-
-            newClient.DefaultTravelPolicyId = defaultPolicy.Id;
-            newClient.DefaultTravelPolicy   = defaultPolicy;
-
-            await _context.SaveChangesAsync();
-
-            await _loggerService.LogInfoAsync($"Default TravelPolicy created with Id: '{defaultPolicy.Id}' for AvaClientId: '{newClient.Id}'.");
-            await _loggerService.LogDebugAsync($"Updated AvaClientId: '{newClient.Id}' with DefaultTravelPolicyId '{defaultPolicy.Id}'.");
-            
-            return Ok();
+                await tx.RollbackAsync();
+                await _loggerService.LogErrorAsync($"Failed to create AvaClient + linked records: {ex.Message}");
+                throw;
+            }
         }
         else
         {

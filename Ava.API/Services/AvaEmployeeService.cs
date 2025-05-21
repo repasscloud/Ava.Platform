@@ -26,7 +26,7 @@ public class AvaEmployeeService : IAvaEmployeeService
 
     public async Task<List<AvaEmployeeRecord>> GetAllAsync()
         => await _context.AvaEmployees.ToListAsync();
-    
+
     public async Task<AvaEmployeeRecord> CreateAsync(string firstName, string lastName, string email, bool isActive, string employeeType, string password, InternalRole role)
     {
         var employee = new AvaEmployeeRecord
@@ -82,7 +82,7 @@ public class AvaEmployeeService : IAvaEmployeeService
             await _context.SaveChangesAsync();
             return true;
         }
-        
+
         return false;
     }
 
@@ -97,7 +97,7 @@ public class AvaEmployeeService : IAvaEmployeeService
             {
                 return false;
             }
-            
+
             // clear password and verification token on user object
             user.VerificationToken = null;
             user.PasswordHash = null;
@@ -106,7 +106,7 @@ public class AvaEmployeeService : IAvaEmployeeService
             user.PasswordHash = _passwordHasher.HashPassword(user.PrivateKey, newPassword);
 
             await _context.SaveChangesAsync();
-            return true;        
+            return true;
         }
 
         return false;
@@ -129,7 +129,7 @@ public class AvaEmployeeService : IAvaEmployeeService
             await _loggerService.LogInfoAsync($"AvaEmployee with Id '{id}' was not found when requesting password reset.");
             return false;
         }
-            
+
         user.PasswordHash = null;
         user.VerificationToken = Nanoid.Generate(size: 16);
 
@@ -154,7 +154,7 @@ public class AvaEmployeeService : IAvaEmployeeService
 
         // Clear the verification token to mark as verified
         user.VerificationToken = null;
-        
+
         // Clear the user password hash to ensure it's not calculated in hashing
         user.PasswordHash = null;
 
@@ -226,14 +226,14 @@ public class AvaEmployeeService : IAvaEmployeeService
 
         var message = new EmailMessage();
         message.From = "AvaAI <no-reply@support.repasscloud.com>";
-        message.To.Add( receipientEmailAddress );
+        message.To.Add(receipientEmailAddress);
         message.Subject = "AvaAI Terminal2 Password Reset";
         message.HtmlBody = htmlBody;
 
-        var resp = await _resend.EmailSendAsync( message );
+        var resp = await _resend.EmailSendAsync(message);
         await _loggerService.LogInfoAsync($"AvaEmployee verification code email send with Id '{resp.Content}'.");
     }
-    
+
     public Task<bool> UpdatePasswordAsync(string id, string newPassword, string oldPassword)
     {
         throw new NotImplementedException();
