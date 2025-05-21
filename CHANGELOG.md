@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 - [#69](https://github.com/repasscloud/Ava.WebApp/issues/69)
-  Remove HTTPS redirection in webapi #69
+  Remove HTTPS redirection in webapi
 - [#71](https://github.com/repasscloud/Ava.WebApp/issues/71)
   Refactor IJwtTokenService.GenerateTokenAsync
 

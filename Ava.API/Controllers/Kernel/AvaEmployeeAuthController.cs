@@ -1,7 +1,8 @@
 namespace Ava.API.Controllers.Kernel;
 
+[Authorize]
 [ApiController]
-[Route("api/v1/auth")]
+[Route("api/[controller]")]
 public class AvaEmployeeAuthController : ControllerBase
 {
     private readonly IJwtTokenService _jwtTokenService;
@@ -27,7 +28,8 @@ public class AvaEmployeeAuthController : ControllerBase
         _configuration = configuration;
     }
 
-    [HttpPost("login")]
+    [AllowAnonymous]
+    [HttpPost("~/api/v1/auth/login")]
     public async Task<IActionResult> Login([FromBody] AvaEmployeeLoginDTO dto)
     {
         var user = await _avaEmployeeService.GetByIdOrEmailAsync(dto.Username);
@@ -40,7 +42,7 @@ public class AvaEmployeeAuthController : ControllerBase
 
         var jwtAudience = _configuration["JwtSettings:Audiences:1"]
             ?? throw new InvalidOperationException("JwtSettings:Audiences:1 is missing");
-            
+
         if (!string.IsNullOrEmpty(user.PasswordHash) &&
             _passwordHasher.VerifyPassword(user.PrivateKey, dto.Password, user.PasswordHash))
         {
@@ -80,7 +82,8 @@ public class AvaEmployeeAuthController : ControllerBase
         return Unauthorized("Password incorrect.");
     }
 
-    [HttpPost("register")]
+    [AllowAnonymous]
+    [HttpPost("~/api/v1/auth/register")]
     public async Task<IActionResult> Register([FromBody] AvaEmployeeRegisterDTO dto)
     {
         // var token = TokenUtils.GetBearerToken(HttpContext);
@@ -104,7 +107,7 @@ public class AvaEmployeeAuthController : ControllerBase
         //     await _loggerService.LogErrorAsync($"Token is marked as invalid for creating user with email '{dto.Email}'.");
         //     return BadRequest("Token is marked as invalid.");
         // }
-            
+
         // if (existingToken.Expires <= DateTime.UtcNow)
         // {
         //     await _loggerService.LogErrorAsync($"Token '{token}' has expired for creating user with email '{dto.Email}'.");
@@ -128,49 +131,44 @@ public class AvaEmployeeAuthController : ControllerBase
         return Ok(new { newUser.VerificationToken });
     }
 
-    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    [HttpPost("~/api/v1/auth/reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] PasswordResetDTO dto)
-        => (await _avaEmployeeService.ResetPasswordAsync(dto.Email)) 
+        => (await _avaEmployeeService.ResetPasswordAsync(dto.Email))
             ? Ok("If an account exists for the provided information, a password reset has been initiated.")
             : Ok("If an account exists for the provided information, a password reset has been initiated.");
 
-    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("~/api/v1/auth/{id}")]
     public async Task<IActionResult> Delete(string id)
         => (await _avaEmployeeService.DeleteAsync(id)) ? Ok() : NotFound();
 
-    [HttpPut("{id}")]
+    [HttpPut("~/api/v1/auth/{id}")]
     public async Task<IActionResult> Update(string id, [FromBody] AvaEmployeeUpdateDTO dto)
         => (await _avaEmployeeService.UpdateAsync(id, dto)) ? Ok() : NotFound();
 
-    [HttpPost("verify-account")]
+    [AllowAnonymous]
+    [HttpPost("~/api/v1/auth/verify-account")]
     public async Task<IActionResult> VerifyAccount([FromBody] AvaEmployeeVerifyAccountDTO dto)
         => (await _avaEmployeeService.VerifyAccountAsync(dto)) ? Ok() : NotFound();
+
+    [HttpPost("~/api/v1/auth/logout")]
+    public async Task<IActionResult> LogoutAccount()
+    {
+        var jwt = HttpContext.GetJwtToken();
+        if (jwt == null)
+        {
+            return BadRequest();
+        }
+
+        return await _jwtTokenService.LogoutAsync(jwt) ? Ok() : NotFound();
+    }
+
+    [Authorize(Roles = "System")]
+    [HttpGet("~/api/v1/auth/logout-all-users")]
+    public async Task<IActionResult> LogoutAllUsersAsync()
+    {
+        await _jwtTokenService.ClearAllTokensAsync();
+        return Ok();
+    }
 }
-
-
-//     [HttpPost("impersonate")]
-//     public async Task<IActionResult> Impersonate([FromQuery] string role)
-//     {
-//         var ok = await _userService.ImpersonateAsRoleAsync(role);
-//         return ok ? Ok() : BadRequest("Invalid role");
-//     }
-// }
-
-
-
-
-
-
-// // JwtTokenService.cs (add this method)
-// public async Task<bool> ValidateTokenAsync(string jwtToken)
-// {
-//     var handler = new JwtSecurityTokenHandler();
-//     var token = handler.ReadJwtToken(jwtToken);
-//     var now = DateTime.UtcNow;
-//     var exp = token.ValidTo;
-
-//     var isStored = await _context.AvaAIAppJwtTokens
-//         .AnyAsync(t => t.JwtToken == jwtToken && t.IsValid && t.Expires > now);
-
-//     return isStored && exp > now;
-// } // 【13†JwtTokenService.cs】

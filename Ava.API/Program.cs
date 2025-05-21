@@ -126,7 +126,9 @@ public class Program
                     ClockSkew = TimeSpan.Zero,
 
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+
+                    RoleClaimType = ClaimTypes.Role
                 };
 
                 options.Events = new JwtBearerEvents
@@ -144,9 +146,8 @@ public class Program
                 };
             });
 
+        
         builder.Services.AddAuthorization();
-
-        builder.Services.AddAuthorization(); // important
 
         var app = builder.Build();
 
@@ -169,6 +170,7 @@ public class Program
 
         //app.UseHttpsRedirection();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
 

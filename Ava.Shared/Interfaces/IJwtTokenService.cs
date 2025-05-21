@@ -12,4 +12,13 @@ public interface IJwtTokenService
 
     Task<bool> ValidateTokenAsync(string jwtToken);
     Task<bool> SaveTokenToDbAsync(AvaJwtTokenResponse jwtToken);
+
+    Task<(bool IsValid, IActionResult? ErrorResult, string Issuer, string Audience, string Role)> ValidateBearerTokenAsync(HttpContext context);
+
+
+    Task<(string Issuer, string Audience, string Role)> ExtractClaimsFromBearerTokenAsync(HttpContext context);
+
+    Task<bool> LogoutAsync(string jwtToken);
+
+    Task ClearAllTokensAsync();
 }
