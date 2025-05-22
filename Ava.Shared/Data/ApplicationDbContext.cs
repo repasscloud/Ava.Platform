@@ -40,7 +40,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     // Client Stuff
     
-
+    
+    // Attribs
+    public DbSet<SupportedCountry> SupportedCountries { get; set; }
+    public DbSet<SupportedCurrency> SupportedCurrencies { get; set; }
+    public DbSet<SupportedDialCode> SupportedDialCodes { get; set; }
+    public DbSet<SupportedTaxId> SupportedTaxIds { get; set; }
 
     // location stuff for travelpolicies
     public DbSet<TravelPolicy> TravelPolicies { get; set; }

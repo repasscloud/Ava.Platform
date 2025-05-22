@@ -63,3 +63,4 @@ global using Ava.Shared.Models.ExternalLib.Wikipedia;
 global using Ava.Shared.Models.Static.Jwt;
 global using Ava.Shared.Models.ExternalLib.GitHub;
 global using Ava.Shared.Models.Kernel.Billing;
+global using Ava.Shared.Models.Kernel.Client.Attribs;

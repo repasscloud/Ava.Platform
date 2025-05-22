@@ -62,3 +62,4 @@ global using Microsoft.IdentityModel.Tokens;
 global using Microsoft.AspNetCore.Authorization;
 global using System.Security.Claims;
 global using Ava.Shared.Extensions;
+global using Ava.Shared.Models.Kernel.Client.Attribs;

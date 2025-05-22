@@ -6,6 +6,7 @@ public class SupportedCurrency
     public int Id { get; set; }
 
     [Required]
+    [MaxLength(3)]
     public required string Iso4217 { get; set; }
 
     [Required]
