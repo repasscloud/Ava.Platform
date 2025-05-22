@@ -1,0 +1,31 @@
+services:
+  migrator:
+    build:
+      context: .
+      dockerfile: Dockerfile.Shared
+    image: ef-migrator:latest
+    env_file:
+      - .env
+    environment:
+      - JwtSettings__Issuer=${JwtSettings__Issuer}
+      - JwtSettings__SecretKey=${JwtSettings__SecretKey}
+      - JwtSettings__Audiences__0=${JwtSettings__Audiences__0}
+      - JwtSettings__Audiences__1=${JwtSettings__Audiences__1}
+      - ConnectionStrings__PostgresConnection=${ConnectionStrings__PostgresConnection}
+      - Amadeus__ClientId=${Amadeus__ClientId}
+      - Amadeus__ClientSecret=${Amadeus__ClientSecret}
+      - Amadeus__Url__FlightOffer=${Amadeus__Url__FlightOffer}
+      - AvaLicense__SecretKey=${AvaLicense__SecretKey}
+      - AvaSettings__GlobalSalt=${AvaSettings__GlobalSalt}
+      - AvaSettings__ResendKey=${AvaSettings__ResendKey}
+      - GitHub__Repos__0__Name=${GitHub__Repos__0__Name}
+      - GitHub__Repos__0__Owner=${GitHub__Repos__0__Owner}
+      - GitHub__Repos__0__Repo=${GitHub__Repos__0__Repo}
+      - GitHub__Repos__0__ApiKey=${GitHub__Repos__0__ApiKey}
+      - Kestrel__Endpoints__Http__Url=${Kestrel__Endpoints__Http__Url}
+      - Logging__LogLevel__Default=${Logging__LogLevel__Default}
+      - Logging__LogLevel__Microsoft.AspNetCore=${Logging__LogLevel__Microsoft_AspNetCore}
+      - Logging__LogLevel__Microsoft.EntityFrameworkCore.Database.Command=${Logging__LogLevel__Microsoft_EntityFrameworkCore_Database_Command}
+      - AllowedHosts=${AllowedHosts}
+    working_dir: /app/Ava.Shared
+    command: ["dotnet", "ef", "database", "update"]

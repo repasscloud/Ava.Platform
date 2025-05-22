@@ -28,6 +28,13 @@ public class AppDbContext : DbContext
     public DbSet<FlightOfferSearchRequestDTO> FlightOfferSearchRequestDTOs { get; set; }
 
     // Client Stuff
+
+
+    // Attribs
+    public DbSet<SupportedCountry> SupportedCountries { get; set; }
+    public DbSet<SupportedCurrency> SupportedCurrencies { get; set; }
+    public DbSet<SupportedDialCode> SupportedDialCodes { get; set; }
+    public DbSet<SupportedTaxId> SupportedTaxIds { get; set; }
     
 
 
