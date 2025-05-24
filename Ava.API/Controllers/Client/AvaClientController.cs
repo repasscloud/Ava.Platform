@@ -1,6 +1,3 @@
-using System.Security.Authentication;
-using Ava.Shared.Models.Kernel.Billing;
-
 namespace Ava.API.Controllers;
 
 [ApiController]
@@ -470,30 +467,28 @@ public class AvaClientController : ControllerBase
             existingClient.PostalCode = dto?.PostalCode ?? null;
             existingClient.Country = dto?.Country ?? null;
 
-#pragma warning disable CS8601 // Possible null reference assignment.
-            existingClient.ContactPersonFirstName   = string.IsNullOrWhiteSpace(dto?.ContactPersonFirstName)     ? null : dto.ContactPersonFirstName!;
-            existingClient.ContactPersonLastName    = string.IsNullOrWhiteSpace(dto?.ContactPersonLastName)      ? null : dto.ContactPersonLastName!;
-            existingClient.ContactPersonCountryCode = string.IsNullOrWhiteSpace(dto?.ContactPersonCountryCode) ? null : dto.ContactPersonCountryCode!;
-            existingClient.ContactPersonPhone       = string.IsNullOrWhiteSpace(dto?.ContactPersonPhone)       ? null : dto.ContactPersonPhone!;
-            existingClient.ContactPersonEmail       = string.IsNullOrWhiteSpace(dto?.ContactPersonEmail)       ? null : dto.ContactPersonEmail!;
-            existingClient.ContactPersonJobTitle    = string.IsNullOrWhiteSpace(dto?.ContactPersonJobTitle)    ? null : dto.ContactPersonJobTitle!;
+            existingClient.ContactPersonFirstName   = string.IsNullOrWhiteSpace(dto?.ContactPersonFirstName) ? string.Empty : dto.ContactPersonFirstName!;
+            existingClient.ContactPersonLastName    = string.IsNullOrWhiteSpace(dto?.ContactPersonLastName) ? string.Empty : dto.ContactPersonLastName!;
+            existingClient.ContactPersonCountryCode = string.IsNullOrWhiteSpace(dto?.ContactPersonCountryCode) ? string.Empty : dto.ContactPersonCountryCode!;
+            existingClient.ContactPersonPhone       = string.IsNullOrWhiteSpace(dto?.ContactPersonPhone) ? string.Empty : dto.ContactPersonPhone!;
+            existingClient.ContactPersonEmail       = string.IsNullOrWhiteSpace(dto?.ContactPersonEmail) ? string.Empty : dto.ContactPersonEmail!;
+            existingClient.ContactPersonJobTitle    = string.IsNullOrWhiteSpace(dto?.ContactPersonJobTitle) ? string.Empty : dto.ContactPersonJobTitle!;
 
-            existingClient.BillingPersonFirstName   = string.IsNullOrWhiteSpace(dto?.BillingPersonFirstName)     ? null : dto.BillingPersonFirstName!;
-            existingClient.BillingPersonLastName    = string.IsNullOrWhiteSpace(dto?.BillingPersonLastName)      ? null : dto.BillingPersonLastName!;
+            existingClient.BillingPersonFirstName   = string.IsNullOrWhiteSpace(dto?.BillingPersonFirstName) ? null : dto.BillingPersonFirstName!;
+            existingClient.BillingPersonLastName    = string.IsNullOrWhiteSpace(dto?.BillingPersonLastName) ? null : dto.BillingPersonLastName!;
             existingClient.BillingPersonCountryCode = string.IsNullOrWhiteSpace(dto?.BillingPersonCountryCode) ? null : dto.BillingPersonCountryCode!;
-            existingClient.BillingPersonPhone       = string.IsNullOrWhiteSpace(dto?.BillingPersonPhone)       ? null : dto.BillingPersonPhone!;
-            existingClient.BillingPersonEmail       = string.IsNullOrWhiteSpace(dto?.BillingPersonEmail)       ? null : dto.BillingPersonEmail!;
-            existingClient.BillingPersonJobTitle    = string.IsNullOrWhiteSpace(dto?.BillingPersonJobTitle)    ? null : dto.BillingPersonJobTitle!;
+            existingClient.BillingPersonPhone       = string.IsNullOrWhiteSpace(dto?.BillingPersonPhone) ? null : dto.BillingPersonPhone!;
+            existingClient.BillingPersonEmail       = string.IsNullOrWhiteSpace(dto?.BillingPersonEmail) ? null : dto.BillingPersonEmail!;
+            existingClient.BillingPersonJobTitle    = string.IsNullOrWhiteSpace(dto?.BillingPersonJobTitle) ? null : dto.BillingPersonJobTitle!;
 
-            existingClient.AdminPersonFirstName     = string.IsNullOrWhiteSpace(dto?.AdminPersonFirstName)      ? null : dto.AdminPersonFirstName!;
-            existingClient.AdminPersonLastName      = string.IsNullOrWhiteSpace(dto?.AdminPersonLastName)       ? null : dto.AdminPersonLastName!;
-            existingClient.AdminPersonCountryCode   = string.IsNullOrWhiteSpace(dto?.AdminPersonCountryCode)  ? null : dto.AdminPersonCountryCode!;
-            existingClient.AdminPersonPhone         = string.IsNullOrWhiteSpace(dto?.AdminPersonPhone)        ? null : dto.AdminPersonPhone!;
-            existingClient.AdminPersonEmail         = string.IsNullOrWhiteSpace(dto?.AdminPersonEmail)        ? null : dto.AdminPersonEmail!;
-            existingClient.AdminPersonJobTitle      = string.IsNullOrWhiteSpace(dto?.AdminPersonJobTitle)     ? null : dto.AdminPersonJobTitle!;
-#pragma warning restore CS8601 // Possible null reference assignment.
+            existingClient.AdminPersonFirstName     = string.IsNullOrWhiteSpace(dto?.AdminPersonFirstName) ? null : dto.AdminPersonFirstName!;
+            existingClient.AdminPersonLastName      = string.IsNullOrWhiteSpace(dto?.AdminPersonLastName) ? null : dto.AdminPersonLastName!;
+            existingClient.AdminPersonCountryCode   = string.IsNullOrWhiteSpace(dto?.AdminPersonCountryCode) ? null : dto.AdminPersonCountryCode!;
+            existingClient.AdminPersonPhone         = string.IsNullOrWhiteSpace(dto?.AdminPersonPhone) ? null : dto.AdminPersonPhone!;
+            existingClient.AdminPersonEmail         = string.IsNullOrWhiteSpace(dto?.AdminPersonEmail) ? null : dto.AdminPersonEmail!;
+            existingClient.AdminPersonJobTitle      = string.IsNullOrWhiteSpace(dto?.AdminPersonJobTitle) ? null : dto.AdminPersonJobTitle!;
 
-
+            // currency cannot be updated, a client needs to be recreated
             //existingClient.DefaultCurrency = dto?.DefaultCurrency ?? "AUD";
 
             existingClient.DefaultTravelPolicyId = dto?.DefaultTravelPolicyId is { Length: > 0 }
@@ -519,15 +514,15 @@ public class AvaClientController : ControllerBase
     [HttpPost("~/api/v1/avaclient/search-everything/dto/{sv}")]
     public async Task<IActionResult> SearchEverythingDtoV1(string sv)
     {
-        // // Validate token
-        // var (isValid, errorResult) = await ValidateBearerTokenAsync();
-        // if (!isValid)
-        // {
-        //     await _loggerService.LogWarningAsync(
-        //         $"Unauthorized call to SearchEverythingDtoV1 for '{sv}'."
-        //     );
-        //     return errorResult!;
-        // }
+        // Validate token
+        var (isValid, errorResult) = await ValidateBearerTokenAsync();
+        if (!isValid)
+        {
+            await _loggerService.LogWarningAsync(
+                $"Unauthorized call to SearchEverythingDtoV1 for '{sv}'."
+            );
+            return errorResult!;
+        }
 
         // Entering and input debug
         await _loggerService.LogTraceAsync("Entering SearchEverythingDtoV1");
@@ -735,7 +730,6 @@ public class AvaClientController : ControllerBase
     public async Task<IActionResult> QuickGenLateFeeConfigAsync(string licenseAgreementId)
         => Ok(new { lateFeeConfigId = await _lateFeeService
                                                 .QuickGenLateFeeConfigAsync(licenseAgreementId) });
-
 
     [HttpPut("~/api/v1/avaclient/latefeeconfigs/byid/{id}")]
     public async Task<IActionResult> UpdateLateFeeConfig(string id, [FromBody] LateFeeConfig updated)
