@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.API
-    image: repasscloud/ava-api:20250518
+    image: repasscloud/ava-api:20250525
     ports:
       - "5165:5165"
     networks:

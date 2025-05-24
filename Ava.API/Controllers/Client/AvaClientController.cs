@@ -516,15 +516,15 @@ public class AvaClientController : ControllerBase
     [HttpPost("~/api/v1/avaclient/search-everything/dto/{sv}")]
     public async Task<IActionResult> SearchEverythingDtoV1(string sv)
     {
-        // Validate token
-        var (isValid, errorResult) = await ValidateBearerTokenAsync();
-        if (!isValid)
-        {
-            await _loggerService.LogWarningAsync(
-                $"Unauthorized call to SearchEverythingDtoV1 for '{sv}'."
-            );
-            return errorResult!;
-        }
+        // // Validate token
+        // var (isValid, errorResult) = await ValidateBearerTokenAsync();
+        // if (!isValid)
+        // {
+        //     await _loggerService.LogWarningAsync(
+        //         $"Unauthorized call to SearchEverythingDtoV1 for '{sv}'."
+        //     );
+        //     return errorResult!;
+        // }
 
         // Entering and input debug
         await _loggerService.LogTraceAsync("Entering SearchEverythingDtoV1");
