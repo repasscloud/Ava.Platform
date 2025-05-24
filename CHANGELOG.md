@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   Enable [Authorize] via JWT
   - Add nuget package Microsoft.AspNetCore.Authentication.JwtBearer [#11](https://github.com/repasscloud/dotnet-sdk-preloaded/issues/11)
   - Add nuget package Microsoft.IdentityModel.Tokens [#10](https://github.com/repasscloud/dotnet-sdk-preloaded/issues/10)
+  - Create version route for AvaTerminal3 [#76](https://github.com/repasscloud/dotnet-sdk-preloaded/issues/76)
 
 ### Changed
 

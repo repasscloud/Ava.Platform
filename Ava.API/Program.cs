@@ -146,7 +146,6 @@ public class Program
                 };
             });
 
-        
         builder.Services.AddAuthorization();
 
         var app = builder.Build();
