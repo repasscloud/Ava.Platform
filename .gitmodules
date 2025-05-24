@@ -7,7 +7,7 @@
 	branch = dev
 [submodule "ava.doks.docker"]
 	path = ava.doks.docker
-	url = git@github.com:danijeljw-RPC/ava.doks.docker.git
+	url = git@github.com:repasscloud/ava.doks.docker.git
 	branch = dev
 [submodule "ava.deploy.docker"]
 	path = ava.deploy.docker
