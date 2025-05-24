@@ -1,3 +1,4 @@
+using System.Security.Authentication;
 using Ava.Shared.Models.Kernel.Billing;
 
 namespace Ava.API.Controllers;
@@ -511,6 +512,93 @@ public class AvaClientController : ControllerBase
         }
     }
 
+    // V1: Search AvaClientDto for record match
+    [HttpPost("~/api/v1/avaclient/search-everything/dto/{searchValue}")]
+    public async Task<IActionResult> SearchEverythingDtoV1(string sv)
+    {
+        // Validate token
+        var (isValid, errorResult) = await ValidateBearerTokenAsync();
+        if (!isValid)
+        {
+            await _loggerService.LogWarningAsync(
+                $"Unauthorized call to SearchEverythingDtoV1 for '{sv}'."
+            );
+            return errorResult!;
+        }
+
+        // Entering and input debug
+        await _loggerService.LogTraceAsync("Entering SearchEverythingDtoV1");
+        await _loggerService.LogDebugAsync($"SearchEverythingDtoV1 called with searchValue={sv}");
+
+        // Lookup
+        var client = await _context.AvaClients
+            .FirstOrDefaultAsync(c =>
+                c.ClientId               == sv
+            || EF.Functions.ILike(c.CompanyName, sv + "%")    // partial, case-insensitive
+            || c.TaxId                 == sv
+            || c.AdminPersonEmail      == sv
+            || c.BillingPersonEmail    == sv
+            || c.ContactPersonEmail    == sv
+            || c.AdminPersonPhone      == sv
+            || c.BillingPersonPhone    == sv
+            || c.ContactPersonPhone    == sv
+            || c.DefaultTravelPolicyId == sv
+            || c.LicenseAgreementId    == sv
+        );
+
+        if (client is null)
+        {
+            await _loggerService.LogInfoAsync(
+                $"SearchEverythingDtoV1: no client found matching “{sv}”"
+            );
+            return NotFound($"No client found matching '{sv}'.");
+        }
+
+        await _loggerService.LogInfoAsync(
+            $"SearchEverythingDtoV1: found client with ClientId={client.ClientId}"
+        );
+
+        AvaClientDTO clientDto = new AvaClientDTO
+        {
+            ClientId = client.ClientId,
+            CompanyName = client.CompanyName,
+            TaxIdType = client.TaxIdType,
+            TaxId = client.TaxId,
+            TaxLastValidated = client.TaxLastValidated,
+            LastUpdated = client.LastUpdated,
+            AddressLine1 = client.AddressLine1,
+            AddressLine2 = client.AddressLine2,
+            AddressLine3 = client.AddressLine3,
+            City = client.City,
+            State = client.State,
+            PostalCode = client.PostalCode,
+            Country = client.Country,
+            ContactPersonFirstName = client.ContactPersonFirstName,
+            ContactPersonLastName = client.ContactPersonLastName,
+            ContactPersonCountryCode = client.ContactPersonCountryCode,
+            ContactPersonPhone = client.ContactPersonPhone,
+            ContactPersonEmail = client.ContactPersonEmail,
+            ContactPersonJobTitle = client.ContactPersonJobTitle,
+            BillingPersonFirstName = client.BillingPersonFirstName,
+            BillingPersonLastName = client.BillingPersonLastName,
+            BillingPersonCountryCode = client.BillingPersonCountryCode,
+            BillingPersonPhone = client.BillingPersonPhone,
+            BillingPersonEmail = client.BillingPersonEmail,
+            BillingPersonJobTitle = client.BillingPersonJobTitle,
+            AdminPersonFirstName = client.AdminPersonFirstName,
+            AdminPersonLastName = client.AdminPersonLastName,
+            AdminPersonCountryCode = client.AdminPersonCountryCode,
+            AdminPersonPhone = client.AdminPersonPhone,
+            AdminPersonEmail = client.AdminPersonEmail,
+            AdminPersonJobTitle = client.AdminPersonJobTitle,
+            DefaultCurrency = client.DefaultCurrency,
+            DefaultTravelPolicyId = client.DefaultTravelPolicyId,
+            LicenseAgreementId = client.LicenseAgreementId
+        };
+
+        return Ok(clientDto);
+    }
+
     // V1: Search everything for record match
     [HttpPost("~/api/v1/avaclient/search-everything/{searchValue}")]
     public async Task<IActionResult> SearchEverythingV1(string searchValue)
@@ -556,7 +644,8 @@ public class AvaClientController : ControllerBase
         await _loggerService.LogInfoAsync(
             $"SearchEverythingV1: found client with ClientId={client.ClientId}"
         );
-        return Ok(new { clientId = client.ClientId });
+
+        return Ok(client);
     }
 
     // --- LicenseAgreement endpoints ---
