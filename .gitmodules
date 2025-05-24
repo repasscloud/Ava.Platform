@@ -17,3 +17,6 @@
 	path = ava.terminal3
 	url = git@github.com:repasscloud/ava.terminal3.git
 	branch = dev
+[submodule "ava.shared"]
+	path = ava.shared
+	url = git@github.com:repasscloud/ava.shared.git
