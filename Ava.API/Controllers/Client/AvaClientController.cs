@@ -310,19 +310,19 @@ public class AvaClientController : ControllerBase
     [HttpPost("~/api/v1/avaclient/new-or-update")]
     public async Task<IActionResult> CreateOrUpdateAvaClientV1([FromBody] AvaClientDTO dto)
     {
-        // // Validate token
-        // var (isValid, errorResult) = await ValidateBearerTokenAsync();
-        // if (!isValid)
-        // {
-        //     var dtoJson = JsonSerializer.Serialize(dto, new JsonSerializerOptions
-        //     {
-        //         WriteIndented = false
-        //     });
-        //     await _loggerService.LogWarningAsync(
-        //         $"Unauthorized call to CreateOrUpdateAvaClientV1 for '{dtoJson}'."
-        //     );
-        //     return errorResult!;
-        // }
+        // Validate token
+        var (isValid, errorResult) = await ValidateBearerTokenAsync();
+        if (!isValid)
+        {
+            var dtoJson = JsonSerializer.Serialize(dto, new JsonSerializerOptions
+            {
+                WriteIndented = false
+            });
+            await _loggerService.LogWarningAsync(
+                $"Unauthorized call to CreateOrUpdateAvaClientV1 for '{dtoJson}'."
+            );
+            return errorResult!;
+        }
 
         await _loggerService.LogTraceAsync("Entering CreateOrUpdateAvaClientV1");
         await _loggerService.LogDebugAsync($"CreateOrUpdateAvaClientV1 called with ClientId={dto.ClientId}");
@@ -455,7 +455,7 @@ public class AvaClientController : ControllerBase
         }
         else
         {
-            await _loggerService.LogInfoAsync($"Updating existing AvaClient with Id: {existingClient.Id}, ClientId: {existingClient.ClientId}");
+            await _loggerService.LogInfoAsync($"Updating existing AvaClient with Record Id: {existingClient.Id}, ClientId: {existingClient.ClientId}");
             existingClient.CompanyName = dto.CompanyName;
             existingClient.TaxIdType = dto?.TaxIdType ?? null;
             existingClient.TaxId = dto?.TaxId ?? null;
@@ -470,28 +470,31 @@ public class AvaClientController : ControllerBase
             existingClient.PostalCode = dto?.PostalCode ?? null;
             existingClient.Country = dto?.Country ?? null;
 
-            existingClient.ContactPersonFirstName = dto?.ContactPersonFirstName ?? "UNKNOWN";
-            existingClient.ContactPersonLastName = dto?.ContactPersonLastName ?? "UNKNOWN";
-            existingClient.ContactPersonCountryCode = dto?.ContactPersonCountryCode ?? "UNKNOWN";
-            existingClient.ContactPersonPhone = dto?.ContactPersonPhone ?? "0000000000";
-            existingClient.ContactPersonEmail = dto?.ContactPersonEmail ?? "nobody@example.com";
-            existingClient.ContactPersonJobTitle = dto?.ContactPersonJobTitle ?? "UNKNOWN";
+#pragma warning disable CS8601 // Possible null reference assignment.
+            existingClient.ContactPersonFirstName   = string.IsNullOrWhiteSpace(dto?.ContactPersonFirstName)     ? null : dto.ContactPersonFirstName!;
+            existingClient.ContactPersonLastName    = string.IsNullOrWhiteSpace(dto?.ContactPersonLastName)      ? null : dto.ContactPersonLastName!;
+            existingClient.ContactPersonCountryCode = string.IsNullOrWhiteSpace(dto?.ContactPersonCountryCode) ? null : dto.ContactPersonCountryCode!;
+            existingClient.ContactPersonPhone       = string.IsNullOrWhiteSpace(dto?.ContactPersonPhone)       ? null : dto.ContactPersonPhone!;
+            existingClient.ContactPersonEmail       = string.IsNullOrWhiteSpace(dto?.ContactPersonEmail)       ? null : dto.ContactPersonEmail!;
+            existingClient.ContactPersonJobTitle    = string.IsNullOrWhiteSpace(dto?.ContactPersonJobTitle)    ? null : dto.ContactPersonJobTitle!;
 
-            existingClient.BillingPersonFirstName = dto?.BillingPersonFirstName ?? "UNKNOWN";
-            existingClient.BillingPersonLastName = dto?.BillingPersonLastName ?? "UNKNOWN";
-            existingClient.BillingPersonCountryCode = dto?.BillingPersonCountryCode ?? "UNKNOWN";
-            existingClient.BillingPersonPhone = dto?.BillingPersonPhone ?? "0000000000";
-            existingClient.BillingPersonEmail = dto?.BillingPersonEmail ?? "nobody@example.com";
-            existingClient.BillingPersonJobTitle = dto?.BillingPersonJobTitle ?? "UNKNOWN";
+            existingClient.BillingPersonFirstName   = string.IsNullOrWhiteSpace(dto?.BillingPersonFirstName)     ? null : dto.BillingPersonFirstName!;
+            existingClient.BillingPersonLastName    = string.IsNullOrWhiteSpace(dto?.BillingPersonLastName)      ? null : dto.BillingPersonLastName!;
+            existingClient.BillingPersonCountryCode = string.IsNullOrWhiteSpace(dto?.BillingPersonCountryCode) ? null : dto.BillingPersonCountryCode!;
+            existingClient.BillingPersonPhone       = string.IsNullOrWhiteSpace(dto?.BillingPersonPhone)       ? null : dto.BillingPersonPhone!;
+            existingClient.BillingPersonEmail       = string.IsNullOrWhiteSpace(dto?.BillingPersonEmail)       ? null : dto.BillingPersonEmail!;
+            existingClient.BillingPersonJobTitle    = string.IsNullOrWhiteSpace(dto?.BillingPersonJobTitle)    ? null : dto.BillingPersonJobTitle!;
 
-            existingClient.AdminPersonFirstName = dto?.AdminPersonFirstName ?? "UNKNOWN";
-            existingClient.AdminPersonLastName = dto?.AdminPersonLastName ?? "UNKNOWN";
-            existingClient.AdminPersonCountryCode = dto?.AdminPersonCountryCode ?? "UNKNOWN";
-            existingClient.AdminPersonPhone = dto?.AdminPersonPhone ?? "0000000000";
-            existingClient.AdminPersonEmail = dto?.AdminPersonEmail ?? "nobody@example.com";
-            existingClient.AdminPersonJobTitle = dto?.AdminPersonJobTitle ?? "UNKNOWN";
+            existingClient.AdminPersonFirstName     = string.IsNullOrWhiteSpace(dto?.AdminPersonFirstName)      ? null : dto.AdminPersonFirstName!;
+            existingClient.AdminPersonLastName      = string.IsNullOrWhiteSpace(dto?.AdminPersonLastName)       ? null : dto.AdminPersonLastName!;
+            existingClient.AdminPersonCountryCode   = string.IsNullOrWhiteSpace(dto?.AdminPersonCountryCode)  ? null : dto.AdminPersonCountryCode!;
+            existingClient.AdminPersonPhone         = string.IsNullOrWhiteSpace(dto?.AdminPersonPhone)        ? null : dto.AdminPersonPhone!;
+            existingClient.AdminPersonEmail         = string.IsNullOrWhiteSpace(dto?.AdminPersonEmail)        ? null : dto.AdminPersonEmail!;
+            existingClient.AdminPersonJobTitle      = string.IsNullOrWhiteSpace(dto?.AdminPersonJobTitle)     ? null : dto.AdminPersonJobTitle!;
+#pragma warning restore CS8601 // Possible null reference assignment.
 
-            existingClient.DefaultCurrency = dto?.DefaultCurrency ?? "AUD";
+
+            //existingClient.DefaultCurrency = dto?.DefaultCurrency ?? "AUD";
 
             existingClient.DefaultTravelPolicyId = dto?.DefaultTravelPolicyId is { Length: > 0 }
                     ? dto?.DefaultTravelPolicyId
