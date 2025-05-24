@@ -396,7 +396,7 @@ public class AvaClientController : ControllerBase
                 var defaultPolicy = new TravelPolicy
                 {
                     Id = defaultPolicyId,
-                    PolicyName = $"{dto.CompanyName} Default Policy",
+                    PolicyName = $"{dto!.CompanyName} Default Policy",
                     AvaClientId = newClient.Id,
                     DefaultCurrencyCode = dto.DefaultCurrency ?? "AUD"
                 };
@@ -420,7 +420,7 @@ public class AvaClientController : ControllerBase
                 var newLicenseAgreement = new LicenseAgreement
                 {
                     Id = licenseAgreementId,
-                    AvaClientId = dto.ClientId,
+                    AvaClientId = dto!.ClientId,
                     LateFeeConfigId = lateFeeConfigId
                 };
 
