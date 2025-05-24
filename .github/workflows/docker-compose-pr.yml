@@ -16,7 +16,7 @@ jobs:
           ref: dev
 
       - name: Build with Docker Compose
-        run: docker compose build
+        run: docker compose build ava-api
 
   create_pr:
     needs: build
