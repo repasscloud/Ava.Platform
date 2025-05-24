@@ -1,3 +1,7 @@
 [submodule "ava.api.docker"]
 	path = ava.api.docker
 	url = git@github.com:repasscloud/ava.api.docker.git
+[submodule "dotnet-sdk-preloaded"]
+	path = dotnet-sdk-preloaded
+	url = git@github.com:repasscloud/dotnet-sdk-preloaded.git
+	branch = dev
