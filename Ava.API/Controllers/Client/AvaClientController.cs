@@ -513,7 +513,7 @@ public class AvaClientController : ControllerBase
     }
 
     // V1: Search AvaClientDto for record match
-    [HttpPost("~/api/v1/avaclient/search-everything/dto/{searchValue}")]
+    [HttpPost("~/api/v1/avaclient/search-everything/dto/{sv}")]
     public async Task<IActionResult> SearchEverythingDtoV1(string sv)
     {
         // Validate token
