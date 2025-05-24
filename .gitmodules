@@ -20,3 +20,7 @@
 [submodule "ava.shared"]
 	path = ava.shared
 	url = git@github.com:repasscloud/ava.shared.git
+[submodule "ava.api"]
+	path = ava.api
+	url = git@github.com:danijeljw-RPC/ava.api.git
+	branch = dev
