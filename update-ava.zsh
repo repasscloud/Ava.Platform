@@ -72,7 +72,7 @@ sed -i -E \
 # ava.platform
 git add .
 git commit -m "v${new_version}"
-git push
+git push origin --force
 git push origin main:dev --force
 
 # docker containers build
