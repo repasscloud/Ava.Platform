@@ -58,7 +58,6 @@ echo $new_version >| $VERSION_FILE
 # Feedback
 echo "Updated ava_version → $new_version"
 
-
 # ava.shared
 if [[ -f $AVASHARED_VERSION_FILE ]]; then
   echo "🔄 Updating version in $AVASHARED_VERSION_FILE"
@@ -69,12 +68,13 @@ if [[ -f $AVASHARED_VERSION_FILE ]]; then
 
   # commit & push in submodule
   echo "🔄 Committing changes in $AVASHARED_SUBMODULE_DIR"
+  cp "${VERSION_FILE}" "${AVASHARED_SUBMODULE_DIR}/${VERSION_FILE}"
   pushd "$AVASHARED_SUBMODULE_DIR" > /dev/null
     git add .
     git commit -m "v${new_version}"
-    git push
-    # git push origin main:dev --force
-    git tag -s v${new_version}" -m v${new_version}"
+    git push origin HEAD:main
+    git push origin main:dev --force
+    git tag -s "v${new_version}" -m "v${new_version}"
     git push --tags
   popd > /dev/null
   echo "✅ Pushed submodule update"
@@ -93,12 +93,13 @@ if [[ -f $AVAAPI_DCKR_FILE ]]; then
 
   # commit & push in submodule
   echo "🔄 Committing changes in $AVAAPI_SUBMODULE_DIR"
-  pushd "$AVASHARED_SUBMODULE_DIR" > /dev/null
+  cp "${VERSION_FILE}" "${AVAAPI_SUBMODULE_DIR}/${VERSION_FILE}"
+  pushd "$AVAAPI_SUBMODULE_DIR" > /dev/null
     git add .
     git commit -m "v${new_version}"
-    git push
+    git push origin HEAD:main
     git push origin main:dev --force
-    git tag -s v${new_version}" -m v${new_version}"
+    git tag -s "v${new_version}" -m "v${new_version}"
     git push --tags
   popd > /dev/null
   echo "✅ Pushed submodule update"
@@ -107,7 +108,7 @@ else
 fi
 
 if [[ -f $AVAAPI_DCKR_LOCAL_FILE ]]; then
-  echo "🔄 Updating version in $AVAAPI_DCKR_LOCAL_FILE"
+  echo "🔄 Updating version in (local) $AVAAPI_DCKR_LOCAL_FILE"
   sed -i -E \
   "s#^LABEL[[:space:]]*version=\"[^\"]*\"#LABEL version=\"${new_version}\"#" \
     $AVAAPI_DCKR_LOCAL_FILE
@@ -127,13 +128,14 @@ if [[ -f $AVAAPI_DCKR_COMPOSE_FILE ]]; then
 
   # commit & push in submodule
   echo "🔄 Committing changes in $AVAAPI_DCKR_SUBMODULE_DIR"
-  pushd "$AVAAPI_DCKR_SUBMODULE_DIR" > /dev/null
-    git add .
-    git commit -m "v${new_version}"
-    git push
-    git tag -s v${new_version}" -m v${new_version}"
-    git push --tags
-  popd > /dev/null
+    cp "${VERSION_FILE}" "$AVAAPI_DCKR_SUBMODULE_DIR/${VERSION_FILE}"
+    pushd "$AVAAPI_DCKR_SUBMODULE_DIR" > /dev/null
+      git add .
+      git commit -m "v${new_version}"
+      git push origin HEAD:main --force
+      git tag -s "v${new_version}" "-m v${new_version}"
+      git push --tags
+    popd > /dev/null
   echo "✅ Pushed submodule update"
 else
   echo "⚠️  $AVAAPI_DCKR_COMPOSE_FILE not found; skipping image update and commit"
@@ -146,8 +148,8 @@ echo "🔄 Committing changes in $AAVADEPLOY_DCKR_SUBMODULE_DIR"
   pushd "$AVADEPLOY_DCKR_SUBMODULE_DIR" > /dev/null
     git add .
     git commit -m "v${new_version}"
-    git push
-    git tag -s v${new_version}" -m v${new_version}"
+    git push origin HEAD:main --force
+    git tag -s "v${new_version}" -m "v${new_version}"
     git push --tags
   popd > /dev/null
 echo "✅ Pushed submodule update"
@@ -163,12 +165,13 @@ if [[ -f $AVATERM3_VERSION_FILE ]]; then
 
   # commit & push in submodule
   echo "🔄 Committing changes in $AVATERM3_SUBMODULE_DIR"
+  cp "${VERSION_FILE}" "${AVATERM3_SUBMODULE_DIR}/${VERSION_FILE}
   pushd "$AVATERM3_SUBMODULE_DIR" > /dev/null
     git add .
     git commit -m "v${new_version}"
     git push
     git push origin main:dev --force
-    git tag -s v${new_version}" -m v${new_version}"
+    git tag -s "v${new_version}" -m "v${new_version}"
     git push --tags
   popd > /dev/null
   echo "✅ Pushed submodule update"
@@ -180,7 +183,7 @@ fi
 # ava.platform
 git add .
 git commit -m "v${new_version}"
-git push origin --force
+git push origin HEAD:main --force
 git push origin main:dev --force
 
 # docker containers build
