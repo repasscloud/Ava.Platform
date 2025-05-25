@@ -33,7 +33,7 @@ current_version="$(< "$VERSION_FILE")"
 echo "🔎  Current Ava version: $current_version"
 IFS='.' read -r major minor patch <<< "$current_version"
 
-# 🔧 Bump logic: --build (patch), --patch (minor+1, reset patch), --version (major+1, reset others)
+# 🔧 Bump logic\ nmode for build, patch or version bump
 mode="${1:---build}"
 case "$mode" in
   --patch)
@@ -59,37 +59,25 @@ esac
 
 new_version="${major}.${minor}.${patch}"
 
-# 💾 Write new version back to file
+# 💾 Write new version to file
 echo "$new_version" >| "$VERSION_FILE"
 echo "✅  Updated $VERSION_FILE → $new_version"
 
-# Function to commit & push in a submodule
+# 🛠️ commit_submodule function to add, commit, push & tag
 commit_submodule() {
   local dir="$1"
-
-  # 🛑 Skip if not a git repo/submodule
-  if ! git -C "$dir" rev-parse --git-dir > /dev/null 2>&1; then
-    echo "⚠️  $dir is not a Git repository—skipping submodule update"
-    return
-  fi
-
-  echo "🔄 Entering submodule: $dir"
+  echo "\n🔄 Processing submodule: $dir"
   pushd "$dir" > /dev/null
 
   git add .
-  git commit -m "v${new_version}" \
-    || echo "⚠️  No changes to commit in $dir"
+  git commit -m "v${new_version}" || echo "⚠️  No changes in $dir"
 
-  # push main
-  git push origin HEAD:main --force \
-    && echo "✅  Pushed main → origin/main in $dir"
+  git push origin HEAD:main --force && echo "✅  Pushed main to origin/main in $dir"
 
-  # only force-push to dev if it exists remotely
   if git ls-remote --exit-code --heads origin dev &>/dev/null; then
-    git push origin HEAD:dev --force \
-      && echo "✅  Pushed main → origin/dev in $dir"
+    git push origin HEAD:dev --force && echo "✅  Pushed main to origin/dev in $dir"
   else
-    echo "⚠️  Remote 'dev' branch not found in $dir—skipping dev push"
+    echo "⚠️  No remote dev branch in $dir, skipped dev push"
   fi
 
   # create signed tag if it doesn't exist
