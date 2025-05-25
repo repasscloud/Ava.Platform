@@ -66,7 +66,14 @@ echo "✅  Updated $VERSION_FILE → $new_version"
 # Function to commit & push in a submodule
 commit_submodule() {
   local dir="$1"
-  echo "🔄  Entering submodule: $dir"
+
+  # 🛑 Skip if not a git repo/submodule
+  if ! git -C "$dir" rev-parse --git-dir > /dev/null 2>&1; then
+    echo "⚠️  $dir is not a Git repository—skipping submodule update"
+    return
+  fi
+
+  echo "🔄 Entering submodule: $dir"
   pushd "$dir" > /dev/null
 
   git add .
@@ -79,8 +86,8 @@ commit_submodule() {
 
   # only force-push to dev if it exists remotely
   if git ls-remote --exit-code --heads origin dev &>/dev/null; then
-    git push origin HEAD:dev --force && \
-      echo "✅  Pushed main → origin/dev in $dir"
+    git push origin HEAD:dev --force \
+      && echo "✅  Pushed main → origin/dev in $dir"
   else
     echo "⚠️  Remote 'dev' branch not found in $dir—skipping dev push"
   fi
