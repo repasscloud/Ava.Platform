@@ -77,3 +77,20 @@ jobs:
             --tag repasscloud/ava-api:${{ env.RELEASE_ID }} \
             repasscloud/ava-api:${{ env.RELEASE_ID }}-amd64 \
             repasscloud/ava-api:${{ env.RELEASE_ID }}-arm64
+  
+  deploy:
+    name: 🚀 Deploy
+    needs: [merge-manifest]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔑 Start SSH agent
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.AVAGHUSR_SSH_KEY }}
+
+      - name: 🚀 Run update-compose-stack.sh on remote
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }} \
+            "/home/${{ secrets.SSH_USERNAME }}/update-compose-stack.sh"
+
