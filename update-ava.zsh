@@ -1,12 +1,12 @@
 #!/usr/bin/env zsh
-# 🚀 update-ava.zsh — bump X.Y.Z in ava_version and sync all submodules
+# 🚀 update-ava.zsh — bump X.Y.Z in ava_version and sync all submodules (no functions!)
 
 set -euo pipefail
 
-# 🛠️ Configuration
+# ──────────────────────────────────────────────────────────────────────────────
+# 🛠️ Config
 VERSION_FILE="ava_version"
 
-# 📁 Submodule directories & files
 SHARED_DIR="Ava.Shared"
 SHARED_VERSION_FILE="$SHARED_DIR/Models/Static/VersionInfo.cs"
 
@@ -15,145 +15,175 @@ API_DOCKERFILE_SUB="${API_DIR}/Dockerfile.API"
 API_DOCKERFILE_LOCAL="Dockerfile.API"
 
 API_DOCKER_DIR="ava.api.docker"
-API_COMPOSE_FILE="${API_DOCKER_DIR}/compose.yaml"
+API_COMPOSE_FILE="$API_DOCKER_DIR/compose.yaml"
 
 DEPLOY_DOCKER_DIR="ava.deploy.docker"
 
 TERM3_DIR="ava.terminal3"
 TERM3_VERSION_FILE="$TERM3_DIR/Models/Static/AppVersion.cs"
 
-# 📄 Ensure the version file exists
-if [[ ! -f "$VERSION_FILE" ]]; then
-  echo "0.0.0" >| "$VERSION_FILE"
-  echo "📄  Created $VERSION_FILE with initial version 0.0.0"
+# ──────────────────────────────────────────────────────────────────────────────
+# 📄 Ensure version file
+if [[ ! -f $VERSION_FILE ]]; then
+  echo "0.0.0" >| $VERSION_FILE
+  echo "📄 Created $VERSION_FILE → 0.0.0"
 fi
 
-# 📥 Read the current version
-current_version="$(< "$VERSION_FILE")"
-echo "🔎  Current Ava version: $current_version"
-IFS='.' read -r major minor patch <<< "$current_version"
+# ──────────────────────────────────────────────────────────────────────────────
+# 📥 Read & bump version
+current=$(< $VERSION_FILE)
+echo "🔎 Current version: $current"
+IFS='.' read -r major minor patch <<< "$current"
 
-# 🔧 Bump logic: --build (patch), --patch (minor+1, reset patch), --version (major+1, reset others)
-mode="${1:---build}"
+mode=${1:---build}
 case "$mode" in
-  --patch)
-    (( minor++ )); patch=0
-    echo "⚙️  Minor bump → new version will be: $major.$minor.$patch"
-    ;;
-  --version)
-    (( major++ )); minor=0; patch=0
-    echo "🚀  Major bump → new version will be: $major.$minor.$patch"
-    ;;
-  --build|"")
-    (( patch++ ))
-    echo "🔨  Patch bump → new version will be: $major.$minor.$patch"
-    ;;
-  *)
-    echo "❓ Usage: $0 [--build|--patch|--version]"
-    exit 1
-    ;;
+  --patch)   (( minor++ )); patch=0 ;;
+  --version) (( major++ )); minor=0; patch=0 ;;
+  --build|"" ) (( patch++ )) ;;
+  *) echo "Usage: $0 [--build|--patch|--version]"; exit 1 ;;
 esac
 
 new_version="${major}.${minor}.${patch}"
+echo "📈 Bumped → $new_version"
+echo $new_version >| $VERSION_FILE
+echo "✅ Wrote $VERSION_FILE"
 
-# 💾 Write new version to file
-echo "$new_version" >| "$VERSION_FILE"
-echo "✅  Updated $VERSION_FILE → $new_version"
-
-# 🛠️ commit_submodule: add, commit, push & tag in each submodule repo
-commit_submodule() {
-  local dir="$1"
-  local tag="v${new_version}"
-
-  echo "\n🔄 Processing submodule: $dir"
-
-  # commit changes
-  git -C "$dir" add .
-  git -C "$dir" commit -m "$tag" || echo "⚠️  No changes in $dir"
-
-  # push main branch
-  git -C "$dir" push origin HEAD:main --force \
-    && echo "✅  Pushed main→origin/main in $dir"
-
-  # push dev branch if it exists remotely
-  if git -C "$dir" ls-remote --exit-code --heads origin dev &>/dev/null; then
-    git -C "$dir" push origin HEAD:dev --force \
-      && echo "✅  Pushed main→origin/dev in $dir"
-  else
-    echo "⚠️  No remote 'dev' branch in $dir, skipped dev push"
-  fi
-
-  # tag and push tag
-  if ! git -C "$dir" rev-parse "refs/tags/$tag" >/dev/null 2>&1; then
-    git -C "$dir" tag -s "$tag" -m "$tag" \
-      && echo "🏷  Created signed tag $tag in $dir"
-    git -C "$dir" push origin "$tag" \
-      && echo "✅  Pushed tag $tag in $dir"
-  else
-    echo "⚠️  Tag $tag already exists in $dir, skipping"
-  fi
-
-  echo "🎉  Done submodule $dir"
-}
-
-# 🔄 Update & tag each submodule in sequence
-
+# ──────────────────────────────────────────────────────────────────────────────
 # 1) Ava.Shared
-if [[ -f "$SHARED_VERSION_FILE" ]]; then
-  echo "\n---\n⚙️  Updating Ava.Shared version"
-  sed -i -E "s#(ClientVersion *= *\")[^\"]*(\";)#\1${new_version}\2#" "$SHARED_VERSION_FILE"
-  cp "$VERSION_FILE" "$SHARED_DIR/$VERSION_FILE"
-  commit_submodule "$SHARED_DIR"
+if [[ -f $SHARED_VERSION_FILE ]]; then
+  echo "\n---\n⚙️  Ava.Shared"
+  sed -i -E 's#(ClientVersion *= *")[^"]*(";)#\1'"$new_version"'\2#' "$SHARED_VERSION_FILE"
+  echo "  ✏️ Updated $SHARED_VERSION_FILE"
+  cp $VERSION_FILE "$SHARED_DIR/$VERSION_FILE"
+
+  echo "  🔄 Commit & push Ava.Shared"
+  pushd "$SHARED_DIR" >/dev/null
+    git add .
+    git commit -m "v${new_version}" || echo "  ⚠️ no changes"
+    git push origin HEAD:main --force
+    if git ls-remote --exit-code --heads origin dev &>/dev/null; then
+      git push origin HEAD:dev --force
+    fi
+    if ! git rev-parse "refs/tags/v${new_version}" &>/dev/null; then
+      git tag -s "v${new_version}" -m "v${new_version}"
+      git push origin "v${new_version}"
+    fi
+  popd >/dev/null
+  echo "  🎉 Ava.Shared done"
 fi
 
+# ──────────────────────────────────────────────────────────────────────────────
 # 2) Ava.API submodule
-if [[ -f "$API_DOCKERFILE_SUB" ]]; then
-  echo "\n---\n⚙️  Updating Ava.API Dockerfile"
-  sed -i -E "s#^LABEL version=\"[^\"]*\"#LABEL version=\"${new_version}\"#" "$API_DOCKERFILE_SUB"
-  cp "$VERSION_FILE" "$API_DIR/$VERSION_FILE"
-  commit_submodule "$API_DIR"
+if [[ -f $API_DOCKERFILE_SUB ]]; then
+  echo "\n---\n⚙️  Ava.API"
+  sed -i -E 's#^LABEL version="[^"]*"#LABEL version="'"$new_version"'"#' "$API_DOCKERFILE_SUB"
+  echo "  ✏️ Updated $API_DOCKERFILE_SUB"
+  cp $VERSION_FILE "$API_DIR/$VERSION_FILE"
+
+  echo "  🔄 Commit & push Ava.API"
+  pushd "$API_DIR" >/dev/null
+    git add .
+    git commit -m "v${new_version}" || echo "  ⚠️ no changes"
+    git push origin HEAD:main --force
+    if git ls-remote --exit-code --heads origin dev &>/dev/null; then
+      git push origin HEAD:dev --force
+    fi
+    if ! git rev-parse "refs/tags/v${new_version}" &>/dev/null; then
+      git tag -s "v${new_version}" -m "v${new_version}"
+      git push origin "v${new_version}"
+    fi
+  popd >/dev/null
+  echo "  🎉 Ava.API done"
 fi
 
-# 3) Local Dockerfile.API (no commit)
-if [[ -f "$API_DOCKERFILE_LOCAL" ]]; then
-  echo "\n---\n⚙️  Updating local Dockerfile.API"
-  sed -i -E "s#^LABEL version=\"[^\"]*\"#LABEL version=\"${new_version}\"#" "$API_DOCKERFILE_LOCAL"
+# ──────────────────────────────────────────────────────────────────────────────
+# 3) Local Dockerfile.API only
+if [[ -f $API_DOCKERFILE_LOCAL ]]; then
+  echo "\n---\n⚙️  local Dockerfile.API"
+  sed -i -E 's#^LABEL version="[^"]*"#LABEL version="'"$new_version"'"#' "$API_DOCKERFILE_LOCAL"
+  echo "  🎉 Updated local Dockerfile.API"
 fi
 
+# ──────────────────────────────────────────────────────────────────────────────
 # 4) ava.api.docker
-if [[ -f "$API_COMPOSE_FILE" ]]; then
-  echo "\n---\n⚙️  Updating compose.yaml"
-  sed -i -E "s#(repasscloud/ava-api:).*#\1${new_version}#" "$API_COMPOSE_FILE"
-  cp "$VERSION_FILE" "$API_DOCKER_DIR/$VERSION_FILE"
-  commit_submodule "$API_DOCKER_DIR"
+if [[ -f $API_COMPOSE_FILE ]]; then
+  echo "\n---\n⚙️  ava.api.docker"
+  sed -i -E 's#(repasscloud/ava-api:).*#\1'"$new_version"'#' "$API_COMPOSE_FILE"
+  echo "  ✏️ Updated $API_COMPOSE_FILE"
+  cp $VERSION_FILE "$API_DOCKER_DIR/$VERSION_FILE"
+
+  echo "  🔄 Commit & push ava.api.docker"
+  pushd "$API_DOCKER_DIR" >/dev/null
+    git add .
+    git commit -m "v${new_version}" || echo "  ⚠️ no changes"
+    git push origin HEAD:main --force
+    if git ls-remote --exit-code --heads origin dev &>/dev/null; then
+      git push origin HEAD:dev --force
+    fi
+    if ! git rev-parse "refs/tags/v${new_version}" &>/dev/null; then
+      git tag -s "v${new_version}" -m "v${new_version}"
+      git push origin "v${new_version}"
+    fi
+  popd >/dev/null
+  echo "  🎉 ava.api.docker done"
 fi
 
+# ──────────────────────────────────────────────────────────────────────────────
 # 5) ava.deploy.docker
-cp "$VERSION_FILE" "$DEPLOY_DOCKER_DIR/$VERSION_FILE"
-commit_submodule "$DEPLOY_DOCKER_DIR"
+echo "\n---\n⚙️  ava.deploy.docker"
+cp $VERSION_FILE "$DEPLOY_DOCKER_DIR/$VERSION_FILE"
 
+echo "  🔄 Commit & push ava.deploy.docker"
+pushd "$DEPLOY_DOCKER_DIR" >/dev/null
+  git add .
+  git commit -m "v${new_version}" || echo "  ⚠️ no changes"
+  git push origin HEAD:main --force
+  if git ls-remote --exit-code --heads origin dev &>/dev/null; then
+    git push origin HEAD:dev --force
+  fi
+  if ! git rev-parse "refs/tags/v${new_version}" &>/dev/null; then
+    git tag -s "v${new_version}" -m "v${new_version}"
+    git push origin "v${new_version}"
+  fi
+popd >/dev/null
+echo "  🎉 ava.deploy.docker done"
+
+# ──────────────────────────────────────────────────────────────────────────────
 # 6) ava.terminal3
-if [[ -f "$TERM3_VERSION_FILE" ]]; then
-  echo "\n---\n⚙️  Updating Ava.Terminal3 version"
-  sed -i -E "s#(VersionInfo *= *\")[^\"]*(\";)#\1${new_version}\2#" "$TERM3_VERSION_FILE"
-  cp "$VERSION_FILE" "$TERM3_DIR/$VERSION_FILE"
-  commit_submodule "$TERM3_DIR"
+if [[ -f $TERM3_VERSION_FILE ]]; then
+  echo "\n---\n⚙️  ava.terminal3"
+  sed -i -E 's#(VersionInfo *= *")[^"]*(";)#\1'"$new_version"'\2#' "$TERM3_VERSION_FILE"
+  echo "  ✏️ Updated $TERM3_VERSION_FILE"
+  cp $VERSION_FILE "$TERM3_DIR/$VERSION_FILE"
+
+  echo "  🔄 Commit & push ava.terminal3"
+  pushd "$TERM3_DIR" >/dev/null
+    git add .
+    git commit -m "v${new_version}" || echo "  ⚠️ no changes"
+    git push origin HEAD:main --force
+    if git ls-remote --exit-code --heads origin dev &>/dev/null; then
+      git push origin HEAD:dev --force
+    fi
+    if ! git rev-parse "refs/tags/v${new_version}" &>/dev/null; then
+      git tag -s "v${new_version}" -m "v${new_version}"
+      git push origin "v${new_version}"
+    fi
+  popd >/dev/null
+  echo "  🎉 ava.terminal3 done"
 fi
 
-# ⭐ Final root commit & tag — only after all submodules are done
-echo "\n---\n🔄 Finalizing root repository"
+# ──────────────────────────────────────────────────────────────────────────────
+# ⭐ Final root commit & tag
+echo "\n---\n🔄 Finalizing root repo"
 git add .
-git commit -m "v${new_version}" || echo "⚠️  No root changes"
-git push origin HEAD:main --force && echo "✅  Root pushed to main"
-git push origin HEAD:dev --force  && echo "✅  Root pushed to dev"
+git commit -m "v${new_version}" || echo "⚠️ no root changes"
+git push origin HEAD:main --force
+git push origin HEAD:dev --force
 
-# tag and push root
 root_tag="v${new_version}"
-if ! git rev-parse "refs/tags/$root_tag" >/dev/null 2>&1; then
-  git tag -s "$root_tag" -m "$root_tag" && echo "🏷  Tagged root $root_tag"
-  git push origin "$root_tag"               && echo "✅  Pushed root tag $root_tag"
-else
-  echo "⚠️  Root tag $root_tag already exists—skipping"
+if ! git rev-parse "refs/tags/$root_tag" &>/dev/null; then
+  git tag -s "$root_tag" -m "$root_tag"
+  git push origin "$root_tag"
 fi
 
-echo "\n🎉 All done! Ava is now at $new_version"
+echo "\n🎉 All done! Ava is now at v${new_version}"
