@@ -77,18 +77,21 @@ commit_submodule() {
   git push origin HEAD:main --force \
     && echo "✅  Pushed main → origin/main in $dir"
 
-  # only force‐push to dev if it already exists
+  # only force-push to dev if it exists remotely
   if git ls-remote --exit-code --heads origin dev &>/dev/null; then
-    git push origin HEAD:dev --force \
-      && echo "✅  Pushed main → origin/dev in $dir"
+    git push origin HEAD:dev --force && \
+      echo "✅  Pushed main → origin/dev in $dir"
   else
     echo "⚠️  Remote 'dev' branch not found in $dir—skipping dev push"
   fi
 
-  # signed tag
-  git tag -s "v${new_version}" -m "v${new_version}" \
-    && echo "🏷  Created signed tag v${new_version} in ${dir}" \
-    || echo "⚠️  Tag v${new_version} already exists in ${dir}"
+  # create signed tag if it doesn't exist
+  if ! git rev-parse "refs/tags/v${new_version}" >/dev/null 2>&1; then
+    git tag -s "v${new_version}" -m "v${new_version}" && \
+      echo "🏷  Created signed tag v${new_version} in $dir"
+  else
+    echo "⚠️  Tag v${new_version} already exists in $dir"
+  fi
 
   git push --tags \
     && echo "✅  Pushed tags in $dir"
