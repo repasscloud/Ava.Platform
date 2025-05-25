@@ -1,26 +1,28 @@
 [submodule "ava.api.docker"]
 	path = ava.api.docker
 	url = git@github.com:repasscloud/ava.api.docker.git
+	branch = main
 [submodule "dotnet-sdk-preloaded"]
 	path = dotnet-sdk-preloaded
 	url = git@github.com:repasscloud/dotnet-sdk-preloaded.git
-	branch = dev
+	branch = main
 [submodule "ava.doks.docker"]
 	path = ava.doks.docker
 	url = git@github.com:repasscloud/ava.doks.docker.git
-	branch = dev
+	branch = main
 [submodule "ava.deploy.docker"]
 	path = ava.deploy.docker
 	url = git@github.com:repasscloud/ava.deploy.docker.git
-	branch = dev
+	branch = main
 [submodule "ava.terminal3"]
 	path = ava.terminal3
 	url = git@github.com:repasscloud/ava.terminal3.git
-	branch = dev
+	branch = main
 [submodule "ava.shared"]
 	path = ava.shared
 	url = git@github.com:repasscloud/ava.shared.git
+	branch = main
 [submodule "ava.api"]
 	path = ava.api
-	url = git@github.com:danijeljw-RPC/ava.api.git
-	branch = dev
+	url = git@github.com:repasscloud/ava.api.git
+	branch = main

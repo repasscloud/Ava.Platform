@@ -1,0 +1,28 @@
+name: .NET CI Build
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+          path: Ava.Shared
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: Ava.Shared
+    - name: Build
+      run: dotnet build --no-restore
+      working-directory: Ava.Shared
+    - name: Build the Docker image
+      run: docker build . --file Ava.Shared/Dockerfile --tag ava.shared:$(date +%s)

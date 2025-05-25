@@ -10,8 +10,11 @@ jobs:
     name: 🛠️ Build & Push amd64
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout Code
+      - name: 📥 Checkout Code (with submodules)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
 
       - name: 🗂️ Set Release ID
         run: echo "RELEASE_ID=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
