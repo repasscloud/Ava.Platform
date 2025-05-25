@@ -93,63 +93,67 @@ commit_submodule() {
     echo "⚠️  Tag $tag already exists in $dir, skipping"
   fi
 
-  popd > /dev/null
   echo "🎉  Done submodule $dir"
 }
 
-# 🔄 Update & tag each submodule
-[[ -f "$SHARED_VERSION_FILE" ]] && {
+# 🔄 Update & tag each submodule in sequence
+
+# 1) Ava.Shared
+if [[ -f "$SHARED_VERSION_FILE" ]]; then
   echo "\n---\n⚙️  Updating Ava.Shared version"
   sed -i -E "s#(ClientVersion *= *\")[^\"]*(\";)#\1${new_version}\2#" "$SHARED_VERSION_FILE"
   cp "$VERSION_FILE" "$SHARED_DIR/$VERSION_FILE"
   commit_submodule "$SHARED_DIR"
-}
+fi
 
-[[ -f "$API_DOCKERFILE_SUB" ]] && {
+# 2) Ava.API submodule
+if [[ -f "$API_DOCKERFILE_SUB" ]]; then
   echo "\n---\n⚙️  Updating Ava.API Dockerfile"
   sed -i -E "s#^LABEL version=\"[^\"]*\"#LABEL version=\"${new_version}\"#" "$API_DOCKERFILE_SUB"
   cp "$VERSION_FILE" "$API_DIR/$VERSION_FILE"
   commit_submodule "$API_DIR"
-}
+fi
 
-[[ -f "$API_DOCKERFILE_LOCAL" ]] && {
+# 3) Local Dockerfile.API (no commit)
+if [[ -f "$API_DOCKERFILE_LOCAL" ]]; then
   echo "\n---\n⚙️  Updating local Dockerfile.API"
   sed -i -E "s#^LABEL version=\"[^\"]*\"#LABEL version=\"${new_version}\"#" "$API_DOCKERFILE_LOCAL"
-}
+fi
 
-[[ -f "$API_COMPOSE_FILE" ]] && {
+# 4) ava.api.docker
+if [[ -f "$API_COMPOSE_FILE" ]]; then
   echo "\n---\n⚙️  Updating compose.yaml"
   sed -i -E "s#(repasscloud/ava-api:).*#\1${new_version}#" "$API_COMPOSE_FILE"
   cp "$VERSION_FILE" "$API_DOCKER_DIR/$VERSION_FILE"
   commit_submodule "$API_DOCKER_DIR"
-}
+fi
 
-# 🚚 Deploy-docker
+# 5) ava.deploy.docker
 cp "$VERSION_FILE" "$DEPLOY_DOCKER_DIR/$VERSION_FILE"
 commit_submodule "$DEPLOY_DOCKER_DIR"
 
-# 🖥️ Terminal3
-[[ -f "$TERM3_VERSION_FILE" ]] && {
+# 6) ava.terminal3
+if [[ -f "$TERM3_VERSION_FILE" ]]; then
   echo "\n---\n⚙️  Updating Ava.Terminal3 version"
   sed -i -E "s#(VersionInfo *= *\")[^\"]*(\";)#\1${new_version}\2#" "$TERM3_VERSION_FILE"
   cp "$VERSION_FILE" "$TERM3_DIR/$VERSION_FILE"
   commit_submodule "$TERM3_DIR"
-}
-
-# ⭐ Final root commit & tag
-
-echo "\n---\n🔄 Finalizing root repository"
- git add .
- git commit -m "v${new_version}" || echo "⚠️  No root changes"
- git push origin HEAD:main --force && echo "✅  Root pushed to main"
- git push origin HEAD:dev --force && echo "✅  Root pushed to dev"
-
-if ! git rev-parse "refs/tags/v${new_version}" >/dev/null 2>&1; then
-  git tag -s "v${new_version}" -m "v${new_version}" && echo "🏷  Tagged root v${new_version}"
-  git push origin "v${new_version}" && echo "✅  Root tag pushed"
-else
-  echo "⚠️  Root tag v${new_version} already exists—skipping"
 fi
 
-echo "\n🎉 All done! Ava is now at v${new_version}"
+# ⭐ Final root commit & tag — only after all submodules are done
+echo "\n---\n🔄 Finalizing root repository"
+git add .
+git commit -m "v${new_version}" || echo "⚠️  No root changes"
+git push origin HEAD:main --force && echo "✅  Root pushed to main"
+git push origin HEAD:dev --force  && echo "✅  Root pushed to dev"
 
+# tag and push root
+root_tag="v${new_version}"
+if ! git rev-parse "refs/tags/$root_tag" >/dev/null 2>&1; then
+  git tag -s "$root_tag" -m "$root_tag" && echo "🏷  Tagged root $root_tag"
+  git push origin "$root_tag"               && echo "✅  Pushed root tag $root_tag"
+else
+  echo "⚠️  Root tag $root_tag already exists—skipping"
+fi
+
+echo "\n🎉 All done! Ava is now at $new_version"
