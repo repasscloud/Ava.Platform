@@ -94,26 +94,26 @@ commit_submodule() {
 # 🔄 Update & tag each submodule
 [[ -f "$SHARED_VERSION_FILE" ]] && {
   echo "\n---\n⚙️  Updating Ava.Shared version"
-  sed -i -E 's:(ClientVersion *= *")[^"]*(";):\1${new_version}\2:' "$SHARED_VERSION_FILE"
+  sed -i -E "s#(ClientVersion *= *\")[^\"]*(\";)#\1${new_version}\2#" "$SHARED_VERSION_FILE"
   cp "$VERSION_FILE" "$SHARED_DIR/$VERSION_FILE"
   commit_submodule "$SHARED_DIR"
 }
 
 [[ -f "$API_DOCKERFILE_SUB" ]] && {
   echo "\n---\n⚙️  Updating Ava.API Dockerfile"
-  sed -i -E 's#^LABEL version="[^"]*"#LABEL version="${new_version}"#' "$API_DOCKERFILE_SUB"
+  sed -i -E "s#^LABEL version=\"[^\"]*\"#LABEL version=\"${new_version}\"#" "$API_DOCKERFILE_SUB"
   cp "$VERSION_FILE" "$API_DIR/$VERSION_FILE"
   commit_submodule "$API_DIR"
 }
 
 [[ -f "$API_DOCKERFILE_LOCAL" ]] && {
   echo "\n---\n⚙️  Updating local Dockerfile.API"
-  sed -i -E 's#^LABEL version="[^"]*"#LABEL version="${new_version}"#' "$API_DOCKERFILE_LOCAL"
+  sed -i -E "s#^LABEL version=\"[^\"]*\"#LABEL version=\"${new_version}\"#" "$API_DOCKERFILE_LOCAL"
 }
 
 [[ -f "$API_COMPOSE_FILE" ]] && {
   echo "\n---\n⚙️  Updating compose.yaml"
-  sed -i -E 's#(repasscloud/ava-api:).*#\1${new_version}#' "$API_COMPOSE_FILE"
+  sed -i -E "s#(repasscloud/ava-api:).*#\1${new_version}#" "$API_COMPOSE_FILE"
   cp "$VERSION_FILE" "$API_DOCKER_DIR/$VERSION_FILE"
   commit_submodule "$API_DOCKER_DIR"
 }
@@ -125,7 +125,7 @@ commit_submodule "$DEPLOY_DOCKER_DIR"
 # 🖥️ Terminal3
 [[ -f "$TERM3_VERSION_FILE" ]] && {
   echo "\n---\n⚙️  Updating Ava.Terminal3 version"
-  sed -i -E 's:(VersionInfo *= *")[^"]*(";):\1${new_version}\2:' "$TERM3_VERSION_FILE"
+  sed -i -E "s#(VersionInfo *= *\")[^\"]*(\";)#\1${new_version}\2#" "$TERM3_VERSION_FILE"
   cp "$VERSION_FILE" "$TERM3_DIR/$VERSION_FILE"
   commit_submodule "$TERM3_DIR"
 }
@@ -146,3 +146,4 @@ else
 fi
 
 echo "\n🎉 All done! Ava is now at v${new_version}"
+
