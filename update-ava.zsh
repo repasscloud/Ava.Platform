@@ -80,99 +80,69 @@ commit_submodule() {
     echo "⚠️  No remote dev branch in $dir, skipped dev push"
   fi
 
-  # create signed tag if it doesn't exist
   if ! git rev-parse "refs/tags/v${new_version}" >/dev/null 2>&1; then
-    git tag -s "v${new_version}" -m "v${new_version}" && \
-      echo "🏷  Created signed tag v${new_version} in $dir"
+    git tag -s "v${new_version}" -m "v${new_version}" && echo "🏷  Tagged v${new_version} in $dir"
+    git push origin "v${new_version}" && echo "✅  Pushed tag v${new_version} in $dir"
   else
     echo "⚠️  Tag v${new_version} already exists in $dir"
   fi
 
-  git push --tags \
-    && echo "✅  Pushed tags in $dir"
-
   popd > /dev/null
-  echo "🎉  Done with submodule $dir"
+  echo "🎉  Done submodule $dir"
 }
 
-# 🧩 Update ava.shared
-if [[ -f "$SHARED_VERSION_FILE" ]]; then
-  echo "🔄  Updating version in $SHARED_VERSION_FILE"
-  sed -i -E \
-    's#(public static string ClientVersion *= *")[^"]*(";)#\1'"${new_version}"'\2#' \
-    "$SHARED_VERSION_FILE"
-  echo "✅  Updated shared version → $new_version"
+# 🔄 Update & tag each submodule
+[[ -f "$SHARED_VERSION_FILE" ]] && {
+  echo "\n---\n⚙️  Updating Ava.Shared version"
+  sed -i -E 's:(ClientVersion *= *")[^"]*(";):\1${new_version}\2:' "$SHARED_VERSION_FILE"
   cp "$VERSION_FILE" "$SHARED_DIR/$VERSION_FILE"
   commit_submodule "$SHARED_DIR"
-else
-  echo "⚠️  $SHARED_VERSION_FILE not found—skipping shared submodule"
-fi
+}
 
-# 🐙 Update ava.api Dockerfile in submodule
-if [[ -f "$API_DOCKERFILE_SUB" ]]; then
-  echo "🔄  Updating LABEL version in $API_DOCKERFILE_SUB"
-  sed -i -E \
-    's#^LABEL[[:space:]]*version="[^"]*"#LABEL version="'"${new_version}"'"#' \
-    "$API_DOCKERFILE_SUB"
-  echo "✅  Updated API submodule Dockerfile version → $new_version"
+[[ -f "$API_DOCKERFILE_SUB" ]] && {
+  echo "\n---\n⚙️  Updating Ava.API Dockerfile"
+  sed -i -E 's#^LABEL version="[^"]*"#LABEL version="${new_version}"#' "$API_DOCKERFILE_SUB"
   cp "$VERSION_FILE" "$API_DIR/$VERSION_FILE"
   commit_submodule "$API_DIR"
-else
-  echo "⚠️  $API_DOCKERFILE_SUB not found—skipping API submodule"
-fi
+}
 
-# 🐳 Update local Dockerfile.API
-if [[ -f "$API_DOCKERFILE_LOCAL" ]]; then
-  echo "🔄  Updating LABEL version in local $API_DOCKERFILE_LOCAL"
-  sed -i -E \
-    's#^LABEL[[:space:]]*version="[^"]*"#LABEL version="'"${new_version}"'"#' \
-    "$API_DOCKERFILE_LOCAL"
-  echo "✅  Updated local Dockerfile.API version → $new_version"
-else
-  echo "⚠️  $API_DOCKERFILE_LOCAL not found—skipping local Dockerfile"
-fi
+[[ -f "$API_DOCKERFILE_LOCAL" ]] && {
+  echo "\n---\n⚙️  Updating local Dockerfile.API"
+  sed -i -E 's#^LABEL version="[^"]*"#LABEL version="${new_version}"#' "$API_DOCKERFILE_LOCAL"
+}
 
-# 🐳 Update ava.api.docker compose.yaml
-if [[ -f "$API_COMPOSE_FILE" ]]; then
-  echo "🔄  Updating image tag in $API_COMPOSE_FILE"
-  sed -i -E "s#(image:[[:space:]]*repasscloud/ava-api:).*#\1${new_version}#" "$API_COMPOSE_FILE"
-  echo "✅  Updated compose image → repasscloud/ava-api:${new_version}"
+[[ -f "$API_COMPOSE_FILE" ]] && {
+  echo "\n---\n⚙️  Updating compose.yaml"
+  sed -i -E 's#(repasscloud/ava-api:).*#\1${new_version}#' "$API_COMPOSE_FILE"
   cp "$VERSION_FILE" "$API_DOCKER_DIR/$VERSION_FILE"
   commit_submodule "$API_DOCKER_DIR"
-else
-  echo "⚠️  $API_COMPOSE_FILE not found—skipping compose update"
-fi
+}
 
-# 🚚 Update ava.deploy.docker
-echo "🔄  Sync version file to $DEPLOY_DOCKER_DIR"
+# 🚚 Deploy-docker
 cp "$VERSION_FILE" "$DEPLOY_DOCKER_DIR/$VERSION_FILE"
-echo "✅  Copied version file to deploy-docker submodule"
 commit_submodule "$DEPLOY_DOCKER_DIR"
 
-# 🖥️ Update ava.terminal3 version
-if [[ -f "$TERM3_VERSION_FILE" ]]; then
-  echo "🔄  Updating version in $TERM3_VERSION_FILE"
-  sed -i -E \
-    's#(public static readonly string VersionInfo *= *")[^"]*(";)#\1'"${new_version}"'\2#' \
-    "$TERM3_VERSION_FILE"
-  echo "✅  Updated terminal3 version → $new_version"
+# 🖥️ Terminal3
+[[ -f "$TERM3_VERSION_FILE" ]] && {
+  echo "\n---\n⚙️  Updating Ava.Terminal3 version"
+  sed -i -E 's:(VersionInfo *= *")[^"]*(";):\1${new_version}\2:' "$TERM3_VERSION_FILE"
   cp "$VERSION_FILE" "$TERM3_DIR/$VERSION_FILE"
   commit_submodule "$TERM3_DIR"
+}
+
+# ⭐ Final root commit & tag
+
+echo "\n---\n🔄 Finalizing root repository"
+ git add .
+ git commit -m "v${new_version}" || echo "⚠️  No root changes"
+ git push origin HEAD:main --force && echo "✅  Root pushed to main"
+ git push origin HEAD:dev --force && echo "✅  Root pushed to dev"
+
+if ! git rev-parse "refs/tags/v${new_version}" >/dev/null 2>&1; then
+  git tag -s "v${new_version}" -m "v${new_version}" && echo "🏷  Tagged root v${new_version}"
+  git push origin "v${new_version}" && echo "✅  Root tag pushed"
 else
-  echo "⚠️  $TERM3_VERSION_FILE not found—skipping terminal3 submodule"
+  echo "⚠️  Root tag v${new_version} already exists—skipping"
 fi
 
-# ⭐ Finalize in root repo
-echo "🔄  Committing root version bump"
-# commit root changes
-git add .
-git commit -m "v${new_version}" || echo "⚠️  No root changes to commit"
-git push origin HEAD:main --force
-git push origin main:dev --force
-
-# 🏷 Tag and push root
-echo "🏷  Creating signed tag v${new_version}"
-git tag -s "v${new_version}" -m "v${new_version}"
-git push origin "v${new_version}"
-
-echo "🎉  All done! Ava version is now v${new_version}"
+echo "\n🎉 All done! Ava is now at v${new_version}"
