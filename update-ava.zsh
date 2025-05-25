@@ -33,18 +33,15 @@ current_version="$(< "$VERSION_FILE")"
 echo "🔎  Current Ava version: $current_version"
 IFS='.' read -r major minor patch <<< "$current_version"
 
-# 🔧 Bump logic\ nmode for build, patch or version bump
+# 🔧 Bump logic: --build (patch), --patch (minor+1, reset patch), --version (major+1, reset others)
 mode="${1:---build}"
 case "$mode" in
   --patch)
-    (( minor++ ))
-    patch=0
+    (( minor++ )); patch=0
     echo "⚙️  Minor bump → new version will be: $major.$minor.$patch"
     ;;
   --version)
-    (( major++ ))
-    minor=0
-    patch=0
+    (( major++ )); minor=0; patch=0
     echo "🚀  Major bump → new version will be: $major.$minor.$patch"
     ;;
   --build|"")
@@ -63,28 +60,37 @@ new_version="${major}.${minor}.${patch}"
 echo "$new_version" >| "$VERSION_FILE"
 echo "✅  Updated $VERSION_FILE → $new_version"
 
-# 🛠️ commit_submodule function to add, commit, push & tag
+# 🛠️ commit_submodule: add, commit, push & tag in each submodule repo
 commit_submodule() {
   local dir="$1"
+  local tag="v${new_version}"
+
   echo "\n🔄 Processing submodule: $dir"
-  pushd "$dir" > /dev/null
 
-  git add .
-  git commit -m "v${new_version}" || echo "⚠️  No changes in $dir"
+  # commit changes
+  git -C "$dir" add .
+  git -C "$dir" commit -m "$tag" || echo "⚠️  No changes in $dir"
 
-  git push origin HEAD:main --force && echo "✅  Pushed main to origin/main in $dir"
+  # push main branch
+  git -C "$dir" push origin HEAD:main --force \
+    && echo "✅  Pushed main→origin/main in $dir"
 
-  if git ls-remote --exit-code --heads origin dev &>/dev/null; then
-    git push origin HEAD:dev --force && echo "✅  Pushed main to origin/dev in $dir"
+  # push dev branch if it exists remotely
+  if git -C "$dir" ls-remote --exit-code --heads origin dev &>/dev/null; then
+    git -C "$dir" push origin HEAD:dev --force \
+      && echo "✅  Pushed main→origin/dev in $dir"
   else
-    echo "⚠️  No remote dev branch in $dir, skipped dev push"
+    echo "⚠️  No remote 'dev' branch in $dir, skipped dev push"
   fi
 
-  if ! git rev-parse "refs/tags/v${new_version}" >/dev/null 2>&1; then
-    git tag -s "v${new_version}" -m "v${new_version}" && echo "🏷  Tagged v${new_version} in $dir"
-    git push origin "v${new_version}" && echo "✅  Pushed tag v${new_version} in $dir"
+  # tag and push tag
+  if ! git -C "$dir" rev-parse "refs/tags/$tag" >/dev/null 2>&1; then
+    git -C "$dir" tag -s "$tag" -m "$tag" \
+      && echo "🏷  Created signed tag $tag in $dir"
+    git -C "$dir" push origin "$tag" \
+      && echo "✅  Pushed tag $tag in $dir"
   else
-    echo "⚠️  Tag v${new_version} already exists in $dir"
+    echo "⚠️  Tag $tag already exists in $dir, skipping"
   fi
 
   popd > /dev/null
