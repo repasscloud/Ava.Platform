@@ -36,4 +36,25 @@
     <PackageReference Include="System.Text.Json" Version="9.0.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update=".github\**">
+      <ExcludeFromSourceControl>true</ExcludeFromSourceControl>
+    </None>
+    <None Update=".gitignore">
+      <ExcludeFromSourceControl>true</ExcludeFromSourceControl>
+    </None>
+    <None Update="update_nuget_packages.sh">
+      <ExcludeFromSourceControl>true</ExcludeFromSourceControl>
+    </None>
+    <None Update="ava_version">
+      <ExcludeFromSourceControl>true</ExcludeFromSourceControl>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove=".github\**" />
+    <None Remove=".gitignore;update_nuget_packages.sh;ava_version" />
+    <EmbeddedResource Remove=".github\**" />
+  </ItemGroup>
+
 </Project>

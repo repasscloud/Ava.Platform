@@ -1,0 +1,13 @@
+# .dockerignore
+
+# Ignore build output directories
+bin/
+obj/
+
+# Ignore GitHub workflows and metadata
+.github/
+
+# Ignore miscellaneous files
+.gitignore
+update_nuget_packages.sh
+ava_version
